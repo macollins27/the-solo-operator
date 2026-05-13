@@ -1,0 +1,39 @@
+chapter:
+  number: 37
+  part: 5
+  slug: orchestrator-subagent-gestalt
+  title: "Hero level: the orchestrator + subagent gestalt"
+
+learning_objective: >
+  The student can describe the orchestrator-and-subagent pattern at
+  hero level — how one main session dispatches dozens of subagents to
+  do parallel work, how subagents return structured signals the
+  orchestrator composes, and how the pattern stays auditable without
+  becoming chaos.
+
+prerequisites:
+  chapters_completed:
+    - 36
+  concepts_required:
+    - fork-subagent-inherits-context
+    - fresh-subagent-zero-context
+    - structured-exit-signals
+
+concepts_taught:
+  - orchestrator-dispatches-not-edits
+  - three-dispatch-patterns
+  - mandate-skill-no-escape-hatch
+  - forbidden-modifications-explicit
+  - post-agent-review-discipline
+
+complexity: high
+
+recall_chapters:
+  - 38   # trust calibration
+
+drill:
+  artifact: parts/05-hero-level/06-orchestrator-subagent-gestalt/verify.sh
+  produces:
+    - student/drills/37-orchestrator-gestalt/01-my-pattern.txt
+    - student/drills/37-orchestrator-gestalt/02-parallel-returns.txt
+    - student/drills/37-orchestrator-gestalt/03-dispatch-template.txt

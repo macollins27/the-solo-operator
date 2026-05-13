@@ -1,0 +1,37 @@
+chapter:
+  number: 18
+  part: 2
+  slug: the-anti-pattern-vocabulary
+  title: "The Anti-Pattern Vocabulary"
+
+learning_objective: >
+  The student can name at least 12 of the 20 anti-pattern categories AI
+  agents commonly fall into, and recognize the verbal signals of at
+  least 8 of them in real Claude sessions.
+
+prerequisites:
+  chapters_completed:
+    - 17
+  concepts_required:
+    - operator-as-manager
+    - junior-dev-mental-model
+
+concepts_taught:
+  - twenty-anti-pattern-catalog
+  - recognition-phrase-vocabulary
+  - intervention-pattern
+  - catalog-grows-with-experience
+
+complexity: high
+
+recall_chapters:
+  - 22   # hooks — anti-pattern classifier hook
+  - 32   # hero-level — anti-pattern classifier in production
+  - 43   # Part 6 — adding new patterns to your catalog
+
+drill:
+  artifact: parts/02-mindset/10-the-anti-pattern-vocabulary/verify.sh
+  produces:
+    - student/drills/18-the-anti-pattern-vocabulary/01-spot-them.txt
+    - student/drills/18-the-anti-pattern-vocabulary/02-caught-one.txt
+    - student/drills/18-the-anti-pattern-vocabulary/03-my-redirects.txt

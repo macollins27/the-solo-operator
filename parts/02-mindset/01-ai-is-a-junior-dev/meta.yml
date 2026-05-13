@@ -1,0 +1,40 @@
+chapter:
+  number: 9
+  part: 2
+  slug: ai-is-a-junior-dev
+  title: "AI is a Junior Dev"
+
+learning_objective: >
+  The student can describe Claude as a junior team member (not an
+  oracle, peer, or search engine), and predict what kind of work a
+  junior team member produces well, badly, or not at all without
+  supervision.
+
+prerequisites:
+  chapters_completed:
+    - 8
+  concepts_required:
+    - chat-vs-agent
+    - tool-call-vs-text-summary-truth-hierarchy
+
+concepts_taught:
+  - junior-dev-mental-model
+  - three-wrong-models-oracle-peer-search
+  - operator-as-manager
+  - spec-not-vibes
+  - structure-raises-the-floor
+  - what-junior-cannot-do
+
+complexity: medium
+
+recall_chapters:
+  - 12 # Two-Option Rule — junior-dev framing for failure handling
+  - 19 # CLAUDE.md — encoded standards a manager would set
+  - 32 # hero-level — what structured junior work looks like
+
+drill:
+  artifact: parts/02-mindset/01-ai-is-a-junior-dev/verify.sh
+  produces:
+    - student/drills/09-ai-is-a-junior-dev/01-vague-assumptions.txt
+    - student/drills/09-ai-is-a-junior-dev/02-specific-interaction.txt
+    - student/drills/09-ai-is-a-junior-dev/03-things-id-tell-a-new-hire.txt

@@ -1,0 +1,39 @@
+chapter:
+  number: 17
+  part: 2
+  slug: the-authority-hierarchy
+  title: "The Authority Hierarchy"
+
+learning_objective: >
+  The student can rank the sources of truth in their project from most
+  to least authoritative, and resolve disagreements between sources by
+  picking the higher rank rather than averaging or improvising.
+
+prerequisites:
+  chapters_completed:
+    - 16
+  concepts_required:
+    - spec-as-authority
+    - output-as-defendant
+
+concepts_taught:
+  - five-rank-authority-hierarchy
+  - typed-instructions-as-rank-1
+  - authored-specs-as-rank-2
+  - shipped-artifact-as-rank-3-reality
+  - generated-docs-as-rank-4
+  - ai-intermediate-as-rank-5
+  - promote-decisions-explicitly
+
+complexity: medium
+
+recall_chapters:
+  - 19   # CLAUDE.md — the rank-2 carrier
+  - 32   # hero-level — the mature hierarchy in practice
+
+drill:
+  artifact: parts/02-mindset/09-the-authority-hierarchy/verify.sh
+  produces:
+    - student/drills/17-the-authority-hierarchy/01-my-hierarchy.txt
+    - student/drills/17-the-authority-hierarchy/02-citation-analysis.txt
+    - student/drills/17-the-authority-hierarchy/03-promoted-decision.txt

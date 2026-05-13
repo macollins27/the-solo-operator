@@ -1,0 +1,40 @@
+chapter:
+  number: 24
+  part: 3
+  slug: session-lifecycle
+  title: "The session lifecycle"
+
+learning_objective: >
+  The student can describe the four phases of a Claude Code session,
+  recognize when context is filling up, write a handoff doc that
+  allows a future session to resume work cleanly, and decide when to
+  exit-and-restart vs continue.
+
+prerequisites:
+  chapters_completed:
+    - 23
+  concepts_required:
+    - context-window-finite
+    - conversation-turns
+
+concepts_taught:
+  - session-four-phases
+  - compaction-as-lossy
+  - handoff-doc-shape
+  - exit-vs-continue-tradeoff
+  - commit-before-exit-discipline
+  - claudemd-reads-handoff-pattern
+
+complexity: medium
+
+recall_chapters:
+  - 35   # multi-session orchestration patterns
+  - 43   # Part 6 — long-running operator workflows
+
+drill:
+  artifact: parts/03-mechanics/06-session-lifecycle/verify.sh
+  produces:
+    - student/state/handoff-*.md
+    - student/drills/24-session-lifecycle/01-handoff-path.txt
+    - student/drills/24-session-lifecycle/02-fresh-orientation.txt
+    - student/drills/24-session-lifecycle/03-claudemd-update.txt

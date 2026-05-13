@@ -1,5 +1,7 @@
 # The Solo Operator's Manual
 
+> Authored by **Maxwell Collins**. Source repo: `https://github.com/macollins27/the-solo-operator`. MIT-licensed (see `LICENSE`). Free to fork, modify, and deploy for your own use.
+
 A self-paced course that teaches you to operate AI as an engineering team. The result: you can produce software at acquisition-grade quality, with one operator (you) running 20-40 agents instead of hiring 20-40 engineers.
 
 This is the **only** page in the course you'll read by yourself. Everything else is taught by an AI tutor that lives in this repo. You install some tools, fork this repo, type a few commands, and your tutor takes it from there. The tutor walks you through every concept, every exercise, and every line of code you'll write.
@@ -237,7 +239,7 @@ Your tutor (Claude) reads where you left off, opens the active chapter, and walk
 
 You can stop at any time. The next time you run `claude` and type "teach me," you pick up exactly where you left off.
 
-There are 50 chapters across 6 parts. You don't have to finish them all. Each chapter you complete makes you a better operator than you were before.
+There are 44 chapters across 6 parts (plus a Part 0 orientation). You don't have to finish them all. Each chapter you complete makes you a better operator than you were before.
 
 ---
 

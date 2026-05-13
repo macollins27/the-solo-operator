@@ -1,0 +1,39 @@
+chapter:
+  number: 28
+  part: 4
+  slug: event-rsvp
+  title: "Practice: Event creation and RSVP"
+
+learning_objective: >
+  The student ships event creation and RSVP for MembershipKit: an
+  admin creates an event with date, time, and capacity; members can
+  RSVP yes/no/maybe; the system shows a roster and prevents
+  over-capacity.
+
+prerequisites:
+  chapters_completed:
+    - 27
+  concepts_required:
+    - feature-build-discipline-loop
+    - atomic-claim-via-update-with-predicate
+
+concepts_taught:
+  - timestamptz-utc-storage
+  - enum-or-check-constraint-for-status
+  - capacity-with-select-for-update
+  - upsert-on-conflict-pattern
+  - timezone-display-vs-storage
+
+complexity: high
+
+recall_chapters:
+  - 29   # real-time checkin builds on this
+  - 32   # hero-level — date/time ast-grep rules
+
+drill:
+  artifact: parts/04-practice/04-event-rsvp/verify.sh
+  produces:
+    - student/specs/event-rsvp.md
+    - student/drills/28-event-rsvp/01-spec-path.txt
+    - student/drills/28-event-rsvp/02-event-state.png
+    - student/drills/28-event-rsvp/03-timestamp-types.txt

@@ -1,0 +1,37 @@
+chapter:
+  number: 41
+  part: 6
+  slug: supersession-pattern
+  title: "The supersession pattern"
+
+learning_objective: >
+  The student can replace a rule cleanly when their thinking changes —
+  preserving the audit trail of WHY it was replaced, without losing
+  the prior reasoning.
+
+prerequisites:
+  chapters_completed:
+    - 40
+  concepts_required:
+    - never-modify-what-isnt-broken
+    - spec-as-authority
+
+concepts_taught:
+  - supersession-vs-deletion
+  - marker-format-date-successor-reason
+  - preserve-body-not-just-marker
+  - when-to-edit-vs-supersede
+  - specific-reasons-not-vague
+
+complexity: medium
+
+recall_chapters:
+  - 42   # consolidation
+  - 43   # building your system over time
+
+drill:
+  artifact: parts/06-meta-skill/03-supersession-pattern/verify.sh
+  produces:
+    - student/drills/41-supersession-pattern/01-candidate.txt
+    - student/drills/41-supersession-pattern/02-diff.txt
+    - student/drills/41-supersession-pattern/03-reason-sharpening.txt

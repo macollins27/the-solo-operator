@@ -1,0 +1,38 @@
+chapter:
+  number: 14
+  part: 2
+  slug: persistence-over-cleverness
+  title: "Persistence > Cleverness"
+
+learning_objective: >
+  The student can recognize the wind-down framing phrases that signal
+  silent deferral, intervene to keep work moving, and refuse to let
+  time-budget framing make decisions for them or for Claude.
+
+prerequisites:
+  chapters_completed:
+    - 13
+  concepts_required:
+    - two-option-rule
+    - operator-as-manager
+
+concepts_taught:
+  - wind-down-framing-as-failure-mode
+  - real-reasons-to-stop-finite-list
+  - tasks-are-made-of-edits
+  - next-concrete-edit-as-frame
+  - time-estimates-are-invented
+  - reject-estimates-from-claude
+
+complexity: medium
+
+recall_chapters:
+  - 22   # hooks — wind-down phrases get mechanically blocked
+  - 18   # Anti-Pattern Vocabulary — wind-down in the catalog
+
+drill:
+  artifact: parts/02-mindset/06-persistence-over-cleverness/verify.sh
+  produces:
+    - student/drills/14-persistence-over-cleverness/01-claudes-phrase.txt
+    - student/drills/14-persistence-over-cleverness/02-my-own-deferral.txt
+    - student/drills/14-persistence-over-cleverness/03-redirect-result.txt

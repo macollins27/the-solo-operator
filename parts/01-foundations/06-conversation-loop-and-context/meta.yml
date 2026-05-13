@@ -1,0 +1,40 @@
+chapter:
+  number: 6
+  part: 1
+  slug: conversation-loop-and-context
+  title: "The conversation loop and context window"
+
+learning_objective: >
+  The student can describe a Claude Code session as a conversation of
+  alternating turns, explain what a context window is and why it's
+  finite, and recognize when context size is the constraint behind a
+  session's behavior.
+
+prerequisites:
+  chapters_completed:
+    - 5
+  concepts_required:
+    - tool-call-rendering
+    - session-state-is-not-persistent-yet
+
+concepts_taught:
+  - conversation-turns
+  - context-window-finite
+  - what-is-a-token
+  - context-compaction-is-lossy
+  - context-pollution-as-failure-mode
+  - fresh-session-as-tool
+
+complexity: medium
+
+recall_chapters:
+  - 19 # CLAUDE.md as a way to keep load-bearing info in context for free
+  - 22 # hooks — when context-bloat protection becomes mechanical
+  - 24 # session lifecycle deep dive
+
+drill:
+  artifact: parts/01-foundations/06-conversation-loop-and-context/verify.sh
+  produces:
+    - student/drills/06-conversation-loop-and-context/01-my-conversation.txt
+    - student/drills/06-conversation-loop-and-context/02-memory-test.txt
+    - student/drills/06-conversation-loop-and-context/03-session-boundary.txt

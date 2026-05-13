@@ -1,0 +1,38 @@
+chapter:
+  number: 42
+  part: 6
+  slug: consolidation-pattern
+  title: "The consolidation pattern"
+
+learning_objective: >
+  The student can recognize when their feedback corpus has accumulated
+  enough related entries to warrant consolidation, perform a
+  consolidation pass, and preserve the original files as historical
+  evidence.
+
+prerequisites:
+  chapters_completed:
+    - 41
+  concepts_required:
+    - corpus-as-moat
+    - supersession-vs-deletion
+
+concepts_taught:
+  - consolidation-as-quarterly-discipline
+  - four-categories-of-consolidation
+  - synthesis-drop-log
+  - active-surface-vs-full-history
+  - when-to-trigger-consolidation
+
+complexity: medium
+
+recall_chapters:
+  - 43   # building your system over time
+
+drill:
+  artifact: parts/06-meta-skill/04-consolidation-pattern/verify.sh
+  produces:
+    - student/drills/42-consolidation-pattern/01-clusters.txt
+    - student/drills/42-consolidation-pattern/02-consolidated-rule.txt
+    - student/drills/42-consolidation-pattern/03-drop-log-template.txt
+    - student/feedback/SYNTHESIS-DROPPED-TEMPLATE.md

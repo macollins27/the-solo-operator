@@ -1,0 +1,39 @@
+chapter:
+  number: 36
+  part: 5
+  slug: anti-pattern-classifier
+  title: "Hero level: the anti-pattern classifier"
+
+learning_objective: >
+  The student can describe how the anti-pattern classifier hook works
+  architecturally, explain why it uses claude -p with a JSON-schema-
+  enforced response instead of a regex, and recognize the design
+  choices that prevent it from becoming a sycophancy vector itself.
+
+prerequisites:
+  chapters_completed:
+    - 35
+  concepts_required:
+    - twenty-anti-pattern-catalog
+    - what-is-a-hook
+
+concepts_taught:
+  - stop-hook-architecture
+  - claude-p-with-json-schema
+  - editable-catalog-pattern
+  - context-aware-disambiguation
+  - false-positives-cheap-false-negatives-expensive
+  - recursive-fire-guard
+
+complexity: high
+
+recall_chapters:
+  - 41   # skill-iteration for the classifier itself
+
+drill:
+  artifact: parts/05-hero-level/05-anti-pattern-classifier/verify.sh
+  produces:
+    - student/drills/36-anti-pattern-classifier/01-architecture.txt
+    - student/.claude/hooks/anti-pattern-classifier-stub.sh
+    - student/drills/36-anti-pattern-classifier/02-stub-path.txt
+    - student/drills/36-anti-pattern-classifier/03-twenty-first-pattern.txt

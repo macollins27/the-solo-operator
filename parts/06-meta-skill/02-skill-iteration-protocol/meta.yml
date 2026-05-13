@@ -1,0 +1,39 @@
+chapter:
+  number: 40
+  part: 6
+  slug: skill-iteration-protocol
+  title: "The skill iteration protocol"
+
+learning_objective: >
+  The student can explain the 9-step skill-iteration protocol used by
+  mature operators when modifying any working skill, apply it to one
+  skill in their own fork, and recognize the "fixes for shits and
+  giggles" failure mode the protocol prevents.
+
+prerequisites:
+  chapters_completed:
+    - 39
+  concepts_required:
+    - what-is-a-skill
+    - root-cause-vs-bandaid
+
+concepts_taught:
+  - never-modify-what-isnt-broken
+  - nine-step-iteration-protocol
+  - cap-at-three-attempts
+  - articulate-invariants-step
+  - three-test-cases-old-new-working
+  - working-case-test-as-load-bearing
+  - diff-justification-as-audit-trail
+
+complexity: high
+
+recall_chapters:
+  - 41   # supersession pattern
+
+drill:
+  artifact: parts/06-meta-skill/02-skill-iteration-protocol/verify.sh
+  produces:
+    - student/drills/40-skill-iteration-protocol/01-target.txt
+    - student/drills/40-skill-iteration-protocol/02-walkthrough.txt
+    - student/drills/40-skill-iteration-protocol/03-outcome.txt

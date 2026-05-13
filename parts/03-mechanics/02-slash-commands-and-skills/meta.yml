@@ -1,0 +1,39 @@
+chapter:
+  number: 20
+  part: 3
+  slug: slash-commands-and-skills
+  title: "Slash commands and skills"
+
+learning_objective: >
+  The student can list the built-in slash commands, author a simple
+  custom skill in their fork, invoke it inside a session, and explain
+  why a skill is "a workflow you can run by name."
+
+prerequisites:
+  chapters_completed:
+    - 19
+  concepts_required:
+    - what-is-claudemd
+    - operator-as-manager
+
+concepts_taught:
+  - built-in-slash-commands
+  - what-is-a-skill
+  - skill-md-anatomy
+  - frontmatter-name-description
+  - project-vs-user-global-skills
+  - skills-are-protocols-not-essays
+  - anything-done-twice-is-a-skill-candidate
+
+complexity: medium
+
+recall_chapters:
+  - 23   # orchestration patterns calling skills from skills
+  - 32   # hero-level — 20-30 skill family
+
+drill:
+  artifact: parts/03-mechanics/02-slash-commands-and-skills/verify.sh
+  produces:
+    - student/.claude/skills/finish-chapter/SKILL.md
+    - student/drills/20-skills/01-invocation-log.txt
+    - student/drills/20-skills/02-second-skill.txt

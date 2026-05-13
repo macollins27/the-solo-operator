@@ -1,0 +1,39 @@
+chapter:
+  number: 1
+  part: 1
+  slug: what-a-computer-does
+  title: "What a computer actually does"
+
+learning_objective: >
+  The student can name the four parts of a working computer (CPU, RAM,
+  storage, operating system), explain what each one does in their own
+  words using an everyday analogy, and predict where their data goes
+  when they save a file or quit a program.
+
+prerequisites:
+  chapters_completed:
+    - 0
+  concepts_required:
+    - prompting-vs-operating
+
+concepts_taught:
+  - what-is-a-cpu
+  - what-is-ram
+  - what-is-storage
+  - what-is-an-os
+  - what-is-a-file
+  - what-is-a-process
+  - counter-vs-pantry-mental-model
+
+complexity: low
+
+recall_chapters:
+  - 2 # surfaces when introducing the terminal
+  - 19 # surfaces when teaching CLAUDE.md (files on disk)
+
+drill:
+  artifact: parts/01-foundations/01-what-a-computer-does/verify.sh
+  produces:
+    - student/drills/01-what-a-computer-does/01-repo-folder.png
+    - student/drills/01-what-a-computer-does/02-my-files.txt
+    - student/drills/01-what-a-computer-does/03-one-process.txt

@@ -1,0 +1,38 @@
+chapter:
+  number: 33
+  part: 5
+  slug: skill-family
+  title: "Hero level: the skill family"
+
+learning_objective: >
+  The student can describe how 20-30 skills compose into a pipeline at
+  hero level, identify the four roles skills play in a mature system
+  (writing, reviewing, dispatching, recovering), and map their own
+  current skill folder against the pattern.
+
+prerequisites:
+  chapters_completed:
+    - 32
+  concepts_required:
+    - what-is-a-skill
+    - anything-done-twice-is-a-skill-candidate
+
+concepts_taught:
+  - four-skill-roles
+  - skills-compose-into-pipelines
+  - role-separation-as-moat
+  - structured-exit-signals
+  - project-vs-user-vs-plugin-skills
+
+complexity: high
+
+recall_chapters:
+  - 41   # skill-iteration protocol
+  - 35   # multi-agent pipeline
+
+drill:
+  artifact: parts/05-hero-level/02-skill-family/verify.sh
+  produces:
+    - student/drills/33-skill-family/01-skill-roles.txt
+    - student/.claude/skills/review-my-change/SKILL.md
+    - student/drills/33-skill-family/02-pipeline.txt

@@ -1,0 +1,38 @@
+chapter:
+  number: 29
+  part: 4
+  slug: real-time-checkin
+  title: "Practice: Real-time event check-in"
+
+learning_objective: >
+  The student ships a real-time check-in feature for MembershipKit:
+  admins watch a live feed of who's arriving at an event, with each
+  new check-in appearing in their browser within seconds.
+
+prerequisites:
+  chapters_completed:
+    - 28
+  concepts_required:
+    - feature-build-discipline-loop
+    - timestamptz-utc-storage
+
+concepts_taught:
+  - websocket-pub-sub-pattern
+  - soketi-as-self-hosted-pusher
+  - channel-auth-required
+  - websocket-as-best-effort-not-source-of-truth
+  - dont-broadcast-sensitive-fields
+
+complexity: high
+
+recall_chapters:
+  - 30   # AI features and webhook similar pattern
+  - 32   # hero-level — multi-channel architecture
+
+drill:
+  artifact: parts/04-practice/05-real-time-checkin/verify.sh
+  produces:
+    - student/specs/real-time-checkin.md
+    - student/drills/29-real-time-checkin/01-spec-path.txt
+    - student/drills/29-real-time-checkin/02-realtime-update.png
+    - student/drills/29-real-time-checkin/03-channel-auth-test.txt

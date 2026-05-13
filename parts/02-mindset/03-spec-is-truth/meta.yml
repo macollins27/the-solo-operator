@@ -1,0 +1,38 @@
+chapter:
+  number: 11
+  part: 2
+  slug: spec-is-truth
+  title: "Spec is Truth, Output is Defendant"
+
+learning_objective: >
+  The student can name the authority hierarchy of their project (their
+  written intent on top, AI output on the bottom), and refuse to
+  "reconcile" a spec to match what Claude actually produced.
+
+prerequisites:
+  chapters_completed:
+    - 10
+  concepts_required:
+    - operator-as-manager
+    - two-option-rule
+
+concepts_taught:
+  - spec-as-authority
+  - output-as-defendant
+  - drift-as-failure-mode
+  - decision-vs-reconciliation
+  - written-intent-beats-remembered-intent
+
+complexity: medium
+
+recall_chapters:
+  - 13 # Verify the Artifact
+  - 17 # Authority Hierarchy
+  - 19 # CLAUDE.md — operationalizing spec as truth
+
+drill:
+  artifact: parts/02-mindset/03-spec-is-truth/verify.sh
+  produces:
+    - student/drills/11-spec-is-truth/01-feature-spec.md
+    - student/drills/11-spec-is-truth/02-drift-list.md
+    - student/drills/11-spec-is-truth/03-resolution.md

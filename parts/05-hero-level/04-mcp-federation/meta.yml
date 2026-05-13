@@ -1,0 +1,39 @@
+chapter:
+  number: 35
+  part: 5
+  slug: mcp-federation
+  title: "Hero level: the MCP federation"
+
+learning_objective: >
+  The student can describe how a mature project exposes its state
+  through a federation of small MCP servers, name the 6-8 server roles
+  that typically emerge, and explain why "agents query, not read"
+  replaces grep + Read at hero level.
+
+prerequisites:
+  chapters_completed:
+    - 34
+  concepts_required:
+    - what-is-mcp
+    - mcp-federation-pattern
+
+concepts_taught:
+  - six-to-eight-mcp-server-roles
+  - orient-as-first-action
+  - query-before-grep-protocol
+  - federation-as-token-savings
+  - servers-stay-small-and-independent
+  - auto-rebuild-on-file-changes
+
+complexity: high
+
+recall_chapters:
+  - 40   # skill-iteration applies to MCP servers too
+  - 43   # building your own system — MCP servers grow over time
+
+drill:
+  artifact: parts/05-hero-level/04-mcp-federation/verify.sh
+  produces:
+    - student/drills/35-mcp-federation/01-my-federation.txt
+    - student/drills/35-mcp-federation/02-missing-server.txt
+    - student/drills/35-mcp-federation/03-mcp-first.txt

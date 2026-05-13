@@ -1,0 +1,39 @@
+chapter:
+  number: 30
+  part: 4
+  slug: ai-directory-search
+  title: "Practice: AI member-directory search"
+
+learning_objective: >
+  The student ships an AI-powered natural-language search for the
+  member directory: queries like "show me admins who joined in the
+  last month" return the right members, with prompt safety and cost
+  safety built in.
+
+prerequisites:
+  chapters_completed:
+    - 29
+  concepts_required:
+    - feature-build-discipline-loop
+    - what-is-a-tool-call
+
+concepts_taught:
+  - server-side-prompt-construction
+  - wrap-user-input-in-tags-against-injection
+  - authorization-in-sql-not-in-prompt
+  - structured-output-with-json-schema
+  - rate-limit-ai-calls
+  - bounded-output-cap
+
+complexity: high
+
+recall_chapters:
+  - 32   # hero-level — AI feature patterns at scale
+
+drill:
+  artifact: parts/04-practice/06-ai-directory-search/verify.sh
+  produces:
+    - student/specs/ai-directory-search.md
+    - student/drills/30-ai-directory-search/01-spec-path.txt
+    - student/drills/30-ai-directory-search/02-search-working.png
+    - student/drills/30-ai-directory-search/03-injection-attempt.txt

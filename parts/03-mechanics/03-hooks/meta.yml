@@ -1,0 +1,41 @@
+chapter:
+  number: 21
+  part: 3
+  slug: hooks
+  title: "Hooks"
+
+learning_objective: >
+  The student can explain what a hook is, where hooks live, name the
+  four most useful hook events, author a simple hook that blocks a
+  specific bad behavior in their fork, and verify the hook fires when
+  expected.
+
+prerequisites:
+  chapters_completed:
+    - 20
+  concepts_required:
+    - what-is-claudemd
+    - two-option-rule
+
+concepts_taught:
+  - what-is-a-hook
+  - hook-vs-rule-determinism
+  - four-hook-events-pretooluse-posttooluse-stop-sessionstart
+  - hook-structure-stdin-jq-exit-2
+  - alarm-register-structured-output
+  - one-hook-one-purpose
+  - hook-promotion-from-claudemd
+
+complexity: medium
+
+recall_chapters:
+  - 32   # hero-level — anti-pattern classifier hook
+  - 33   # mature hook layer
+
+drill:
+  artifact: parts/03-mechanics/03-hooks/verify.sh
+  produces:
+    - student/.claude/hooks/block-todo-commits.sh
+    - student/.claude/settings.json
+    - student/drills/21-hooks/01-settings.txt
+    - student/drills/21-hooks/02-block-message.txt

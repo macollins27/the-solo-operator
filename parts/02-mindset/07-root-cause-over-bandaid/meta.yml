@@ -1,0 +1,37 @@
+chapter:
+  number: 15
+  part: 2
+  slug: root-cause-over-bandaid
+  title: "Root Cause > Bandaid"
+
+learning_objective: >
+  The student can recognize when Claude is layering defensive code
+  around a symptom instead of finding the cause, and redirect Claude
+  to investigate the underlying mechanism before fixing.
+
+prerequisites:
+  chapters_completed:
+    - 14
+  concepts_required:
+    - two-option-rule
+    - claim-vs-evidence
+
+concepts_taught:
+  - root-cause-vs-bandaid
+  - bandaid-shapes-catalog
+  - mechanism-naming-as-diagnostic
+  - defensive-code-as-failure-mode
+  - try-catch-as-suspicion-signal
+
+complexity: medium
+
+recall_chapters:
+  - 18   # Anti-Pattern Vocabulary — "AI slop / forward-defensive layering"
+  - 22   # hooks — ast-grep rules that catch common bandaid shapes
+
+drill:
+  artifact: parts/02-mindset/07-root-cause-over-bandaid/verify.sh
+  produces:
+    - student/drills/15-root-cause-over-bandaid/01-error.txt
+    - student/drills/15-root-cause-over-bandaid/02-without-guidance.txt
+    - student/drills/15-root-cause-over-bandaid/03-with-rule.txt

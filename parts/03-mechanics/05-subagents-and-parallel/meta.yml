@@ -1,0 +1,40 @@
+chapter:
+  number: 23
+  part: 3
+  slug: subagents-and-parallel
+  title: "Subagents and parallel work"
+
+learning_objective: >
+  The student can describe the difference between a fork subagent and
+  a fresh subagent, predict when each is appropriate, dispatch one of
+  each from their own session, and read the results without polluting
+  their main conversation.
+
+prerequisites:
+  chapters_completed:
+    - 22
+  concepts_required:
+    - conversation-turns
+    - context-window-finite
+
+concepts_taught:
+  - fork-subagent-inherits-context
+  - fresh-subagent-zero-context
+  - when-to-fork-vs-fresh
+  - subagent-output-stays-out-of-context
+  - parallel-diagnostics-pattern
+  - decompose-big-task-pattern
+  - dont-peek-dont-race-verify-return
+
+complexity: high
+
+recall_chapters:
+  - 32   # hero-level — orchestrator-and-subagent gestalt
+  - 35   # multi-agent pipeline
+
+drill:
+  artifact: parts/03-mechanics/05-subagents-and-parallel/verify.sh
+  produces:
+    - student/drills/23-subagents-and-parallel/01-fresh-result.txt
+    - student/drills/23-subagents-and-parallel/02-fork-result.txt
+    - student/drills/23-subagents-and-parallel/03-context-growth.txt

@@ -1,0 +1,43 @@
+chapter:
+  number: 7
+  part: 1
+  slug: reading-tool-calls
+  title: "Reading Claude's tool calls"
+
+learning_objective: >
+  The student can identify the six tools Claude Code uses most often
+  (Read, Write, Edit, Bash, Grep, Glob), explain what each one does in
+  their own words, and predict which tool Claude will use given a
+  plain-English task.
+
+prerequisites:
+  chapters_completed:
+    - 6
+  concepts_required:
+    - tool-call-rendering
+    - what-is-a-tool-call
+
+concepts_taught:
+  - read-tool-semantics
+  - write-tool-semantics
+  - edit-tool-semantics
+  - bash-tool-semantics
+  - grep-tool-semantics
+  - glob-tool-semantics
+  - tool-call-vs-text-summary-truth-hierarchy
+  - prefer-edit-over-write
+  - prefer-grep-over-read-for-search
+
+complexity: medium
+
+recall_chapters:
+  - 12 # Two-Option Rule — when text claims success but no tool fired
+  - 13 # Verify the Artifact — same principle, deeper
+  - 19 # CLAUDE.md — rules for which tool Claude should prefer
+
+drill:
+  artifact: parts/01-foundations/07-reading-tool-calls/verify.sh
+  produces:
+    - student/drills/07-reading-tool-calls/01-session-map.txt
+    - student/drills/07-reading-tool-calls/02-prediction.txt
+    - student/drills/07-reading-tool-calls/03-prediction-vs-reality.txt

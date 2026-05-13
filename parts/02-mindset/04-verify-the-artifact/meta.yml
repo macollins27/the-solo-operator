@@ -1,0 +1,38 @@
+chapter:
+  number: 12
+  part: 2
+  slug: verify-the-artifact
+  title: "Verify the Artifact, Not the Summary"
+
+learning_objective: >
+  The student can distinguish between Claude's text claims and the
+  underlying evidence (tool calls, file diffs, command output,
+  screenshots), and refuse to mark work complete based on claims alone.
+
+prerequisites:
+  chapters_completed:
+    - 11
+  concepts_required:
+    - tool-call-vs-text-summary-truth-hierarchy
+    - two-option-rule
+
+concepts_taught:
+  - claim-vs-evidence
+  - four-kinds-of-evidence
+  - 90-10-verification-ratio
+  - tests-pass-as-misleading-claim
+  - behavioral-verification-for-ui
+
+complexity: medium
+
+recall_chapters:
+  - 14 # Root Cause > Bandaid — verification surfaces hidden bandaids
+  - 22 # hooks — when verification becomes mechanical
+  - 26 # Playwright MCP for browser verification
+
+drill:
+  artifact: parts/02-mindset/04-verify-the-artifact/verify.sh
+  produces:
+    - student/drills/12-verify-the-artifact/01-evidence.txt
+    - student/drills/12-verify-the-artifact/02-claim-vs-reality.txt
+    - student/drills/12-verify-the-artifact/03-browser-screenshot.png

@@ -1,0 +1,38 @@
+chapter:
+  number: 16
+  part: 2
+  slug: the-memory-discipline
+  title: "The Memory Discipline"
+
+learning_objective: >
+  The student can recognize when they've been bitten by a specific AI
+  failure mode, write a durable rule from that incident in a reusable
+  shape, and save it to their own feedback corpus where future
+  sessions can re-read it.
+
+prerequisites:
+  chapters_completed:
+    - 15
+  concepts_required:
+    - operator-as-manager
+    - root-cause-vs-bandaid
+
+concepts_taught:
+  - corpus-as-moat
+  - feedback-file-shape-four-lines
+  - what-happened-mechanism-rule-evidence
+  - first-second-third-fourth-time-pattern
+  - rule-promotion-feedback-to-claudemd
+
+complexity: medium
+
+recall_chapters:
+  - 19   # CLAUDE.md — operationalize the feedback corpus
+  - 41   # supersession pattern — when rules need replacing
+  - 43   # Part 6 — authoring your own rules over time
+
+drill:
+  artifact: parts/02-mindset/08-the-memory-discipline/verify.sh
+  produces:
+    - student/drills/16-the-memory-discipline/01-the-incident.txt
+    - student/feedback/INDEX.md

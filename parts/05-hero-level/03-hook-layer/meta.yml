@@ -1,0 +1,37 @@
+chapter:
+  number: 34
+  part: 5
+  slug: hook-layer
+  title: "Hero level: the hook layer"
+
+learning_objective: >
+  The student can describe how a mature hook layer of 25-30 hooks
+  composes, identify the three hook layers (disaster prevention,
+  workflow discipline, behavioral classification), and explain the
+  alarm-register pattern.
+
+prerequisites:
+  chapters_completed:
+    - 33
+  concepts_required:
+    - what-is-a-hook
+    - alarm-register-structured-output
+
+concepts_taught:
+  - three-hook-layers
+  - alarm-register-vs-prose
+  - hook-composition-and-friction
+  - hooks-versioned-in-project
+  - hook-iteration-rate
+
+complexity: high
+
+recall_chapters:
+  - 36   # anti-pattern classifier deep dive
+
+drill:
+  artifact: parts/05-hero-level/03-hook-layer/verify.sh
+  produces:
+    - student/drills/34-hook-layer/01-hook-layers.txt
+    - student/drills/34-hook-layer/02-new-hook.txt
+    - student/drills/34-hook-layer/03-alarm-register.txt

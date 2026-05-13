@@ -1,0 +1,37 @@
+chapter:
+  number: 3
+  part: 1
+  slug: git-in-plain-english
+  title: "Git in plain English"
+
+learning_objective: >
+  The student can initialize a Git repository, save their work in three
+  commits, view their commit history, and explain why an operator treats
+  Git as the memory layer of their work.
+
+prerequisites:
+  chapters_completed:
+    - 2
+  concepts_required:
+    - basic-shell-commands
+    - what-is-a-file
+
+concepts_taught:
+  - what-is-a-repo
+  - what-is-a-commit
+  - git-status-add-commit-flow
+  - commit-message-discipline
+  - git-as-memory-for-ai-work
+
+complexity: low
+
+recall_chapters:
+  - 5 # surfaces when cloning the course repo
+  - 19 # surfaces when discussing CLAUDE.md versioning
+  - 25 # surfaces in the discipline-in-practice drills
+
+drill:
+  artifact: parts/01-foundations/03-git-in-plain-english/verify.sh
+  produces:
+    - student/drills/03-git-in-plain-english/myrepo/.git
+    - student/drills/03-git-in-plain-english/myrepo/about.txt

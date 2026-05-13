@@ -1,0 +1,37 @@
+chapter:
+  number: 38
+  part: 5
+  slug: trust-calibration
+  title: "Hero level: the trust-calibration arc"
+
+learning_objective: >
+  The student can describe the trust-calibration arc — from direct
+  supervision through stage gates through eventual autonomous
+  operation — and identify which mechanical guardrails replace which
+  forms of human supervision at each step.
+
+prerequisites:
+  chapters_completed:
+    - 37
+  concepts_required:
+    - orchestrator-dispatches-not-edits
+    - post-agent-review-discipline
+
+concepts_taught:
+  - four-stage-trust-arc
+  - mechanical-guards-replace-supervision
+  - the-walk-test
+  - trust-break-as-signal
+  - move-forward-gradually
+
+complexity: high
+
+recall_chapters:
+  - 43   # building YOUR system over time
+
+drill:
+  artifact: parts/05-hero-level/07-trust-calibration/verify.sh
+  produces:
+    - student/drills/38-trust-calibration/01-my-stage.txt
+    - student/drills/38-trust-calibration/02-guards-vs-supervision.txt
+    - student/drills/38-trust-calibration/03-next-guard.txt

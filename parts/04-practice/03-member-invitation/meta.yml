@@ -1,0 +1,39 @@
+chapter:
+  number: 27
+  part: 4
+  slug: member-invitation
+  title: "Practice: Member invitation flow"
+
+learning_objective: >
+  The student ships an invite-by-email flow for MembershipKit: an
+  admin enters an email address, a unique invitation link is generated
+  and sent, and the invitee can click the link to join the organization
+  with a pre-bound email.
+
+prerequisites:
+  chapters_completed:
+    - 26
+  concepts_required:
+    - feature-build-discipline-loop
+    - spec-as-authority
+
+concepts_taught:
+  - crypto-random-for-tokens
+  - expiration-and-single-use
+  - atomic-claim-via-update-with-predicate
+  - generic-error-message-no-enumeration-leak
+  - env-aware-email-service
+
+complexity: high
+
+recall_chapters:
+  - 32   # hero-level — security ast-grep rules
+  - 30   # webhooks deepen security primitives
+
+drill:
+  artifact: parts/04-practice/03-member-invitation/verify.sh
+  produces:
+    - student/specs/member-invitation.md
+    - student/drills/27-member-invitation/01-spec-path.txt
+    - student/drills/27-member-invitation/02-member-list.png
+    - student/drills/27-member-invitation/03-no-math-random.txt

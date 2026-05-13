@@ -1,0 +1,37 @@
+chapter:
+  number: 13
+  part: 2
+  slug: decisions-belong-to-you
+  title: "Decisions Belong to You"
+
+learning_objective: >
+  The student can recognize when Claude is routing a technical decision
+  back to them, and redirect Claude to propose ONE recommendation with
+  rationale instead of presenting a menu.
+
+prerequisites:
+  chapters_completed:
+    - 12
+  concepts_required:
+    - operator-as-manager
+    - junior-dev-mental-model
+
+concepts_taught:
+  - propose-approve-execute-chain
+  - menu-as-decision-routing-failure
+  - recommendation-with-rationale-pattern
+  - what-you-decide-vs-what-claude-decides
+  - non-technical-operator-can-still-evaluate-reasoning
+
+complexity: medium
+
+recall_chapters:
+  - 19   # CLAUDE.md — encode "no menus" project-wide
+  - 22   # hooks — block menu-asking mechanically
+
+drill:
+  artifact: parts/02-mindset/05-decisions-belong-to-you/verify.sh
+  produces:
+    - student/drills/13-decisions-belong-to-you/01-what-i-got.txt
+    - student/drills/13-decisions-belong-to-you/02-recommendation.txt
+    - student/drills/13-decisions-belong-to-you/03-with-instruction.txt

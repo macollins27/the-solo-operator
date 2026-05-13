@@ -1,0 +1,39 @@
+chapter:
+  number: 22
+  part: 3
+  slug: mcp-servers
+  title: "MCP servers"
+
+learning_objective: >
+  The student can explain what an MCP server is, name three things MCP
+  servers do that file reads and Bash commands cannot, list the MCP
+  servers active in their fork, and query one of them from a Claude
+  Code session.
+
+prerequisites:
+  chapters_completed:
+    - 21
+  concepts_required:
+    - what-is-claudemd
+    - conversation-turns
+
+concepts_taught:
+  - what-is-mcp
+  - mcp-as-queryable-tools
+  - mcpjson-configuration
+  - mcp-tool-naming-prefix
+  - when-to-use-mcp-vs-read-vs-bash
+  - mcp-federation-pattern
+
+complexity: medium
+
+recall_chapters:
+  - 32   # hero-level — 8-server federation
+  - 34   # building your own MCP server
+
+drill:
+  artifact: parts/03-mechanics/04-mcp-servers/verify.sh
+  produces:
+    - student/drills/22-mcp-servers/01-active-servers.txt
+    - student/drills/22-mcp-servers/02-state-response.txt
+    - student/drills/22-mcp-servers/03-read-vs-query.txt

@@ -1,0 +1,39 @@
+chapter:
+  number: 26
+  part: 4
+  slug: dues-plan
+  title: "Practice: Dues plan and subscription"
+
+learning_objective: >
+  The student ships a working dues-plan model and member-subscription
+  flow for MembershipKit: an admin can create a plan with a price and
+  billing interval, and a member can subscribe to it via Stripe test
+  mode.
+
+prerequisites:
+  chapters_completed:
+    - 25
+  concepts_required:
+    - feature-build-discipline-loop
+    - spec-as-authority
+
+concepts_taught:
+  - money-as-integer-cents
+  - no-floats-no-parsefloat-no-tofixed
+  - convert-to-dollars-only-at-display
+  - stripe-test-mode-and-test-cards
+  - dollars-to-cents-named-helper
+
+complexity: high
+
+recall_chapters:
+  - 30   # webhooks deepen here
+  - 32   # hero-level — money rules enforced by ast-grep
+
+drill:
+  artifact: parts/04-practice/02-dues-plan/verify.sh
+  produces:
+    - student/specs/dues-plan.md
+    - student/drills/26-dues-plan/01-spec-path.txt
+    - student/drills/26-dues-plan/02-subscription.png
+    - student/drills/26-dues-plan/03-money-discipline.txt

@@ -1,0 +1,38 @@
+chapter:
+  number: 32
+  part: 5
+  slug: mature-claudemd
+  title: "Hero level: the mature CLAUDE.md"
+
+learning_objective: >
+  The student can read and explain a mature, battle-tested CLAUDE.md —
+  recognizing the patterns a 60-day operating discipline takes — and
+  identify which sections of their own CLAUDE.md correspond to which
+  moments in their operator journey.
+
+prerequisites:
+  chapters_completed:
+    - 31
+  concepts_required:
+    - what-is-claudemd
+    - five-rank-authority-hierarchy
+    - corpus-as-moat
+
+concepts_taught:
+  - mature-claudemd-anatomy
+  - incident-authored-rules-with-dates
+  - density-not-length
+  - link-not-inline-subdocs
+  - growth-pattern-60-day-arc
+
+complexity: high
+
+recall_chapters:
+  - 38   # operator-journey-over-time
+
+drill:
+  artifact: parts/05-hero-level/01-mature-claudemd/verify.sh
+  produces:
+    - student/drills/32-mature-claudemd/01-current-state.txt
+    - student/drills/32-mature-claudemd/02-three-rules.txt
+    - student/drills/32-mature-claudemd/03-trim-and-link.txt

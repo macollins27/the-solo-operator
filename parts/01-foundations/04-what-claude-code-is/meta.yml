@@ -1,0 +1,39 @@
+chapter:
+  number: 4
+  part: 1
+  slug: what-claude-code-is
+  title: "What Claude Code is, what it isn't"
+
+learning_objective: >
+  The student can explain in their own words the difference between a
+  chat interface and an agent, and name three things Claude Code can do
+  that a chat cannot.
+
+prerequisites:
+  chapters_completed:
+    - 3
+  concepts_required:
+    - what-is-a-file
+    - what-is-a-process
+    - git-as-memory-for-ai-work
+
+concepts_taught:
+  - chat-vs-agent
+  - what-is-a-tool-call
+  - claude-code-as-employee-not-consultant
+  - agent-action-has-consequences
+  - extensibility-via-claudemd-skills-hooks-mcp
+
+complexity: low
+
+recall_chapters:
+  - 11 # surfaces in "AI is a junior dev"
+  - 19 # surfaces in the CLAUDE.md mechanics chapter
+  - 22 # surfaces in the hooks mechanics chapter
+
+drill:
+  artifact: parts/01-foundations/04-what-claude-code-is/verify.sh
+  produces:
+    - student/drills/04-what-claude-code-is/01-claude-help.txt
+    - student/drills/04-what-claude-code-is/02-one-feature.txt
+    - student/drills/04-what-claude-code-is/03-agent-vs-chat.txt

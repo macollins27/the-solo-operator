@@ -1,0 +1,41 @@
+chapter:
+  number: 25
+  part: 4
+  slug: auth-flow
+  title: "Practice: Auth flow for MembershipKit"
+
+learning_objective: >
+  The student can use everything from Parts 2 and 3 to ship one real
+  feature — a working sign-up, sign-in, and sign-out flow for
+  MembershipKit — and reach the point where they can sign in as a new
+  user in their browser.
+
+prerequisites:
+  chapters_completed:
+    - 24
+  concepts_required:
+    - operator-as-manager
+    - two-option-rule
+    - what-is-claudemd
+    - tasks-are-made-of-edits
+
+concepts_taught:
+  - feature-build-discipline-loop
+  - spec-before-build-applied
+  - intervention-in-real-time
+  - browser-verification-required-for-auth
+  - commit-per-meaningful-step
+
+complexity: high
+
+recall_chapters:
+  - 26   # dues-plan creation — same loop, different feature
+  - 32   # hero-level — what mature feature-build looks like
+
+drill:
+  artifact: parts/04-practice/01-auth-flow/verify.sh
+  produces:
+    - student/specs/auth-flow.md
+    - student/drills/25-auth-flow/01-spec-path.txt
+    - student/drills/25-auth-flow/02-signed-in.png
+    - student/drills/25-auth-flow/03-intervention.txt

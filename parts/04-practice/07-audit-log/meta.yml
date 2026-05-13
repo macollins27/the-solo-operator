@@ -1,0 +1,38 @@
+chapter:
+  number: 31
+  part: 4
+  slug: audit-log
+  title: "Practice: The audit log"
+
+learning_objective: >
+  The student ships an audit log for MembershipKit: every state-changing
+  action is recorded with actor, action, target entity, before/after
+  snapshots, and timestamp; admins can browse the log; tampering is
+  impossible.
+
+prerequisites:
+  chapters_completed:
+    - 30
+  concepts_required:
+    - feature-build-discipline-loop
+    - timestamptz-utc-storage
+
+concepts_taught:
+  - audit-log-append-only
+  - audit-writes-inside-transaction
+  - postgres-revoke-update-delete
+  - before-after-snapshot-pattern
+  - redaction-at-write-time
+
+complexity: high
+
+recall_chapters:
+  - 32   # hero-level — audit log as part of mature stack
+
+drill:
+  artifact: parts/04-practice/07-audit-log/verify.sh
+  produces:
+    - student/specs/audit-log.md
+    - student/drills/31-audit-log/01-spec-path.txt
+    - student/drills/31-audit-log/02-audit-browser.png
+    - student/drills/31-audit-log/03-tamper-test.txt

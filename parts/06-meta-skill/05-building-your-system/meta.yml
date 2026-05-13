@@ -1,0 +1,34 @@
+chapter:
+  number: 43
+  part: 6
+  slug: building-your-system
+  title: "Building YOUR system over time"
+
+learning_objective: >
+  The student can describe the first 30 days as a solo operator on
+  their own project, name the rule-cadence and consolidation cadence
+  that produce a working system, and identify the moat-building loop
+  that compounds over months.
+
+prerequisites:
+  chapters_completed:
+    - 42
+  concepts_required:
+    - corpus-as-moat
+    - bite-frequency-determines-promotion
+
+concepts_taught:
+  - first-30-days-cadence
+  - dont-pre-engineer
+  - moat-building-loop
+  - quarterly-consolidation-cadence
+  - bites-design-your-system
+
+complexity: medium
+
+drill:
+  artifact: parts/06-meta-skill/05-building-your-system/verify.sh
+  produces:
+    - student/drills/43-building-your-system/01-day-one.md
+    - student/drills/43-building-your-system/02-three-bites.txt
+    - student/drills/43-building-your-system/03-consolidation-cadence.txt

@@ -1,0 +1,38 @@
+chapter:
+  number: 2
+  part: 1
+  slug: the-terminal
+  title: "The terminal — text commands as a tool"
+
+learning_objective: >
+  The student can open a terminal on their computer, run four basic
+  commands (pwd, ls, cd, mkdir), and explain why text commands give an
+  operator more leverage than mouse clicks.
+
+prerequisites:
+  chapters_completed:
+    - 1
+  concepts_required:
+    - what-is-a-file
+    - what-is-an-os
+
+concepts_taught:
+  - what-is-a-terminal
+  - what-is-a-shell
+  - what-is-a-prompt
+  - basic-shell-commands
+  - pipe-and-redirect
+  - scriptability-as-leverage
+
+complexity: low
+
+recall_chapters:
+  - 5 # surfaces when installing Claude Code
+  - 19 # surfaces when teaching CLAUDE.md (text-as-leverage)
+
+drill:
+  artifact: parts/01-foundations/02-the-terminal/verify.sh
+  produces:
+    - student/drills/02-the-terminal/01-my-home.txt
+    - student/drills/02-the-terminal/02-around-me.txt
+    - student/drills/02-the-terminal/03-scratch-exists.txt

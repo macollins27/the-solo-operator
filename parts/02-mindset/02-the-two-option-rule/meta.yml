@@ -1,0 +1,39 @@
+chapter:
+  number: 10
+  part: 2
+  slug: the-two-option-rule
+  title: "The Two-Option Rule"
+
+learning_objective: >
+  The student can recognize, in real time, when their AI is silently
+  continuing past an error instead of fixing or surfacing it, and
+  intervene with the correct redirect. The student can also enforce
+  this rule on themselves.
+
+prerequisites:
+  chapters_completed:
+    - 9
+  concepts_required:
+    - junior-dev-mental-model
+    - operator-as-manager
+
+concepts_taught:
+  - two-option-rule
+  - silent-continuation-failure-mode
+  - workaround-phrases-as-smoking-gun
+  - pre-existing-issue-must-be-surfaced
+  - claim-vs-evidence-tests-pass
+
+complexity: medium
+
+recall_chapters:
+  - 13 # Verify the Artifact — same family of discipline
+  - 14 # Root Cause > Bandaid
+  - 22 # hooks — when this rule gets mechanically enforced
+
+drill:
+  artifact: parts/02-mindset/02-the-two-option-rule/verify.sh
+  produces:
+    - student/drills/10-two-option-rule/01-planted-bug.txt
+    - student/drills/10-two-option-rule/02-what-claude-did.txt
+    - student/drills/10-two-option-rule/03-with-the-rule.txt

@@ -1,0 +1,39 @@
+chapter:
+  number: 5
+  part: 1
+  slug: your-first-session
+  title: "Your first Claude Code session"
+
+learning_objective: >
+  The student can start a Claude Code session in their terminal, ask
+  Claude to perform a read-only task, observe the tool calls Claude
+  makes, respond to a permission prompt, and exit the session cleanly.
+
+prerequisites:
+  chapters_completed:
+    - 4
+  concepts_required:
+    - chat-vs-agent
+    - what-is-a-tool-call
+
+concepts_taught:
+  - working-directory-matters
+  - session-lifecycle-start-and-exit
+  - tool-call-rendering
+  - permission-prompts-are-checkpoints
+  - session-state-is-not-persistent-yet
+  - slash-commands-help-clear-exit
+
+complexity: low
+
+recall_chapters:
+  - 12 # Two-Option Rule — when Claude reports done without tool calls
+  - 19 # CLAUDE.md — session state persistence
+  - 24 # session-lifecycle deep dive
+
+drill:
+  artifact: parts/01-foundations/05-your-first-session/verify.sh
+  produces:
+    - student/drills/05-your-first-session/01-readme-summary.txt
+    - student/drills/05-your-first-session/02-permission-observation.txt
+    - student/drills/05-your-first-session/03-tools-i-saw.txt

@@ -1,0 +1,38 @@
+chapter:
+  number: 39
+  part: 6
+  slug: rule-vs-hook
+  title: "When to write a rule vs. a hook"
+
+learning_objective: >
+  The student can decide, given a recurring failure mode, whether to
+  encode the response as a CLAUDE.md rule, a hook, an ast-grep rule,
+  or a SKILL.md amendment — and predict the maintenance cost of each
+  over a 6-month horizon.
+
+prerequisites:
+  chapters_completed:
+    - 38
+  concepts_required:
+    - what-is-claudemd
+    - what-is-a-hook
+    - corpus-as-moat
+
+concepts_taught:
+  - four-encoding-candidates
+  - decision-matrix-by-failure-type
+  - enforcement-hierarchy
+  - bite-frequency-determines-promotion
+  - dont-pre-promote-dont-fail-to-promote
+
+complexity: high
+
+recall_chapters:
+  - 41   # skill iteration
+
+drill:
+  artifact: parts/06-meta-skill/01-rule-vs-hook/verify.sh
+  produces:
+    - student/drills/39-rule-vs-hook/01-bite-audit.txt
+    - student/drills/39-rule-vs-hook/02-promotion.txt
+    - student/drills/39-rule-vs-hook/03-prediction.txt

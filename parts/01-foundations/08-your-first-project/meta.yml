@@ -1,0 +1,42 @@
+chapter:
+  number: 8
+  part: 1
+  slug: your-first-project
+  title: "Your first project: a working app on your machine"
+
+learning_objective: >
+  The student can install Node.js and pnpm, scaffold a new Next.js
+  application inside their course fork, run the development server,
+  see the default page in their browser, and commit the initial state
+  to Git.
+
+prerequisites:
+  chapters_completed:
+    - 7
+  concepts_required:
+    - basic-shell-commands
+    - git-status-add-commit-flow
+    - tool-call-vs-text-summary-truth-hierarchy
+
+concepts_taught:
+  - what-is-nodejs
+  - what-is-a-package-manager
+  - what-is-nextjs
+  - what-is-a-dev-server
+  - localhost-as-your-machine
+  - reference-vs-student-fork-discipline
+
+complexity: medium
+
+recall_chapters:
+  - 11 # AI is a Junior Dev — verifying what Claude did
+  - 25 # discipline-in-practice drills against the same scaffold
+
+drill:
+  artifact: parts/01-foundations/08-your-first-project/verify.sh
+  produces:
+    - student/drills/08-your-first-project/01-versions.txt
+    - student/drills/08-your-first-project/02-localhost-screenshot.png
+    - student/drills/08-your-first-project/03-first-commit.txt
+    - student/canonical-project/package.json
+    - student/canonical-project/app/

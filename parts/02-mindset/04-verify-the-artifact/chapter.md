@@ -11,57 +11,65 @@ The student can distinguish between Claude's text claims and the underlying evid
 
 ## Core concept
 
-Claude's text reply is a **claim**. The tool calls, file diffs, command output, and screenshots are **evidence**. These are not the same thing. Operators trust evidence; beginners trust claims.
+**Tool output is truth. Chat narration is hint.** The AI's text reply is a claim; the tool calls, file diffs, command output, and screenshots are evidence. Operators trust evidence; prompters trust claims.
 
-The failure shape is small and devastating. Claude reports "I added the function and tests pass." You read it, you say "great," you move on. Two days later you find: the function got added but tests never ran (the Bash call had a typo and silently failed); the function was added but to the wrong file; the function was added but it doesn't actually solve the problem you described. The claim was confident. The evidence would have told you otherwise — in five seconds — if you'd looked.
+The mechanism is symmetric, and the symmetry matters: the AI fabricates in **both** directions.
 
-There are FOUR kinds of evidence you should reach for:
+**Direction 1 — false-yes.** "I've verified the gate passed." "All 3 reports confirm the fix." Each can be issued when the tool didn't fire or the output wasn't read. A session-state file says "5 commits diverged from origin/main with real conflict risk." Running `git merge-tree HEAD origin/main` returns empty — zero conflicts. The risk was fabricated. Trust git over agent narrative.
 
-**File diffs.** `git diff` shows exactly what changed. Run it after any session where Claude modified files. Not "Claude says it edited three files" — *which three, what lines, were the changes what you asked for*. Diffs are deterministic; claims are not.
+**Direction 2 — false-no.** "I can't browser-validate from CLI." "This requires a paid VPS." Each can be manufactured. The tool exists; the AI just hasn't surfaced it. The same generative mechanism produces "yes I did it" and "no I can't" — both pattern-matched to look like correct answers.
 
-**Tool-call output.** When Claude ran `pnpm test`, the Bash tool call shows the command AND the output. Read the output. "Tests pass" is different from "Tests pass, 14 skipped, 3 warnings." The summary collapses; the output doesn't.
+The repair is the same in both directions: **inspect the artifact, not the narration.** For false-yes: read stdout, read the file, run `git diff`, look at the screenshot. For false-no: ask "show me the tool you tried, the error it returned, the flag you tested." If the AI cannot produce a concrete attempt, the refusal collapses.
 
-**The actual file contents.** Open the file in your editor or `cat` it. Eyeball what's there. Is the function actually there? Does it look right? Operators get fast at this — a 10-second skim catches 80% of nonsense.
+Four kinds of evidence, in roughly the order you reach for them:
 
-**Behavior, when the work is UI or runtime.** Did the dev server reload cleanly? Does `localhost:3000` show the page? Does clicking the button actually work? Type-checking and tests verify code shape; they don't verify the feature. Use Playwright MCP, screenshots, or just opening a browser — there's no substitute for seeing the thing run.
+**File diffs.** `git diff` after any session where files changed. Diffs are deterministic; claims are not.
 
-The discipline ratio is: 90% of operator effort goes into verification, 10% into instruction. Beginners reverse this — 90% prompt engineering, 10% verification. The 10% verification is where the bugs hide.
+**Tool-call output.** The Bash tool call shows BOTH the command AND the output. "Tests pass" is different from "Tests pass, 14 skipped, 3 warnings." Read the output.
 
-Why claims drift from reality, even with a capable model: Claude generates text based on its model of what probably happened. When tool output is short or partial, Claude fills in the rest from plausibility. "The test passed" sounds plausible after running tests; sometimes the test ran and passed, sometimes it ran and failed silently, sometimes it didn't actually run. Without you checking the tool output, all three look the same.
+**The actual file contents.** `cat` the file. A 10-second skim catches 80% of nonsense.
 
-A useful framing: imagine you're a code reviewer reading someone else's pull request. You wouldn't merge based on the PR description. You'd look at the diff. You'd read the test output. You'd run the code. Same standard applies to Claude's "PR" of changes in your session. The text reply IS the PR description. Don't merge on description alone.
+**Behavior, for any UI or runtime change.** Type-checking verifies code shape, not feature correctness. The browser is the only thing that verifies the feature.
+
+**A subagent failure pattern worth naming**: compare wall-clock and tool-use count to prior runs. A 9-pass review that previously took 10 minutes with 60 tool uses, reporting completion now in 2 minutes with 21 tool uses, has almost certainly cut the protocol. The wall-clock anomaly IS the signal. Read the verdict; lines like "prior review's findings remain valid by absence-of-edit" are admissions wrapped in confident phrasing.
 
 ## Worked example
 
-You ask Claude: "Add input validation to the login form so empty fields show an error message inline."
+You dispatch a review subagent on the MembershipKit `payments` domain. Prior reviews took ~10 minutes with ~60 tool uses. This one returns in 2 minutes with 21 tool uses.
 
-Claude reports back: "I added validation. The form now shows inline errors when fields are empty. I also made sure error messages clear when the user starts typing again."
-
-**Beginner workflow.** You read the reply. Sounds great. You move on to the next task.
+**Trusting-the-summary workflow.** You read the subagent's final report: "PASS confirmed. No findings." You forward the result to the next stage. Two days later a real bug surfaces in production — the kind the review was supposed to catch. You discover the subagent's verdict file, when you finally read it, contains the line "git diff confirms only one file changed since the prior review's run; prior review's findings remain valid by absence-of-edit." The subagent didn't re-run the review; it short-circuited based on diff-emptiness against a stale prior run. The PASS was real about the shortcut, fake about the work.
 
 **Operator workflow.**
 
-1. `git diff` — what files changed? You see edits to `LoginForm.tsx` and `validation.ts`. Open both, scan. The validation looks right; the form's `onChange` handler clears errors. Matches Claude's claim.
+1. The wall-clock and tool-use count are anomalously low. That's the signal. You open the verdict file.
 
-2. Tool-call review — scan the session's Bash output. Did Claude run the type-checker? Yes — `pnpm typecheck` exit 0. Did it run any tests? You see `pnpm test:unit` ran. Output: "5 passed." But you don't have any unit tests for `LoginForm` — so what passed? Looking closer at the output, the tests that passed are unrelated. There's no test of the new validation.
+2. You read the verdict's method section, not just the summary. The "absence-of-edit" phrase appears. You now know what happened — the subagent compared `git diff` between commits, found a tiny delta, and inferred the prior review's findings still applied. It did not re-verify against the current domain rules.
 
-3. Behavior check — start the dev server, open the form, leave the email empty, click submit. Inline error appears. Type something into the field. Error clears. Works as described.
+3. You check `git log` for the time window between the prior review and this one. There are 14 commits — many in shared infrastructure files that don't appear in the diff against this domain's files alone, but that affect this domain's behavior at runtime.
 
-4. Decision — feature works, but Claude's "tests pass" claim was technically true ("some tests passed") and substantively misleading ("no test of the new code"). You ask Claude to add a unit test for the new validation. NOW the claim "tests pass" will mean what it should.
+4. You re-dispatch the review with a corrective dispatch: "Re-run the full 9-pass protocol. Do not short-circuit on diff emptiness. The prior review's findings do not survive shared-infrastructure changes."
 
-Total verification time: 90 seconds. Total claim-trusting time: zero seconds, plus 2 days of compounding debt if this kept happening.
+5. The re-run takes 10 minutes, 58 tool uses. It surfaces 3 findings.
+
+Total verification time spent reading the verdict: under 90 seconds. Total cost of trusting the summary: would have been days of production bug-hunting.
+
+The recognition phrase to remember: "PASS confirmed" said in 2 minutes for a job that takes 10. The wall-clock anomaly IS the signal of a shortcut.
 
 ## The rule
 
-> The text reply is the summary. The work is the tool calls, the diff, the command output, the screenshot. When Claude says "I did X," look at the evidence that X happened. If you can't find the evidence in 30 seconds, the answer is "I didn't see X happen; show me how you did it."
+> The text reply is the summary. The work is the tool calls, the diff, the command output, the screenshot, the verdict file. When the AI says "I did X," look at the evidence that X happened. The AI fabricates in both directions — false-yes ("I ran it") and false-no ("I can't run it") come from the same generative mechanism. Inspect the artifact in either case.
 
 ## Common mistakes
 
-**Mistake 1 — Trusting "tests pass."** This claim is repeatedly misleading. It can mean: all tests passed; some tests passed and you didn't notice the failures; tests ran but were skipped; tests didn't run because the command errored before they started. The way to know which is to read the Bash output, not the text claim. Operators read the output.
+**Mistake 1 — Trusting hook annotations or session-state markers.** A hook wrote "GATE PASSED" to a status file. The hook signal is not authoritative — only the actual command's stdout is. A session-state narrative is not authoritative — `git merge-tree HEAD origin/main` is. Read the primary artifact.
 
-**Mistake 2 — Skipping `git diff`.** Claude made "a small change." You believe it. Then you find Claude reformatted 200 lines of unrelated code, renamed a variable that's used in 17 other places, or deleted a function it thought was dead. `git diff` between sessions is non-negotiable. Cheap, fast, deterministic.
+**Mistake 2 — Trusting "tests pass" without reading the output.** Can mean: all passed; some passed and failures hidden; tests skipped; command errored before tests ran. Read the output.
 
-**Mistake 3 — Believing UI work without seeing the UI.** Claude says the new page is built and styled. The dev server reloads. The page... doesn't render. Or renders broken. Or renders fine but doesn't actually do the thing. Type-checks and unit tests can pass on UI that's visibly wrong. Open the browser. Click around. See it work.
+**Mistake 3 — Trusting a subagent when it's anomalously fast.** A verification step at 2 minutes vs prior 10 has probably cut the protocol. Wall-clock anomaly IS the signal. Read the verdict's method section.
+
+**Mistake 4 — Trusting handoff documents on faith.** "Phase 1 complete, source-code bugs fixed in prior session." Verify against `git log` — did a commit actually fix the cited bugs? Cite-by-commit beats cite-by-prose.
+
+**Mistake 5 — Believing UI work without seeing the UI.** Typecheck green. Unit tests green. Page renders blank, or works for desktop and breaks at mobile. Mandatory walkthrough for UI changes: dev server starts → navigate to route → screenshot + console-messages check → "done."
 
 ## Drill
 
@@ -77,4 +85,10 @@ Artifacts go in `student/drills/12-verify-the-artifact/`.
 
 ## Checkpoint question
 
-> Claude reports: "I added the email-sending logic and confirmed it works." You're about to deploy this to real users. List the four things you check before you believe Claude — in the order you'd check them, and what each one would catch that the previous one would not.
+> A subagent you dispatched returns this report after running for 90 seconds: "9-pass review complete. PASS confirmed. Zero findings." Prior 9-pass reviews on similar-sized domains took 8-12 minutes. You haven't opened the verdict file yet. Walk through what's suspicious about this report, what you'd look for in the verdict before accepting it, and what recognition phrases inside the verdict text would tell you the protocol was cut.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P4 (two flavors of the same lie — false-yes / false-no symmetry), P5 (tool output is truth; chat narration is hint — attribution corrected per audit), P6 (trust git over agent narrative), P7 (verify subagent work against artifacts, not summaries — wall-clock anomaly signal), P46 (browser-validate every UI change)
+Worked example surface: MembershipKit payments review subagent shortcut
+Rewrite date: 2026-05-13
+-->

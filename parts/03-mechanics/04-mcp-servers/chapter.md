@@ -11,21 +11,21 @@ The student can explain what an MCP server is, name three things MCP servers do 
 
 ## Core concept
 
-**MCP** stands for **Model Context Protocol**. An MCP server is a small program that exposes data or capabilities to Claude as **tools** — additional things Claude can call alongside Read, Write, Edit, Bash, etc.
+**MCP** stands for **Model Context Protocol**. An MCP server is a small program that exposes data or capabilities to the AI as **tools** — additional things the AI can call alongside Read, Write, Edit, Bash.
 
-Why this exists: Claude can already read files and run commands. But that means burning tokens to load file contents into context every time you need them. If you have 200 chapters of curriculum, or 1,000 CTO decisions, or 500 customer records, you can't keep loading all of them on every question. An MCP server lets Claude QUERY the data at the speed of an API call rather than read it at the cost of file tokens.
+The load-bearing reason MCP servers exist in mature systems: they replace grep-on-files with structured queries. The AI can already Read files and run Bash. But that means burning tokens to load file contents into context every time. A mature project might have thirteen thousand lines of domain rules, hundreds of past decisions, hundreds of QA findings, an indexed feedback corpus. Grepping that on every question costs context. An MCP server holds the data and exposes queryable tools; the AI calls a tool and gets back exactly what it needs.
+
+The token-economy difference is measurable. A "MCP-first" protocol in CLAUDE.md instructs the AI to query the federation before reading raw files. The empirical result on a mature project: roughly two-and-a-half kilobytes of structured-tool context replaces roughly thirty kilobytes of file reads on a typical orientation. Over hundreds of similar questions per project lifetime, the savings compound directly into longer productive sessions before context compaction starts to degrade quality.
 
 Three things MCP servers do that Read and Bash cannot:
 
-**1. Return structured, queryable data on demand.** "Get me chapter 19" returns just that chapter, not the whole curriculum. "List the rate-limiting CTO decisions" returns just those, not the entire decisions document. The MCP server holds the data; Claude pulls what it needs.
+**1. Return structured, queryable data on demand.** "Get me decisions about org-scoping" returns three matching decisions in a few hundred tokens — not the whole decisions document. "Find similar bugs to this finding" returns the prior bug matches, not every finding ever recorded.
 
-**2. Persist state across sessions.** An MCP server can write to a SQLite database, a JSON file, anywhere. The state survives session boundaries. This is how this course's `student.db` works — your progress persists because the MCP server saves it.
+**2. Persist state across sessions.** An MCP server writes to SQLite or JSON; the state survives session boundaries. Your student-progress data persists through the course's `course-curriculum` server. The orient server in a mature project caches the last-decisions / open-dispatches / findings-summary view for fast retrieval each session start.
 
-**3. Connect to outside systems.** An MCP server can talk to a database, a Slack workspace, a Jira board, a GitHub repo, a cloud bucket. Claude querying the MCP is querying the outside world by proxy, with the MCP handling auth and shape.
+**3. Connect to outside systems with auth handled in the server.** Database queries, Slack workspaces, GitHub issues, cloud storage — the MCP server owns the auth and the shape; the AI just calls the tool.
 
-The course you're taking has SIX-ish MCP servers wired into your fork (or will, by the time you've set things up). One of them — `course-curriculum` — exposes the curriculum content + your student state. You've been interacting with it implicitly via the AI tutor every session.
-
-MCP servers are configured in `.mcp.json` in your project root. The format is small:
+MCP servers are configured in `.mcp.json` at the project root:
 
 ```json
 {
@@ -38,55 +38,35 @@ MCP servers are configured in `.mcp.json` in your project root. The format is sm
 }
 ```
 
-That says: when Claude Code opens this project, run `python3 mcp-servers/course-curriculum/server.py` as a stdio MCP server. Claude can call any tool that server exposes by name (prefixed `mcp__course-curriculum__<tool_name>`).
+When Claude Code opens this project, that server starts as a stdio subprocess. Its tools become callable as `mcp__course-curriculum__<tool-name>`.
 
-The tools that server exposes (from Chapter 8's `course-curriculum` server):
+A mature project doesn't have one MCP server — it has six or eight. Each exposes a slice of project state: orient (one-call summary of project status), memory (indexed feedback corpus), decisions (past CTO/operator decisions), findings (open bug reports), ledger (dispatch history), code-graph (AST-based "who calls X" queries), domain-rules-graph (same idea over domain rules). Each server stays small — roughly one-hundred-fifty to three-hundred lines of thin code wrapping SQLite or markdown. Together they form a federation; the AI queries the federation instead of grepping the filesystem.
 
-- `mcp__course-curriculum__student_state(student_id)` — read your progress
-- `mcp__course-curriculum__get_chapter(n)` — load a specific chapter
-- `mcp__course-curriculum__next_chapter(student_id)` — what to teach next
-- `mcp__course-curriculum__mark_completed(...)` — record completion
-- ...and several more
-
-When you ask the AI tutor a question like "what chapter am I on?", Claude doesn't have to read every file in the curriculum to figure out — it calls `student_state(student_id)` and gets the answer in milliseconds.
-
-When you should use an MCP server:
-
-- You have data Claude will need REPEATEDLY across sessions (state, indexes, lookups).
-- You want Claude to query rather than re-derive (querying is cheaper than reading every time).
-- The data lives somewhere structured (a database, a service, a deterministic computation).
-
-When you should NOT use an MCP server:
-
-- One-off lookups (just have Claude run a command).
-- Data that changes shape every time (MCP servers like contracts; arbitrary shapes are hard to expose).
-- Tiny projects (the infrastructure overhead isn't worth it).
-
-The MCP server you'll use most as a beginner is the one that already exists for the course. Later (Part 5), you'll build small MCP servers of your own — for instance, a server that indexes YOUR feedback corpus so Claude can query "what rule applies to silent failures?" against your authored rules.
+The MCP-first protocol that makes the federation pay off: in CLAUDE.md or in a SessionStart hook, the AI is instructed to call orient (or its equivalent) as its first action, and to query specific servers before reading raw files. Without that instruction, the AI defaults to Read+Grep and the federation goes unused.
 
 ## Worked example
 
-You're operating a session and want to know which chapters you've completed. Three ways to do it:
+You want to know whether prior CTO decisions cover dues-plan deletion when there are active subscribers. Two paths:
 
-**Way 1 — Read everything.** Have Claude `Read` every meta.yml in `parts/`, parse out the completion state (somewhere), produce a list. Slow, token-expensive, and there's no completion state in the meta.yml anyway — that lives in your student state DB.
+**Without the federation:** the AI reads `docs/decisions.md` (~8,000 tokens), grep's for "dues-plan delete" (no direct hit), grep's broader for "delete" (200 matches, all loaded), reads a related portion of the codebase. Total context spend on this one question: ~25k tokens.
 
-**Way 2 — Bash queries.** Have Claude `Bash` into the SQLite file directly with `sqlite3 student/student.db "SELECT chapter_n FROM completed_chapters"`. Works, but requires Claude to know the schema and the file path, and every query is shell parsing.
+**With the federation:** the AI calls `mcp__decisions__query_decisions("dues plan delete with active subscribers")`. The server returns the top three matching decisions in ~500 tokens total. The AI calls `mcp__code-graph__get_neighbors("deleteDuesPlan")` to see what currently depends on it; ~200 tokens of edges. Total: ~1,000 tokens. Roughly twenty-five times cheaper for the same quality of answer.
 
-**Way 3 — MCP.** Claude calls `mcp__course-curriculum__student_state("default-student")`. One tool call. Returns a structured dict including completed chapters. Cheap, fast, type-correct, and no shell parsing required.
-
-Way 3 is what an MCP server enables. As your project grows, more and more queries shift from Way 1/2 to Way 3, and the savings compound.
+The federation pays for itself in a single multi-hour session. Across a project lifetime, the token-savings compound directly into longer productive sessions, faster orientation per session, and freedom to query speculatively without anxiety about context cost.
 
 ## The rule
 
-> MCP servers turn repeated queries into fast structured calls. Read for one-off browsing. Bash for ad-hoc commands. MCP for structured data Claude needs again and again. Hero-level systems are built on a federation of small MCP servers, each exposing one slice of project state.
+> MCP servers turn repeated queries into fast structured calls. Read for one-off browsing; Bash for ad-hoc commands; MCP for structured project state the AI needs repeatedly. The MCP-first protocol in CLAUDE.md tells the AI to query before reading. The federation pays for itself in a single multi-hour session via ~70-90% token reduction on indexed queries.
 
 ## Common mistakes
 
-**Mistake 1 — Re-reading data the MCP already serves.** You ask Claude "what's my current chapter?" and Claude reads `student/.claude/state.json` instead of calling `mcp__course-curriculum__student_state`. Educate Claude in your CLAUDE.md: "When state data is available via MCP, prefer the MCP tool over file reads."
+**Mistake 1 — Re-reading data the MCP already serves.** You ask "what's my current chapter?" and the AI Reads `student/.claude/state.json` instead of calling `mcp__course-curriculum__student_state`. Educate via CLAUDE.md: "When state data is available via MCP, prefer the MCP tool over file reads." Without that explicit rule, the AI defaults to Read+Grep because that's the training-data prior.
 
-**Mistake 2 — Bundling unrelated things into one MCP server.** A single MCP server with 30 tools across 8 unrelated domains is a maintenance trap. Split into multiple servers (curriculum, state, search, …). Each one stays small.
+**Mistake 2 — One mega-server with thirty tools across eight concerns.** Unmaintainable. Split by concern: a memory server, a decisions server, a code-graph server, etc. Each one stays small (~150-300 lines). Each one fails independently — if the decisions server is down, the memory server still works.
 
-**Mistake 3 — Treating MCP as magic.** MCP servers are just programs you can read. Their source is on disk. When something behaves weirdly, open the server file (`mcp-servers/course-curriculum/server.py` for this course) and read it. You don't need to be a Python expert to spot the obvious problems.
+**Mistake 3 — Stale indexes.** The MCP server's data is rebuilt manually once a month. Three weeks of code changes don't appear in queries. The operator loses trust in the federation and drifts back to Read+Grep. The fix is auto-rebuild on file changes (launchd, cron, watchman). Fresh indexes are non-negotiable; stale-by-default kills the federation.
+
+**Mistake 4 — Not telling the AI to use the federation.** You build six servers; you don't update CLAUDE.md. The AI grep's anyway. The MCP-first protocol has to be explicit, prioritized, and (for mature projects) reinforced via a SessionStart hook that prints the MCP roster at the top of every session.
 
 ## Drill
 
@@ -94,10 +74,16 @@ Artifacts go in `student/drills/22-mcp-servers/`.
 
 **Drill 1 — Find the active servers.** In your fork, find the `.mcp.json` file. List every server name in it (the keys under `mcpServers`). Save them, one per line, to `student/drills/22-mcp-servers/01-active-servers.txt`.
 
-**Drill 2 — Query an MCP tool.** Open Claude Code. Ask: "Use mcp__course-curriculum__student_state to look up my progress." Watch the tool call. Save the response (the state dict Claude got back) to `student/drills/22-mcp-servers/02-state-response.txt`. If the response is large, capture the key fields: current chapter, completed chapters count, concepts known count.
+**Drill 2 — Query an MCP tool.** Open Claude Code. Ask: "Use mcp__course-curriculum__student_state to look up my progress." Watch the tool call. Save the response (the state dict the AI got back) to `student/drills/22-mcp-servers/02-state-response.txt`.
 
-**Drill 3 — Compare reads vs queries.** In a fresh session, ask Claude two questions: (a) "What's the title of Chapter 12?" — observe which tool Claude uses (Read of the chapter file, or `mcp__course-curriculum__get_chapter(12)`). (b) "Find a chapter that explains soft deletes" — observe which tool Claude uses. For each, save the tool name + the response size (rough estimate is fine) to `student/drills/22-mcp-servers/03-read-vs-query.txt`.
+**Drill 3 — Compare reads vs queries.** In a fresh session, ask the AI two questions: (a) "What's the title of Chapter 12?" — observe which tool the AI uses (Read of the chapter file, or `mcp__course-curriculum__get_chapter(12)`). (b) "Find a chapter that explains soft deletes" — observe which tool the AI uses. For each, save the tool name + rough response size to `student/drills/22-mcp-servers/03-read-vs-query.txt`.
 
 ## Checkpoint question
 
-> You're starting a new project where you'll be building a community library catalog with 50,000 books. You expect to be asking Claude things like "find books by author X," "list books due back this week," "show me books in the 'romance' category." Should you have Claude `Read` your catalog every time, `Bash` SQLite queries, or expose an MCP server? Walk through the tradeoffs in 3-4 sentences, with one specific reason MCP wins or loses.
+> You're starting a new project where you'll build a community library catalog with 50,000 books. You expect to be asking the AI things like "find books by author X," "list books due back this week," "show me books in the 'romance' category." Should you have the AI `Read` your catalog every time, `Bash` SQLite queries, or expose an MCP server? Walk through the tradeoffs in 3-4 sentences, naming one specific cost ratio and one specific failure mode the federation prevents.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P58 (MCP-first protocol replaces grep-on-files with structured queries; ~2.5KB context replaces ~30KB of file reads on orientation), and informed by P59/P60 (verify before stating; documented means decomposed — the federation enables fast verification queries that prose-reading discourages)
+Worked example surface: MembershipKit decisions federation query for dues-plan deletion
+Rewrite date: 2026-05-13
+-->

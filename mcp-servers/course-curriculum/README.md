@@ -32,7 +32,7 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-Requires Python 3.11+.
+Requires Python 3.11+. **macOS note:** the system `python3` shipped with macOS is 3.9, which is too old. If `pip install -e .` errors with `requires a different Python: 3.9.x not in '>=3.11'`, recreate the venv with a newer interpreter. The easiest path is [`uv`](https://docs.astral.sh/uv/) (`brew install uv` then `uv python install 3.12 && uv python find 3.12` for the path to use with `-m venv`). `pyenv` and `Homebrew python@3.12` also work. The course's `.mcp.json` points at this venv by relative path, so the venv must exist before Claude Code can load the curriculum server.
 
 ## Smoke test
 

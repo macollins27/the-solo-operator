@@ -68,3 +68,8 @@ After all three files exist, your tutor will run `verify.sh` to confirm them mec
 ## Checkpoint question
 
 > You just typed in your favorite music app and saved a new playlist. Then you quit the app. Where did the playlist go — to the counter, to the pantry, or both? And how do you know it'll still be there when you reopen the app tomorrow?
+
+<!-- Rewriter audit trail
+No principles ground this chapter; mechanical foundation (CPU/RAM/storage/OS). Untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

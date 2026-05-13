@@ -11,55 +11,59 @@ The student can describe Claude as a junior team member (not an oracle, peer, or
 
 ## Core concept
 
-How you THINK about Claude determines what you GET from Claude. The mental model is load-bearing. Most people pick a wrong one and stay stuck there for months.
+The mental model you hold of Claude determines what you get. The right model is load-bearing, and it is not the one most people pick.
 
-Three wrong mental models, all common:
+**The wrong models: oracle, peer, search engine.** An oracle is asked vague questions and is expected to know. A peer collaborates as an equal and pushes back when you're wrong. A search engine returns a deterministic result. None match what's happening. Claude isn't retrieving — it's generating. Claude doesn't push back like a peer; it tends to comply. Claude doesn't know your project — it guesses what you probably mean, plausibly and sometimes wrongly. These models keep you tuning your prompt as if a magic phrase will fix a context-and-supervision problem.
 
-**Wrong model 1: Claude is an oracle.** You ask, Claude knows. Asking a vague question and getting a vague answer feels like a query that needs better phrasing. People keep tuning their prompt as if the answer is hidden behind the right magic words. But Claude doesn't know your project unless you've told it. It guesses what you probably mean. The guesses are usually plausible. Sometimes they're wrong. The fix is not better prompts — it's better context.
+**The right model: Claude is the engineer; you are the operator.** You are not co-engineering. You are not Claude's peer or customer. You are Claude's operator. The operator's job is to **specify the outcome, push the boundary of what the AI is willing to attempt, evaluate the work product against the artifact, and refuse refusals**. Every technical call between outcomes belongs to Claude. When Claude asks "would you like httpOnly cookies or bearer tokens for the mobile session?" the right answer: "That's an engineering call. Make it. Tell me your reasoning. I'll approve or push back."
 
-**Wrong model 2: Claude is a peer.** You're collaborating; Claude is another engineer. This sounds respectful but it's wrong. A peer pushes back when you're wrong. Claude often doesn't. A peer notices something out of scope you missed. Claude generally won't. A peer carries the weight of caring about your project's outcome. Claude carries no weight. Treating Claude as a peer leaves you with no manager — and the work product reflects it.
+What follows from this inversion:
 
-**Wrong model 3: Claude is a search engine.** You type a question, you get an answer. But Claude isn't retrieving a result — it's generating one. The same question can produce different answers in different sessions. The answer is shaped by what you said earlier, what file you happen to be in, what's in the system prompt. Search engines are deterministic and external; Claude is probabilistic and contextual. Treating it as search makes you stop verifying.
+**You don't pick from menus.** A technical menu offered to a non-technical operator is a routed decision — Claude has the context to choose well; you don't. Picking randomly accumulates bad decisions. The intervention: "Don't give me a menu. Pick one with reasoning."
 
-The right model: **Claude is a junior team member.** A fast, smart, never-tired, never-bored junior. Better at some things than you are (typing, syntax, knowing 17 libraries' APIs). Worse at others (judgment calls, knowing what your customer wants, knowing when to STOP and ask).
+**You don't accept the first refusal.** When Claude says "I can't browser-validate from CLI," "this requires a paid service," "I don't have access" — the refusal is almost always wrong. The tool exists; the AI is pattern-matching "AIs can't do X" framing. Ask for proof: "Show me the tool you tried, the error it returned."
 
-What follows from this model:
+**You raise the floor with structure.** A fresh session is unreliable by default. A session with a tight `CLAUDE.md`, a hook catching known failures, a skill bundling a known-good workflow, and an MCP server exposing project data is reliable by structure.
 
-**You manage.** You set the standards (`CLAUDE.md`). You define the workflow (skills). You enforce the rules (hooks). You decide what's in scope. You decide what "done" means. You verify the work before it ships. A junior without a manager produces junior-quality work; a junior with a strong manager produces senior-quality work. Same with Claude.
+**You verify against the artifact.** Tool output is truth. Chat narration is hint. The Bash output, the file diff, the screenshot — those are the work. Chapter 12 names this discipline; you start practicing it here.
 
-**You write specs, not vibes.** "Build me a sign-up form" gives Claude license to invent. "Add a sign-up form with email + password (8+ chars), redirect to /onboarding on success, show inline error on failure" gives Claude a target. The first prompt is a wish; the second is a spec. Operators write the second.
-
-**You catch mistakes early.** A junior who runs unchecked for two weeks does two weeks of work that may need to be redone. Catch the mistake on day one and you've saved 13 days. With Claude, "day one" is "this turn." The verification cost is small; the regret cost is huge.
-
-**You raise the floor with structure.** A new junior is unreliable by default. A junior with a tight team operating manual, a code style guide, a list of patterns to use, and a senior pair-reviewing every PR is reliable by structure. Same junior, different floor. Most of the rest of this course is about how to build that structure for Claude.
-
-What the junior is GREAT at: typing, syntax, looking up APIs you don't remember, generating boilerplate, refactoring within a file, explaining unfamiliar code, writing tests for the happy path. Use Claude for these freely.
-
-What the junior is BAD at without supervision: architectural choices, security tradeoffs, "should we even build this," subtle business-logic decisions, knowing when to stop and ask, distinguishing "this works" from "this is right." Verify Claude on these heavily — or don't delegate them at all.
-
-What the junior CANNOT do: care about your project's outcome the way you do. Hold the constraints in your head that you haven't written down. Notice when "I've worked around it" hides a deeper problem. You are the only one with those capabilities. They're yours.
+In practice: when something hard or ambiguous comes up, you do NOT carry the technical weight. You push. You ask for the recommendation. You evaluate the reasoning. You approve or redirect. The system gets built by Claude doing the engineering and you keeping Claude from quitting on you.
 
 ## Worked example
 
-Two operators want to add a "forgot password" link to their app.
+You ask Claude to add member subscription billing to MembershipKit. Claude reads the schema, opens the existing payment files, and responds:
 
-**Operator A** asks: "Add a forgot password feature to my app." Claude reads some files, writes a new route, a form, an email-sending function, a token table, a reset endpoint. It looks reasonable. The operator skims the diff, says "looks good," ships. Two weeks later they find: the reset tokens never expire, the email template hardcodes a domain the operator doesn't own, the form's CSRF protection was forgotten. Each is a bug a junior might miss.
+> "Two questions before I start. First — should subscription renewals charge automatically via Stripe webhooks, or should we send a manual renewal link? Second — for past-due accounts, do you want a 7-day grace period or immediate suspension?"
 
-**Operator B** asks the same starting question. Then before letting Claude write code: "Before you implement, list the security-relevant choices you're making: token expiration, email content, CSRF, rate limiting, account-enumeration prevention. For each, propose your default and ask me." Claude writes the list. Operator B confirms or corrects each. Then Claude implements. The result has tokens that expire in 15 minutes, an email that doesn't hardcode anything, CSRF protection, rate limiting, and account-enumeration prevention (same message whether the email exists or not).
+**Prompter's response:** "Uh, I don't know. What do you think? Let's do automatic charges and 7-day grace. Sounds reasonable."
 
-Same junior. Same task. Different management. Operator B's product is shippable; Operator A is doing two weeks of debugging.
+What just happened: Claude routed two technical-product calls to a non-engineer. The prompter picked, partly randomly, with no real evaluation. Multiply by 30 such decisions across the feature and the cumulative drift is large. Operator overhead silently subverted the contract.
+
+**Operator's response:** "Those are engineering calls. Make them. For each, tell me the call, the reasoning, and the main alternative you rejected. I'll approve or push back."
+
+Claude returns:
+
+> "Automatic charges via Stripe webhooks. Reasoning: industry default, matches the rest of MembershipKit's Stripe integration, no extra UI surface to maintain, recoverable from idempotency keys on retry. Rejected alternative: manual renewal — better for organizations with unusual billing cadences, but you have none of those in spec yet.
+>
+> 7-day grace period. Reasoning: matches Stripe's default `past_due` behavior; gives the admin time to follow up before suspension feels punitive. Rejected alternative: immediate suspension — cleaner state machine but creates support tickets when cards expire silently."
+
+The operator reads the reasoning. The reasoning is sound. The operator says "proceed." Claude builds.
+
+Same task. Same model. Different management. The operator never carried a technical weight they couldn't carry. Claude carried it — because Claude is the engineer.
 
 ## The rule
 
-> Claude is a junior team member, not an oracle, peer, or search engine. You manage; you verify; you set the structure that makes junior work reliable. Skip the management and you get junior work; do the management well and you get senior work from a junior at junior speed.
+> The AI is the engineer; you are the operator. You specify the outcome, you push the boundary of what the AI is willing to attempt, and you evaluate the work against the artifact. Every technical call between those outcomes belongs to the AI. When the AI offers you a menu, refuse it — ask for the recommendation with reasoning, then approve or redirect.
 
 ## Common mistakes
 
-**Mistake 1 — Assuming Claude knows what you mean.** Your project has 14 conventions Claude doesn't know about because you haven't written them down. Claude makes plausible guesses. They're often wrong in small ways that compound. The fix is `CLAUDE.md` (Part 3) — but the mindset comes first: assume Claude knows NOTHING about your project until you've told it explicitly.
+**Mistake 1 — Accepting the menu.** The AI offers two or three options. Recognition phrase: "Which would you prefer?" or "your call." The intervention: "Pick one with reasoning. I'll approve or push back."
 
-**Mistake 2 — Skipping the "before you implement, list the choices" step.** Juniors are happiest implementing — they want to type code. They're worst at the choice-listing step. Force the listing. "Before you change anything, tell me what assumptions you're about to make." Claude will say things like "I'm assuming you want to use cookies for auth" — and you'll say "no, use JWT" — and the next two hours of work just got saved.
+**Mistake 2 — Accepting the first refusal.** "I can't browser-validate from CLI," "this requires a paid VPS." The tool usually exists. Intervention: "Show me the tool you tried, the error it returned, the flag you tested."
 
-**Mistake 3 — Treating Claude's confidence as evidence.** Claude's text reply often sounds confident. "I've fixed the bug." "This will handle all the edge cases." "The tests pass." Confidence is not evidence. The tool calls are evidence. The Git diff is evidence. The test output is evidence. Operators verify against evidence, not against tone.
+**Mistake 3 — Treating Claude's confidence as evidence.** "I've fixed the bug." "Tests pass." Confident tone is not evidence. The Bash output, Git diff, and screenshot are. Look for 30 seconds before believing.
+
+**Mistake 4 — "What do you want me to do?"** The AI's most frequent abdication phrase. Variants: "How would you like to proceed?", "your call." Intervention: "Tell me what you'd do, and why. I'll approve or push back."
 
 ## Drill
 
@@ -73,4 +77,10 @@ You'll observe the difference management makes. Artifacts go in `student/drills/
 
 ## Checkpoint question
 
-> You're delegating "set up the database schema for MembershipKit" to a brand-new junior engineer on their first day. You're delegating the same task to Claude. What are two things you'd do for the junior that you would NOT have thought to do for Claude before this chapter — and which of them is actually MORE important to do with Claude than with the junior?
+> You ask Claude to add notifications to MembershipKit. Claude responds: "I can do this either as email-only, in-app-only, or both. Each has tradeoffs — email reaches inactive members, in-app is cheaper, both is more work. Which would you like?" You feel a small impulse to pick "both" because it sounds the most thorough. Before you answer Claude, walk through: what's wrong with the way Claude just framed this, what's the right response from you, and what would the correct response from Claude look like in your reply's wake?
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P1 (operator built the system by pushing capabilities, not by writing it themselves), P2 (decisions belong to engineer = AI; own-it/solve-it/present-it/await-approval), P3 (push first, accept "no" second; the false-refusal patterns)
+Worked example surface: MembershipKit subscription billing
+Rewrite date: 2026-05-13
+-->

@@ -76,3 +76,8 @@ After all three exist, your tutor runs `verify.sh`.
 ## Checkpoint question
 
 > Your friend tells you they're frustrated because Claude (the chat) keeps giving them code that "doesn't work in their app." You're about to recommend Claude Code instead. In one sentence, what is the actual difference that's going to make their experience better — and what is the single new responsibility they're taking on by switching from chat to agent?
+
+<!-- Rewriter audit trail
+Mechanical chapter introducing the agent vs chat distinction. Sets up tool-call vocabulary used by P4/P5 (verify against tool calls, not summaries) in Chapter 12. Core untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

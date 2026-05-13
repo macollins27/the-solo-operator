@@ -86,3 +86,8 @@ After all three exist, run the chapter's `verify.sh` to confirm.
 ## Checkpoint question
 
 > You ran a sequence of 5 commands to set up a project folder last week. Now you want to do it again. With a mouse, you'd click your way through it from memory (and hope you remember). What can you do in the terminal that you can't do with a mouse, that makes "set up the same way I did last week" a one-command operation?
+
+<!-- Rewriter audit trail
+No principles ground this chapter; mechanical foundation (terminal, shell, four basic commands). Untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

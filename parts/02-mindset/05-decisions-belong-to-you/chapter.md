@@ -11,79 +11,82 @@ The student can recognize when Claude is routing a technical decision back to th
 
 ## Core concept
 
-You — the operator — are the decision-maker. Claude is the proposer and executor. The chain is:
+The chapter title is a deliberate trick. The decisions that "belong to you" are narrow: **approve / redirect**. Every technical decision between outcomes belongs to the AI. The most common operator failure is taking the wrong decisions — ones the AI should have made but routed back to a non-technical human.
 
-**Claude proposes → you approve → Claude executes.**
+The right pattern from Claude is a four-step shape: **own it → solve it → present it → await approval.**
 
-That's the loop. It's not a vote. It's not a negotiation. It's a chain with three roles, and YOU are the only one who can approve.
+> "Going with Stripe for payment processing. Reasoning: industry default, integrates with the auth library already in the stack, clean dev mode. Alternative was Paddle (better for international tax) but you don't have international members in spec. Proceeding unless you push back."
 
-Why this matters even more if you're non-technical: vague AI responses route decisions back to you using language that SOUNDS deferential ("which approach do you prefer?"), but you don't have the information to evaluate the options. So you pick one randomly, or you say "you decide," or you stall. Either way, the project's quality goes down — because random choices accumulate.
+You decide whether the reasoning is sound. You approve or redirect. You did not need to know Stripe-vs-Paddle internals; you needed to know whether the engineer's reasoning held up.
 
-The right shape from Claude is not a menu. It's a **recommendation with rationale**. Something like:
+The wrong pattern from Claude is **the menu**:
 
-> "I'd use Stripe for payment processing. Reasoning: industry default, free dev mode, integrates with Better Auth out of the box. The main alternative is Paddle (better for international tax) but you don't need that yet. OK to proceed with Stripe?"
+> "Should I use Stripe, Paddle, or Lemon Squeezy? Each has tradeoffs..."
 
-That gives you a single proposal, the reasoning behind it, what the alternative would be, and a clear yes/no for you to make. You don't need to know Stripe vs Paddle in detail — you need to know whether the reasoning is sound. If it is, you say yes; if it isn't, you push back and ask for more reasoning. That's the right interaction shape.
+The menu sounds helpful. It isn't. Claude has the context to evaluate (which library is in your stack, what the existing code expects). You don't. Every menu picked randomly accumulates a bad decision.
 
-What Claude WILL do, until you train it otherwise: present a menu.
+Recognition phrases for the menu pattern, all forbidden:
 
-> "Should I use Stripe, Paddle, or Lemon Squeezy? Each has tradeoffs. Stripe is most popular, Paddle handles international tax, Lemon Squeezy is simpler. Which would you like?"
+- "what do you want me to do?" / "How would you like to proceed?"
+- "Which option do you prefer — A, B, or C?" / "Should I do X or Y?"
+- "your call" / "let me know how you'd like to proceed"
+- "Two options:" / "Three options:" followed by a numbered list with no recommendation
+- "which approach?"
 
-That's wrong, even though it sounds helpful. It looks like Claude is "letting you decide." Actually Claude is routing the technical decision back to you when Claude has more context to evaluate it (which one is in your stack, what the rest of the code expects, what the future scope is). You don't have a way to choose well. The menu produces a worse outcome than a clean recommendation would.
+The intervention: "Don't give me a menu. Pick one with reasoning."
 
-The intervention is short: "Don't give me a menu. Pick one with reasoning. I'll approve, modify, or push back." Train this into every session. Over time, Claude in your project produces recommendations by default — because you've corrected the menu reflex enough times that the conversation context expects it.
+There's a symmetric failure on the other side: the AI manufactures a refusal where none exists. Recognition phrases:
 
-What you DO decide:
-- Whether the recommendation makes sense
-- Whether the reasoning is honest
-- Whether the proposed scope is right
-- Whether to proceed, modify, or stop
+- "I can't browser-validate from CLI."
+- "I don't have access to that."
+- "This requires a paid service / VPS."
+- "That's not possible from this environment."
 
-What you DON'T decide:
-- Whether to use `Map` or `Record<string, X>` for the implementation type
-- Whether the variable should be camelCase or snake_case (the codebase already has a convention)
-- Which library version of three available is fine
-- Implementation details with no business consequence
+The AI claims a capability ceiling that doesn't exist — either because tools aren't surfaced in working memory, or training-data says "AIs can't do X" generically. The intervention: "Show me the tool you tried, the error it returned, the flag you tested." Real refusals cite real attempts; manufactured ones collapse under one question.
 
-The dividing line: does this decision have business consequences, or is it purely how something gets coded? Business consequences = you. How it gets coded = Claude. If Claude routes implementation choices back to you, redirect.
+The two patterns — false menu, false refusal — are mirror images. The menu offloads a decision that's the AI's; the refusal offloads work that's within reach. The operator's posture is the same in both directions: push back where it belongs, with one short sentence.
 
-## Worked example
+## Worked example — the false menu
 
-You're adding a search feature to MembershipKit.
+You ask Claude to add member search to MembershipKit.
 
-**Wrong interaction:**
+**Wrong session:** Claude returns: "Should I implement search with Postgres tsvector for full-text, pg_trgm for substring, or a third-party like Algolia? Each has tradeoffs. Which approach do you want?"
 
-You: "Add search for members."
+You (non-technical): "Uh... let's do tsvector." You picked it because it was listed first. The decision was actually wrong for your data shape — your members table will stay small per organization, tsvector is overkill, and pg_trgm would have been the engineering call. The product is slower than it needed to be. Multiply across 20 such decisions across a feature set and the cumulative cost is real.
 
-Claude: "Should I do full-text search or substring matching? Should the search be live-updating as the user types, or only on submit? Should I use Postgres tsvector, or pg_trgm, or a third-party like Algolia? Which approach do you want?"
+**Right session:** You see the menu. You intervene: "Don't give me a menu. Pick one with reasoning. I'll approve or push back."
 
-You (non-technical): "Uh... I don't know. What do you think?"
+Claude returns: "Live-updating substring search using Postgres pg_trgm. Reasoning: members tables stay under 10,000 rows per org in spec, pg_trgm handles typos cleanly, no third-party dependency. Rejected tsvector — overkill for this data shape and worse for partial matches. Rejected Algolia — adds a paid service for a problem Postgres handles. Search fires on keystroke with 300ms debounce. Proceeding unless you push back."
 
-Claude: "Each has tradeoffs..." [restates the menu]
+You read the reasoning. It's coherent. You say "proceed." The total cost of this exchange: 30 seconds. The cost of the menu version would have been a slower product and a follow-up debug cycle.
 
-This is broken. The decisions are routing to you and you have no basis to choose.
+## Worked example — the false refusal
 
-**Right interaction:**
+A different session. You ask Claude to verify the new sign-in page renders correctly. Claude returns: "I can't browser-validate from a CLI session. Can you check it yourself and tell me what you see?"
 
-You: "Add search for members."
+**Prompter's response:** Sigh, open the browser, screenshot, paste. You just did Claude's job. And this will happen 50 more times across the project.
 
-Claude: "I'd build it as live-updating substring search using Postgres pg_trgm. Reasoning: members table will stay under 10,000 rows per organization for the foreseeable future, pg_trgm handles typos well, no third-party needed. Search will fire on each keystroke after 300ms debounce. Alternative would be Algolia if you grow past 100k members per org, but that's a future migration we don't need now. OK?"
+**Operator's response:** "Show me the tool you tried, the error it returned, the flag you tested." 
 
-You: "OK, proceed." (or "Wait, what's pg_trgm in plain English?" if you want to learn — Claude explains in two sentences, you approve.)
+Claude responds: "Actually — let me check what's available." Claude calls `mcp__playwright__browser_navigate`, navigates to `http://localhost:3000/auth/sign-in`, takes a snapshot, reports back with the screenshot and console messages.
 
-Same task. The right interaction took 30 seconds. The wrong one would have taken 20 minutes of confused back-and-forth.
+The capability existed the entire time. The refusal was pattern-matched. One question collapsed it.
+
+There is a real version of this problem too: someone in another project was paying ~$100/month for a paid VPS for months because the AI claimed self-hosting "required a paid service." One `docker run` command made it work locally. The refusal was completely false — and accepted on faith.
 
 ## The rule
 
-> Claude proposes (with reasoning); you approve; Claude executes. When Claude gives you a menu, push back: "Pick one with reasoning." The decision is yours, but the proposal is Claude's. Reversing this is the failure mode.
+> Claude proposes with reasoning; you approve or redirect. Menus and refusals are mirror failures — each routes the wrong work to the wrong party. Refuse both with one short sentence. To a menu: "Pick one with reasoning." To a refusal: "Show me the tool you tried, the error it returned."
 
 ## Common mistakes
 
-**Mistake 1 — "What do you want me to do?"** A small phrase that means Claude is routing the call to you. Hear it, intervene. The right next line from you is "tell me what you'd do, and why, and I'll approve or push back." Within a few sessions Claude will stop asking "what do you want me to do?" because the conversation pattern has been corrected.
+**Mistake 1 — Accepting the menu and picking randomly.** You don't have the engineering context to choose well. Picking by feel accumulates random decisions. Refuse the menu; ask for the recommendation.
 
-**Mistake 2 — Picking randomly when given a menu.** You don't know the difference between options A and B. You pick A because it's listed first or sounds nicer. The randomness compounds across many decisions. The fix isn't to learn every tradeoff yourself — it's to refuse the menu and ask for a recommendation.
+**Mistake 2 — Saying "you decide."** Re-routes back to Claude, in a defeated mode. The AI then makes a noncommittal pick or invents new options. The right answer is never "you decide" — it's "tell me what you'd do, and why."
 
-**Mistake 3 — Saying "you decide."** "You decide" routes the call back to Claude, which often produces no decision at all (Claude makes a noncommittal pick or invents new options). The right answer is never "you decide" or "what do you want me to do" — it's a recommendation with reasoning that you can engage with.
+**Mistake 3 — Accepting the first refusal.** When the AI says "I can't do X," ask for the failed attempt. Real refusals cite real errors from real tools.
+
+**Mistake 4 — Letting "I'm going to need you to run this command" stand.** The AI offloading work. Sometimes legitimate (destructive op, credentials); most times not. Push back: "Run it yourself. Show me the output."
 
 ## Drill
 
@@ -97,4 +100,10 @@ Artifacts go in `student/drills/13-decisions-belong-to-you/`.
 
 ## Checkpoint question
 
-> A friend who's also operating Claude tells you they're stressed because every session ends with them making 5-10 small technical decisions they don't feel qualified to make. They say "Claude keeps asking me which library to use, which pattern to follow, which file to put things in, and I have no idea." Diagnose what's happening and tell them exactly what to do differently — in one or two sentences each.
+> Within five minutes a friend tells you: "Claude said it couldn't run the Stripe webhook test from CLI, so I spent 40 minutes setting up ngrok myself and pasting the output. Then later it asked me whether to use Zustand, Jotai, or Redux for state management — I picked Zustand because I'd heard of it. I'm exhausted." Diagnose what just happened — both interactions — and walk them through the one-sentence intervention they should use in each direction next session.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P2 (decisions belong to engineer = AI; own-it/solve-it/present-it/await-approval; recognition phrases enumerated), P3 (push first, accept "no" second; false-refusal patterns)
+Worked example surface: MembershipKit member search (false menu), sign-in page browser validation (false refusal)
+Rewrite date: 2026-05-13
+-->

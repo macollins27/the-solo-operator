@@ -114,4 +114,9 @@ After this, run the chapter's `verify.sh` to confirm the repo has at least two c
 
 ## Checkpoint question
 
-> Your AI agent just made what looks like a small change to one of your files. Five minutes later, the app stops working. You think the AI's change broke it, but you're not sure exactly what changed. What two Git commands would you run to find out what the AI changed, and what one Git command could you run to undo just that change?
+> The AI just pushed a 30-line change to your codebase, told you "this fixes the bug," and the tests it ran came back green. Why might you still want to read the actual diff against the prior commit before trusting the change, and what specifically would you look for in that diff?
+
+<!-- Rewriter audit trail
+Lightly touches P4/P5 (the checkpoint question seeds the verify-the-artifact discipline — trust git diff over text claim — that Chapter 12 develops). Mechanical foundation otherwise (git init, add, commit, log). Core untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

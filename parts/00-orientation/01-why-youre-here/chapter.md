@@ -13,35 +13,37 @@ None. This is the orientation chapter.
 
 ## Core concept
 
-Most people who use AI to write code are PROMPTING. They open a chat, describe what they want, take the output, paste it somewhere, and hope. When it works, great. When it doesn't, they prompt again. The relationship is request-and-receive, like ordering at a counter.
+There are two ways to use AI to build software. One scales. The other doesn't.
 
-OPERATING an AI engineering system is different. You're not a customer; you're a manager. You set up the rules the AI works by. You decide what tools it can use. You catch its failures before they ship. You build deterministic guardrails around its non-deterministic output. You read its work, not just its claims. Over time you build a SYSTEM — a set of rules, hooks, skills, and indexes that make YOUR AI produce work nobody else's AI can produce.
+**The way that doesn't:** PROMPTING. You open a chat. You describe what you want. You take the output, paste it somewhere, hope. When the AI says "I can't do that" you accept it. When the AI offers you a menu of three approaches, you pick one. When the AI says "tests pass" you believe it. The whole relationship is request-and-receive. You are a customer at a counter; the AI is whatever shows up on the tray.
 
-The difference matters because PROMPTING plateaus. After a few weeks you've extracted most of what a chat interface can give you. You're better than you started but you're stuck near the average. OPERATING compounds. Every rule you write makes every future session better. Every hook you add catches a class of failure forever. Every skill you author becomes a workflow you can run with one word. The system you build is yours — non-portable, non-replicable, an actual moat.
+**The way that scales:** OPERATING. You are not the customer. The AI is the engineer. Technical decisions belong to the AI. You push the boundary of what the AI is willing to attempt; you specify outcomes; you evaluate work product against the artifact; you refuse refusals. The system that gets built gets built by the AI doing the work AI is structurally good at, and you keeping the AI from quitting on you. Over time you accumulate rules, hooks, skills, and indexes — a system that produces work no one else's AI can produce. The system IS the moat.
 
-This course teaches operating, not prompting. You'll learn the principles (how to think about AI as a teammate), the mechanics (how to configure Claude Code, write skills, write hooks, run subagents, query your own data), and the meta-skill (how to author your own rules when you get bitten by something new). By the end you'll have built a working piece of software AND a system that produces software, both yours, both compounding.
+The difference matters because every load-bearing failure mode of using AI to build software lives in PROMPTING. The AI invents a workaround instead of fixing the cause. The AI says "I can't browser-validate from CLI" when it can. The AI claims "the gate passed" without reading the actual command output. The AI gives you three options when it should have made the call itself. Prompters wear all of these. Operators have an answer to each — and the answer is a piece of the system, on disk, that prevents the failure for every future session.
+
+OPERATING is what the rest of this course teaches: the mindset (you are the operator, not the engineer), the discipline (verify the artifact, never the summary; spec is truth; persistence over cleverness), the mechanics (Claude Code, hooks, skills, subagents, MCP), and the meta-skill (when something bites you, write the rule). By the end you have a working piece of software AND a system that produces software — both yours, both compounding.
 
 ## Worked example
 
-Imagine two people building the same small app — a to-do list with sharing between friends.
+Two operators are each building a small membership manager for their community — the canonical project for this course, MembershipKit.
 
-PERSON A prompts. They open Claude, say "make me a to-do app," get HTML, JavaScript, and a database file. It mostly works. They prompt for tweaks. After two weeks they have a working app and a chat history full of half-remembered solutions. If they want to add a new feature, they prompt from scratch. The Claude they used yesterday and the Claude they're using today don't know each other.
+**Person A prompts.** They open a session: "Add an auth flow with sign-up, sign-in, and password reset." The AI returns. The AI says "I'll use cookies for the session — do you want httpOnly or bearer tokens?" Person A doesn't know. Person A says "you decide." The AI picks, builds, returns. Person A skims the diff. The AI says "tests pass." Person A believes it. Two weeks later they hit a bug: signed-in users can re-submit the sign-in form, get a fresh session with the wrong organization context. They didn't catch it during review because they trusted the summary. They didn't have a rule preventing it because they didn't author one. The same shape of bug will hit them again — they have no system that remembers.
 
-PERSON B operates. Day one they write a one-page `CLAUDE.md` describing their app's goals and rules ("every database column has a created_at, no money fields are floats, every form has CSRF protection"). Day two they add a hook that runs the linter on every file Claude writes. Day three they add a skill called `/add-feature` that walks Claude through their preferred feature pattern. Day five they've added an MCP server that lets Claude query their database schema directly. After two weeks Person B has the same working to-do app — but also a SYSTEM. Their CLAUDE.md is law. Their hooks block the failures they've seen. Their skill makes new features cheap. Their MCP makes the AI smarter than yesterday.
+**Person B operates.** Same starting request. The AI says "I'll use cookies for the session — do you want httpOnly or bearer tokens?" Person B refuses the menu: "That's an engineering call. Make it. Tell me your reasoning. I'll approve or push back." The AI picks httpOnly, explains why, ships. Person B opens the page in a browser before saying done. Person B catches the missing reverse-guard on `/auth/sign-in`. The AI fixes it. Person B writes a four-line rule to disk: "When you finish any UI change, open it in a browser before reporting done. Cite the screenshot." Saves it to `student/feedback/feedback_browser_validate_ui.md`. Two weeks later, the same shape of failure tries to occur on a different feature — and doesn't, because every session reads that file at start.
 
-By month two, Person A's progress is linear. Person B's is exponential. Person B is becoming a solo operator.
+Same task. Same AI. After three months Person A is still debugging the same families of bug. Person B has 30 such rules, an AI that doesn't make those mistakes, and a system that gets sharper every week.
 
 ## The rule
 
-> You are not a customer; you are a manager. The AI is your team. Build the system that makes the team produce excellent work, not the prompt that asks the AI to please be good.
+> You are not the engineer. The AI is the engineer. Your job is to specify the outcome, push the boundary of what the AI is willing to attempt, evaluate the work product against the artifact, and accumulate rules that prevent every failure mode you've already lived through. Build the system, not the prompt.
 
 ## Common mistakes
 
-**Mistake 1 — Thinking the AI is the product.** Beginners optimize the prompt. Operators optimize the SYSTEM around the AI: rules, hooks, skills, indexes. The prompt matters but it's the smallest lever. Reach for it last.
+**Mistake 1 — Making technical decisions instead of refusing menus.** The AI offers "Option A, Option B, Option C — which do you prefer?" Prompters pick one (badly, randomly, because you don't have the context to choose). Operators refuse the menu: "Pick one with reasoning. I'll approve or push back." The technical call belongs to the AI; the approve/redirect belongs to you.
 
-**Mistake 2 — Treating each session as fresh.** Without a system, you re-explain your project every session. With a system, the AI re-orients itself in seconds because your `CLAUDE.md`, your skills, and your MCP servers tell it what it needs to know. Sessions compound; conversations don't.
+**Mistake 2 — Trusting AI summaries.** "I fixed the bug." "The tests pass." "The build is clean." These are claims, not evidence. The tool calls, the file diff, the command output, the browser screenshot — those are evidence. Operators look at the evidence in under 30 seconds before believing the claim. Every time.
 
-**Mistake 3 — Trusting AI summaries.** "I fixed the bug." "The tests pass." "The build is clean." These are claims, not facts. Operators verify by reading the actual diff, log, or screenshot. Prompters take the summary at face value and ship.
+**Mistake 3 — Letting incidents happen without writing the rule.** Something bites you. You fix it. You move on. Three weeks later the same shape of failure bites you again because you didn't write the rule down. The 60 seconds to author a four-line rule prevents the 60-minute re-debug. Operators write the rule the moment the incident is fresh; prompters keep re-discovering the same lessons.
 
 ## Drill
 
@@ -67,4 +69,10 @@ By the end of this drill you have created the literal first artifact of your ope
 
 ## Checkpoint question
 
-> In your own words, what is the difference between PROMPTING an AI and OPERATING an AI engineering system, and which one does this course teach? Give one specific example of something an "operator" would do that a "prompter" wouldn't.
+> A friend tells you: "I asked Claude to add a feature. It came back with 'I can implement this either as Option A (faster, less safe) or Option B (slower, more secure). Which would you prefer?' I picked B because it sounded safer." Your friend is asking you whether that was the right interaction. Walk them through what a prompter would do, what an operator would do, and which kind of failure mode they just enacted.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P1 (operator built the system by pushing capabilities), P2 (decisions belong to engineer = AI), P3 (push first, accept no second), P4 (false-yes/false-no symmetry), P21 (mechanical enforcement), P57 (memory before compaction), P68 (already-signed-in users)
+Worked example surface: MembershipKit auth flow
+Rewrite date: 2026-05-13
+-->

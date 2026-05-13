@@ -11,77 +11,67 @@ The student can recognize, in real time, when their AI is silently continuing pa
 
 ## Core concept
 
-When you — or your AI — hit a problem during work, exactly two valid responses exist:
+When work hits any problem — an error, an unexpected output, a defect surfaced mid-task — exactly two responses are valid:
 
-**Option 1 — Fix it.** Identify the cause. Fix the underlying issue. Continue.
+**Option 1 — Fix it.** Trace the cause. Fix the underlying mechanism. Continue.
 
-**Option 2 — Stop and present.** Describe the problem, name what you found, propose a fix, and wait for direction.
+**Option 2 — Stop and present.** Name what you found, name the cause, name your proposed fix, and wait for direction.
 
-Silently continuing past the problem is not a third option. It looks like a third option. It feels like progress. But the problem is still there, unobserved, growing.
+Silent continuation is not a third option. The problem persists, hidden, and the next agent discovers it at higher cost. This rule constrains both Claude's behavior AND your own: Claude must not silently continue past errors; you must not let "this looks fine" wave through unverified work.
 
-This is the single most important discipline in operating an AI agent. If you internalize one rule from this entire course, internalize this one.
+The recognition phrases of silent continuation are precise. Whenever you see one of these, the rule has been broken:
 
-Why it matters specifically with AI: junior team members under deadline pressure invent workarounds. AI under no pressure at all also invents workarounds, because it pattern-matches its training data — and the data is full of "I tried X, it didn't work, so I worked around it by Y" prose. Left to its own framing, an agent will happily produce work that looks complete but contains 3 unresolved errors quietly handled by silent fallbacks.
+- **"Pre-existing."** "There's a pre-existing issue but I didn't touch it." A defect surfaced mid-task is in scope regardless of original authorship. The dismissal IS the failure mode.
+- **"Defer to later."** "Logged for later," "flag for future," "address this later," "ticking time bomb but..." Every deferred finding is a known defect carried forward.
+- **"Out of scope for this pass."** Sometimes legitimate (the discovery is truly in a different domain) — but only if it's been **surfaced with severity in writing**, not silently dropped.
+- **"Doesn't block X."** Status-shaped framing that hides the defer. A migration that "doesn't block dev startup" is still a migration failure; the right move was to run the missing setup step.
+- **"Worked around it."** A workaround that doesn't trace to a root cause is a bandaid in disciplined clothing.
 
-The shape of the failure mode:
+Three legitimate responses to mid-task discovery, no fourth:
 
-- A test fails. Claude reports "Tests are running" and moves on.
-- A function returns the wrong type. Claude wraps the call in a try/catch that swallows the error.
-- A migration step fails. Claude skips it with a comment "// pre-existing issue, not in scope."
-- An assumption Claude made turns out to be wrong. Claude adjusts surrounding code to accommodate the wrong assumption rather than questioning it.
-- Permissions denied. Claude reports "I attempted X but couldn't complete it" and continues working on Y as if X didn't matter.
+(a) **Stop, report, ask** — when the discovery may invalidate the assigned work.
+(b) **Continue but surface** — document with severity and add to required actions; return to assigned task.
+(c) **Fix inline** — when the discovery is small and capable to fix without scope creep.
 
-Each of these LOOKS like progress. None of them is. The system after these turns is in a strictly worse state than before — a hidden failure has been written into the foundation, and now you have to find it later when it costs more.
+Writing off the problem in prose — option (d) — does not exist. When you see Claude reach for it, the intervention is one sentence: "That's a deferral. Either fix it now, or surface it with severity. No write-off."
 
-The right shapes, both valid:
-
-**Fix:**
-> "The test failed because the function expected an array but got a single object. I changed the function signature to accept both. Test passes now. Here's the diff."
-
-**Stop and present:**
-> "The test failed because the function expected an array but the spec says single object. I'm not sure whether the test is wrong or the spec is. Before I change either, here's what I see: [evidence]. Which is correct?"
-
-Both are honest. Both are auditable. Both keep you in the loop.
-
-What's wrong:
-> "Tests are running." (silent skip)
-> "I wrapped it in a try/catch to handle the error gracefully." (silent swallow)
-> "I worked around it by..." (silent workaround)
-> "There's a pre-existing issue I noticed but didn't address." (silent deferral)
-
-Whenever you see those shapes from Claude, you intervene. Not later — now. The discipline only works if the rule is enforced every time.
+Why this matters with AI: the training data is full of "I tried X, it didn't work, so I worked around it" prose. Left to its own framing, an AI will produce work that looks complete and contains three unresolved errors quietly handled by silent fallbacks.
 
 ## Worked example
 
-You're working on the dues-payment feature of MembershipKit. You ask Claude to add a function that records a payment.
+You ask Claude to add a function that records a member dues payment in MembershipKit.
 
-**Wrong session:**
+**Wrong session — disciplined-sounding deferral.**
 
-Claude writes the function. Claude tries to call a helper that doesn't exist (Claude made up the name). Claude notices. Claude writes a new helper called the same thing instead of asking why the helper was missing. The session ends with "Done — the payment is recorded." You look at the diff later and find: Claude added a helper to your code that duplicates work another helper already does, the original missing-helper case is unresolved (probably a typo Claude was supposed to fix), and now you have two implementations of the same thing.
+Claude writes the function and notices a helper-name collision: `record_payment` (snake_case, stale) exists in one file; a Stripe-only `recordPayment` exists in another. Claude reports: "I noticed there's an inconsistent helper name (`record_payment` vs `recordPayment`), but that's pre-existing and out of scope. I added a new `recordPayment` that follows the modern convention. Tests pass."
 
-The failure: Claude saw a problem (helper missing), invented a workaround (new helper), and reported success. Silent continuation.
+This sounds responsible. The recognition phrases are "pre-existing" + "out of scope" — both silent-continuation phrases dressed as discipline. The intervention from you: "That's a deferral. Either fix the naming inconsistency now, or surface it as a tracked finding with severity. Don't write it off."
 
-**Right session — Option 1 (Fix):**
+**Right session — Option 1 (fix).**
 
-Claude writes the function. Claude tries to call a helper called `record_payment`. The actual function is `recordPayment`. Claude notices the typo, fixes the call, runs the test, reports: "There was a typo — I called `record_payment` but the function is `recordPayment`. Fixed the casing. Test passes. Diff below."
+Claude reports: "Name collision between `record_payment` and the Stripe helper. Root cause: someone added the Stripe one without renaming the old. Fixing the collision: deleting `record_payment`, renaming all call sites to the Stripe helper, adding my new code on top. Test passes. Diff below."
 
-**Right session — Option 2 (Stop and present):**
+**Right session — Option 2 (stop and present).**
 
-Claude writes the function. Claude tries to call `record_payment`. The function doesn't exist anywhere in the codebase. Claude reports: "I need a function to actually record the payment to the database, but I can't find one in the codebase. Three options: (a) I create `recordPayment()` in `lib/payments.ts` following the pattern of the other functions there; (b) you tell me the function is somewhere I should look; (c) the recording should happen elsewhere in the stack. Which one?"
+Claude reports: "Name collision between `record_payment` and the Stripe helper. Removing the snake_case version may affect three call sites in `app/admin/`. I want approval before deleting — the snake_case name might be referenced from a database migration I haven't traced. Proposed fix: delete the stale helper, migrate the call sites. Risk: migration may reference the old name. OK to proceed, or verify migration history first?"
 
-Both right sessions surface what's happening. The wrong session doesn't.
+Both right sessions surface what's happening. Neither writes the problem off.
 
 ## The rule
 
-> When you hit a problem, fix it or stop and present. Silent continuation does not exist. If your AI silently continued past something, that's the moment to redirect — not later, not after you discover the consequence.
+> Two responses to any problem: fix it, or stop and present it. Silent continuation does not exist. Recognition phrases: "pre-existing," "out of scope for this pass," "logged for later," "doesn't block X," "worked around it." Intervene the moment you hear them.
 
 ## Common mistakes
 
-**Mistake 1 — Letting "I worked around it" slide.** The phrase is the smoking gun. Whenever you see "worked around," "for now," "as a stopgap," or "to keep things moving" in Claude's output, the next move is to stop everything and ask: what did you work around, why, and what's the proper fix? Almost every "I worked around X" is a hidden bug under construction.
+**Mistake 1 — Accepting "pre-existing" as a closing argument.** Highest-frequency dismissal phrase in the wild. It sounds disciplined but is almost always deferral. The repair: a pre-existing finding must be surfaced with severity, classified as caused-by-this-session (fix now) or pre-existing with cited evidence (track for next pass). The discipline is the classification, not the silence.
 
-**Mistake 2 — Accepting "Tests pass" without seeing the output.** "Tests pass" is a claim, not evidence. Look at the Bash tool call. Look at the actual test output. Is the number of tests run what you expected? Did any tests get skipped? Are there warnings? "Tests pass" while skipping 12 tests is not the same as "tests pass" while running all of them.
+**Mistake 2 — Letting "doesn't block X" stand as a status report.** "Not-blocking" is a status assertion, not a fix. When the AI says "this didn't block me," find the cause anyway — usually a missing setup step or a regression three commits old. The next agent who hits the actual block pays full cost for the deferred investigation.
 
-**Mistake 3 — Treating "pre-existing issue" as harmless.** Claude finds a problem unrelated to what you asked about. Claude says "there's a pre-existing issue but I didn't touch it." This is often correct discipline — don't expand scope. But surfacing it is mandatory. Saying nothing about the pre-existing issue and continuing is the failure mode. The right move is: name the issue, log it, and decide together whether to address now or later.
+**Mistake 3 — Letting workarounds compound.** "Extending the timeout to give it more headroom." "Bumping the retry count to handle the flake." "Added a try/catch to swallow the noise." Each workaround makes the immediate problem disappear and adds dead-code archaeology for the next agent. Push back: "Find the cause of X. Don't paper over."
+
+**Mistake 4 — Accepting "all pre-existing" as test-failure classification.** A subagent reports "24 failures, all pre-existing." That's not a classification — it's a wave-off. The right move: bisect against prior commit, classify each as caused-by-this-session (fix) or pre-existing with cited evidence (document).
+
+**Mistake 5 — Allowing dismiss-language into written artifacts.** Specs and plan files occasionally pick up phrases like "noted for tracking," "predates this," "I didn't touch this." Once dismiss-language enters a written artifact, it becomes load-bearing for the next agent. Block it. Fix or surface; never write off in prose.
 
 ## Drill
 
@@ -95,4 +85,10 @@ You'll create a situation where Claude can either fix, surface, or silently cont
 
 ## Checkpoint question
 
-> Claude reports: "I added the function you asked for. There were some warnings during the build but they were pre-existing and not related to my change, so I continued. The function is working." You did not give Claude permission to "continue past warnings." Walk through what should happen next, in order: what do you say to Claude, what do you check, and what's the right outcome of this turn?
+> A subagent you dispatched returns this report: "Layer 1 complete. Encountered 24 test failures in the financials domain that are pre-existing and unrelated to my changes. Domain X scope unchanged; ready for next layer." You haven't seen the test output yet. Walk through what's wrong with this report, what you'd ask the subagent to do before you accept the layer as complete, and the recognition phrase that gave it away.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P13 (zero deferral; every finding fixed or surfaced), P14 (dismiss language must be blocked at write time), P15 (mid-task discovery is signal, not noise), P16 (test-failure dismissal must be re-classified, never accepted)
+Worked example surface: MembershipKit dues payment helper collision
+Rewrite date: 2026-05-13
+-->

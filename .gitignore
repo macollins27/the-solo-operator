@@ -24,3 +24,6 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Internal authoring material (not for students)
+_internal/

@@ -76,3 +76,8 @@ When all three drills are done, run the chapter's `verify.sh`.
 ## Checkpoint question
 
 > The dev server is running, `localhost:3000` shows the welcome page, but you forgot to commit. You quit the dev server and open a new Claude Code session to start Chapter 9. Claude reads your `student/canonical-project/` and "improves" some of the scaffolded files without asking. You now have uncommitted changes mixed with the original scaffold. How do you figure out exactly what Claude changed, and how do you get back to the original scaffold without losing the things Claude did that you might want to keep?
+
+<!-- Rewriter audit trail
+Mechanical chapter — Node/pnpm/Next.js install, scaffold, dev server, first commit. Checkpoint seeds the discipline of verifying against the artifact (P4/P5) before trusting "done." Core untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

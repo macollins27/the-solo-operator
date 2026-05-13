@@ -11,84 +11,89 @@ The student can describe how 20-30 skills compose into a pipeline at hero level,
 
 ## Core concept
 
-At hero level, the `.claude/skills/` folder contains 20-30 skills. They're not random workflows — they form a **pipeline**. Each skill plays one of four roles, and skills of different roles compose into the full build loop.
+At hero level, the `.claude/skills/` folder contains 20-30 skills. They're not random workflows — they form a **pipeline**. Each skill plays one of four roles; skills of different roles compose into the full build loop.
 
 The four roles:
 
-**1. Writers.** Skills that produce new artifacts: code, specs, configs. Examples from a mature system: `specify` (write a domain spec), `contract` (write a build contract from a spec), `build-source` (write code from a contract), `frontend-implement` (turn a wireframe into React).
+**1. Writers.** Skills that produce new artifacts: code, specs, configs. Examples: `specify` (write a domain spec), `contract` (extract a layer-based build plan from a spec), `build-source` (implement one layer with per-procedure write-verify loop), `frontend-implement` (turn a wireframe into React).
 
-**2. Reviewers.** Skills that read artifacts and produce findings. They DON'T write code — they audit it. Examples: `review-source` (9-pass adversarial review), `spec-audit` (audit a spec against architecture + inventory), `test-audit` (audit tests for quality), `frontend-review` (audit shipped frontend against wireframe).
+**2. Reviewers.** Skills that read artifacts and produce findings. They DON'T write code — they audit. Examples: `review-source` (nine-pass adversarial review against contract + domain rules; emits structured findings), `spec-audit` (audit a spec against architecture + inventory), `test-audit` (audit tests for quality patterns), `frontend-review` (audit shipped frontend against wireframe).
 
 **3. Dispatchers.** Skills that orchestrate other skills, typically across subagents. Examples: `contract-feature` (writes a multi-domain contract by fanning out one subagent per layer), `qa-runner` (dispatches QA subagents per flow), `cto` (read-only judge that decides between options).
 
-**4. Recovers.** Skills that respond to failure. Examples: `fix-source` (per-bug fix cycle), `test-fix` (repair broken tests without weakening assertions), `qa-verify` (verify a finding is real, not a false positive), `domain-status` (read current state and recommend next action).
+**4. Recoverers.** Skills that respond to failure. Examples: `fix-source` (per-bug fix cycle), `test-fix` (repair broken tests without weakening assertions), `qa-verify` (verify a finding is real, not a false positive), `domain-status` (read current state and recommend next action).
 
-A typical workflow uses skills from all four roles, in sequence:
+A typical workflow uses skills from all four roles in sequence:
 
 ```
 specify → contract → build-source → review-source → pnpm gate → qa-audit → fix-source
- (write)  (write)     (write)        (review)      (mechanical) (review)   (recover)
+ (write)  (write)    (write)        (review)        (mechanical) (review)   (recover)
 ```
 
 Each skill is small (~200-500 lines of SKILL.md). Each skill calls specific tools. The pipeline emerges from composition, not from any single skill being huge.
 
-Key discipline points about a hero-level skill family:
+Three discipline points that make a mature skill family work:
 
-**Skills have single responsibilities.** No mega-skill that does everything. The skill that writes a Layer Brief does not also dispatch the build for it. Different role; different skill.
+**1. Single responsibility per skill.** No mega-skill that does everything. The skill that writes a Layer Brief does not also dispatch the build for it. Different role; different skill. Writers don't audit themselves; reviewers don't rewrite code; dispatchers don't do the work.
 
-**Skills produce structured exit signals.** When a skill finishes, it emits a JSON or YAML block summarizing what was done. The orchestrator (or the next skill in the pipeline) reads that block, not the skill's prose summary. Structured signals compose.
+**2. Per-layer / per-stage / per-procedure decomposition.** A skill that builds an entire feature in one invocation accumulates drift — violations compound, the AI forgets earlier choices, the final gate run lumps errors together. The mature pattern is one stage per invocation. `build-source` builds ONE LAYER of a domain — not the whole domain. `page-build` runs ONE STAGE per invocation — `map`, `plan`, `build-index`, `build-detail`, `verify` — each terminating with a structured exit sentinel. Each invocation has bounded scope; mechanical checks fire at the boundary; the next stage is a separate dispatch.
 
-**Skills can't bypass each other.** A reviewer skill can't silently rewrite code; that's not its role. A writer skill can't approve its own output; that's the reviewer's job. The role separation is the moat against AI failure modes.
-
-**Skills evolve via the skill-iteration protocol** (you'll see in Chapter 41). Never modify what isn't broken. Every skill change is justified per the 9-step protocol.
-
-**Skills compose via wrapper scripts** when one skill has to fan out across multiple subagents. The wrapper script is in `scripts/`, not the skill. Skill responsibilities stay clean.
+**3. Structured exit signals.** Every staged skill requires the FIRST line of output to be a structured sentinel naming scope + ISO8601 timestamp. Every TERMINATION emits a sentinel plus a JSON exit object. The orchestrator parses mechanically. A missing sentinel is a process-compliance failure, flagged alongside the raw response. Without sentinels, the orchestrator can't tell whether the subagent actually completed scope or stopped halfway — re-dispatch is unsafe and skipping forward is unsafe.
 
 A mature system also distinguishes:
 
-- **Project skills** at `.claude/skills/<name>/` — apply to this project's domain.
+- **Project skills** at `.claude/skills/<name>/` — apply to this project.
 - **User-global skills** at `~/.claude/skills/<name>/` — apply across all your projects.
-- **Plugin skills** — distributed via plugins, can be opted in.
+- **Plugin skills** distributed via plugins — opted in.
 
-The split matters because the same operator may have very different skill needs across projects. The MembershipKit project doesn't need a `medical-record-export` skill; a healthcare project doesn't need `dues-plan-validate`.
+The same operator can have very different skill needs across projects. A healthcare project doesn't need a `dues-plan-validate` skill; a community app doesn't need `medical-record-export`. The split keeps each project's skill set focused on the project's actual surface.
 
 ## Worked example
 
 A walkthrough of how skills compose in a real feature build:
 
-1. You decide to add the renewal-reminder feature to MembershipKit.
-2. You run `/specify renewal-reminders` — invokes the `specify` skill, which produces `domain-rules/renewal-reminders.md` (a spec).
-3. You run `/contract renewal-reminders` — invokes the `contract` skill, which reads the spec and produces a build contract: which procedures, which Layers, which invariants per Layer.
-4. You run `/build-source renewal-reminders --layer 1` — invokes `build-source` per Layer. Writes the code. Runs `pnpm gate` (a script, not a skill) as a hard gate.
-5. After all Layers: you run `/review-source renewal-reminders` — invokes `review-source`. 9 passes of structured review. Emits findings.
-6. You triage findings, dispatch `/fix-source` per finding. Each fix re-runs gate.
-7. Once all findings are closed: you run `/qa-audit renewal-reminders` — dispatches QA subagents per flow.
-8. If QA finds bugs: `/fix-source` again, re-gate, re-QA.
+1. You add the renewal-reminder feature to MembershipKit.
+2. Run `/specify renewal-reminders` — the `specify` skill produces `domain-rules/renewal-reminders.md`.
+3. Run `/contract renewal-reminders` — the `contract` skill produces a build contract: which procedures, which Layers, which invariants per Layer. The skill's first output line is `STAGE-COMPLETE: contract` followed by a JSON object with the artifact path.
+4. Run `/build-source renewal-reminders --layer 1` — the `build-source` skill builds Layer 1. After each procedure: 15 mechanical grep checks. After the layer: `pnpm gate` as hard gate. Final output: `STAGE-COMPLETE: build-source layer 1` + JSON with files changed and gate-result SHA.
+5. Repeat for layer 2, layer 3, ... Each is a separate dispatch with its own sentinel.
+6. Run `/review-source renewal-reminders` — nine passes of structured review. Emits findings as a JSON array.
+7. Triage findings; dispatch `/fix-source` per finding. Each fix re-runs gate.
+8. Once all findings are closed: run `/qa-audit renewal-reminders --flow signup`. Dispatches a QA subagent.
+9. If QA finds bugs: `/fix-source` again; re-gate; re-QA.
 
-Eight skill invocations across six skill types. The pipeline is YOUR composition; the skills are the units. Each unit is auditable; each transition is structured.
+Eight skill invocations across six skill types, each emitting structured sentinels. The pipeline is YOUR composition; the skills are the units. Each unit is auditable; each transition is structured.
 
 ## The rule
 
-> Skills come in four roles: writers, reviewers, dispatchers, recovers. A hero-level family has 20-30 skills composing into a pipeline. Each skill has one responsibility. Each transition between skills is via structured exit signals, not prose. The skill family is what makes the pipeline auditable and reliable.
+> Skills come in four roles: writers, reviewers, dispatchers, recoverers. Single responsibility per skill. One layer / one stage / one procedure per invocation. Every staged skill emits a structured sentinel as its first line of output and at termination — the orchestrator parses mechanically, never interprets prose.
 
 ## Common mistakes
 
-**Mistake 1 — One mega-skill that does everything.** "Build a feature from spec to shipped" sounds appealing. In practice, the mega-skill has 30 internal branches and is impossible to debug. Splitting into specify + contract + build-source + review-source + fix-source produces five reusable units. The pipeline is the composition.
+**Mistake 1 — One mega-skill that does everything.** "Build a feature from spec to shipped" sounds appealing; in practice the mega-skill branches internally and is impossible to debug. Splitting into specify + contract + build-source + review-source + fix-source produces five reusable units that compose into the pipeline. Roles stay clean.
 
-**Mistake 2 — Skills that bypass each other.** A `build-source` skill that also "auto-reviews its work" is doing two roles, badly. Reviews need a fresh-context, adversarial agent — not the same one that just wrote the code. Maintain role boundaries even when it feels redundant.
+**Mistake 2 — Skills that bypass each other.** A `build-source` skill that also "auto-reviews its work" is doing two roles, badly. Reviews need a fresh-context, adversarial agent — not the same one that just wrote the code. Self-review is biased by the same reasoning thread that produced the work. Maintain role boundaries.
 
-**Mistake 3 — Skills without structured exit signals.** A skill that ends with "Done!" tells the orchestrator nothing actionable. A skill that ends with a JSON block (`{"status": "complete", "files_changed": 3, "findings": []}`) lets the orchestrator decide what to do next. Mature skills always end with structured output.
+**Mistake 3 — Skills without structured exit signals.** A skill that ends with "Done!" tells the orchestrator nothing actionable. A skill that ends with `STAGE-COMPLETE: <stage>` + a JSON exit object lets the orchestrator decide the next dispatch mechanically. Without sentinels, you have prose; with them, you have a protocol.
+
+**Mistake 4 — Skills that try to build everything in one invocation.** Accumulated drift. The mature pattern is per-stage / per-layer / per-procedure with mechanical checks at each boundary. Each invocation has bounded scope; the next unit is a separate dispatch.
 
 ## Drill
 
 Artifacts in your fork.
 
-**Drill 1 — Audit your skill folder.** List all skills you have so far in `student/.claude/skills/`. Classify each by role (writer / reviewer / dispatcher / recover). Save the classification to `student/drills/33-skill-family/01-skill-roles.txt`. Format: `<skill-name>: <role>`.
+**Drill 1 — Audit your skill folder.** List all skills in `student/.claude/skills/`. Classify each by role (writer / reviewer / dispatcher / recoverer). Save the classification to `student/drills/33-skill-family/01-skill-roles.txt`. Format: `<skill-name>: <role>`.
 
-**Drill 2 — Add a reviewer skill.** Author `student/.claude/skills/review-my-change/SKILL.md` — a small reviewer skill that reads the most recent commit's diff, checks the changes against your CLAUDE.md rules, and reports findings (no edits — review-only). The skill should explicitly state in its body "This skill is READ-ONLY. Use only Read, Grep, Glob. Never call Edit, Write, or Bash with mutating commands."
+**Drill 2 — Add a reviewer skill with a sentinel.** Author `student/.claude/skills/review-my-change/SKILL.md` — a small reviewer skill that reads the most recent commit's diff, checks the changes against your CLAUDE.md rules, and reports findings (no edits — review-only). The skill body opens with imperative bans ("Do NOT call Edit / Write / mutating Bash"). The skill's first output line must be `REVIEW-STAGE: <date>`; the final line must be `STAGE-COMPLETE: review` followed by a JSON object summarizing findings.
 
-**Drill 3 — Structure the pipeline.** Write a short paragraph at `student/drills/33-skill-family/02-pipeline.txt` describing the build pipeline YOU would compose for your fork: which writer + reviewer + dispatcher + recover skills, in what sequence, with structured signals at each transition. You don't have to actually run this pipeline today; design it on paper.
+**Drill 3 — Structure the pipeline.** Write a paragraph at `student/drills/33-skill-family/02-pipeline.txt` describing the build pipeline YOU would compose for your fork: which writer + reviewer + dispatcher + recoverer skills, in what sequence, with what structured signal at each transition. You don't have to run this pipeline today; design it on paper.
 
 ## Checkpoint question
 
-> You're operating a system where the same skill writes code AND audits it. Tests pass; CI green; deploys clean. The system has been in production for 3 months. Then a critical bug ships. Walk through what's probably wrong with this setup — and what skill-role discipline would have caught the bug before it reached production.
+> You're operating a system where the same skill writes code AND audits it. Tests pass; CI green; deploys clean. The system has been in production for 3 months. Then a critical bug ships. Walk through what's probably wrong with the setup in 3-4 sentences — name the role-boundary violation, the self-verification bias it produces, and what skill-role discipline would have caught the bug before it reached production.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P45 (one layer / one stage / one procedure per invocation prevents drift), P36 (mandatory exit sentinels make multi-stage workflows mechanically resumable; STAGE-COMPLETE first line + JSON exit; missing sentinel = process-compliance failure), P28 (fresh-context isolation; reviewers must not be the same agent that wrote the work — self-verification is biased by the same reasoning thread)
+Worked example surface: MembershipKit renewal-reminders feature build with eight staged skill invocations
+Rewrite date: 2026-05-13
+-->

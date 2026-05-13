@@ -93,3 +93,8 @@ After all three exist, run the chapter's `verify.sh`.
 ## Checkpoint question
 
 > You've been in a Claude Code session for 90 minutes. You've read 12 files, run 8 commands, and Claude has just started giving slightly off answers — like it's missed a detail you established earlier. Why is this happening, and what's the cheaper move: explaining more, or restarting?
+
+<!-- Rewriter audit trail
+Mechanical chapter — turns, context window, compaction, fresh-session-as-tool. Sets up P57 (memory before compaction) which Chapter 16 develops. Core untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

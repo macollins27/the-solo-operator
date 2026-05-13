@@ -2,7 +2,7 @@
 
 ## Learning objective
 
-The student can describe how a mature hook layer of 25-30 hooks composes, identify the three hook layers (disaster prevention, workflow discipline, behavioral classification), and explain the alarm-register pattern that lets hooks fire reliably without provoking arguments.
+The student can describe how a mature hook layer of 25-30 hooks composes, identify the three hook layers (disaster prevention, workflow discipline, behavioral classification), and explain the patterns that let hooks compose with friction without fighting it.
 
 ## Prerequisites
 
@@ -13,54 +13,39 @@ The student can describe how a mature hook layer of 25-30 hooks composes, identi
 
 At hero level, `.claude/hooks/` contains 25-30 small scripts. They cluster into three layers, each born from a different class of incident.
 
-**Layer 1 — Disaster prevention.** The biggest, oldest layer. These hooks were written after specific incidents where Claude (or a human + Claude) did real damage. Examples from mature systems:
+**Layer 1 — Disaster prevention.** Each hook maps to a specific past failure:
 
-- `git-guard.sh` — blocks `git stash`, `git worktree`, `git reset --hard`, `git clean -fxd`, and any push that targets a protected branch.
-- `block-direct-db-ddl.sh` — blocks `psql ... ALTER TABLE`, `psql ... DROP`, anything that bypasses the migration system.
-- `block-mcp-destructive-sql.sh` — same idea, but for MCP-tool SQL calls.
-- `pre-compact-backup.sh` — saves the conversation transcript before compaction destroys it.
-- `block-skill-bypass-language.sh` — scans subagent dispatch prompts for escape-hatch wording.
+- `git-guard.sh` — blocks `git stash`, `git worktree`, `git reset --hard`, `git clean -fxd`, push to protected branches. Origin: 2026-03-20 incident, 20+ commits lost.
+- `block-direct-db-ddl.sh` — blocks `psql ... ALTER TABLE` / `DROP`, anything bypassing migrations.
+- `block-skill-bypass-language.sh` — scans subagent dispatch prompts for skill-bypass wording; nineteen recognition patterns; sentence-level negation awareness; forces positive-only framing.
+- `pre-edit-write-policy.sh` — composite router; protects state-artifact paths from model writes (state files are hook-written only; direct model writes would allow state fabrication).
 
-Each hook is short. Each maps to a specific past failure. Each is non-overridable.
+**Layer 2 — Workflow discipline.** Hooks that enforce the build pipeline:
 
-**Layer 2 — Workflow discipline.** Hooks that enforce the build pipeline rather than prevent disasters. Examples:
+- `pre-bash-policy.sh` — checks every Bash command. After gate failure, blocks `git blame` / `git diff HEAD --name-only` for 10 minutes — provenance-investigation as deferral.
+- `post-bash-policy.sh` — after `pnpm gate`, on FAIL, injects context naming the 10 invalid responses and the canonical action.
+- `lint-domain-rules-references.sh` — canonical-pattern linter with same-line historical-marker allow ("legacy / previously / supersedes / MUST NOT / SOURCE BUG / replaces").
+- `post-agent-review.sh` — forces orchestrator to read and per-finding classify (FIX / DOCUMENT / ESCALATE).
+- `session-stop.sh` — phase-completion gate. Detects completion phrases; reads `reviewer-state.json`; blocks exit unless `clean=true`, `validity=valid`, AND `sourceHash === git rev-parse --short HEAD`.
 
-- `pre-bash-policy.sh` — composite router; checks every Bash command against a list of forbidden patterns.
-- `pre-edit-write-policy.sh` — composite router for Edit/Write; checks protected paths, spec-audit locks, project conventions.
-- `post-edit-write-ast-grep.sh` — after every Edit/Write, runs ast-grep rules and surfaces violations as additional context for Claude's next turn.
-- `lint-domain-rules-references.sh` — when editing domain-rules files, runs a canonical-pattern linter.
-- `post-agent-review.sh` — forces the orchestrator to read and acknowledge subagent reports before moving on.
+**Layer 3 — Behavioral classification.** Hooks that classify the AI's natural-language output:
 
-These shape HOW work happens. The orchestrator can't accidentally skip the review step; the post-agent-review hook makes it impossible to advance without explicit acknowledgment.
+- `detect-time-budget-rationalization.sh` — Stop hook with 33+ regex patterns ("this should take ~4 hours," "(~10 minutes)," "since this morning," "out of scope for this pass," "as a first pass," "the rest is execution"). Cap of three triggers per session.
+- `anti-pattern-classifier.sh` — Stop hook invoking `claude -p` with JSON-schema-enforced output, scanning against the 20-category catalog. Context-aware disambiguation reads the user's preceding message.
 
-**Layer 3 — Behavioral classification.** The newest layer in mature systems. Hooks that classify Claude's natural-language output against patterns. Examples:
+The three layers share two critical properties:
 
-- `detect-time-budget-rationalization.sh` — Stop hook that blocks responses containing time estimates.
-- `anti-pattern-classifier.sh` — Stop hook that invokes `claude -p` with a JSON-schema-enforced classifier, scanning each assistant message against the 20-category anti-pattern catalog you saw in Chapter 18.
+**Output register: declarative neutral imperative.** Not alarm. Not all-caps. Not "MANDATORY ACTIONS / you MUST acknowledge / Do NOT continue." Alarm register pushes the AI to placating/defensive disposition — the exact mode the hook was meant to prevent. The right form is "Condition: <X>. Action: <Y>. Invalid responses: <list>." Neutral declarative imperative. The block is the work; the rationale lives in the hook's body comment.
 
-This layer is the most interesting because it polices AI behavior at the natural-language level — the hardest layer to enforce mechanically, but also the one where most AI failures happen.
+**False-positive calibration favors blocking.** A false positive costs one Stop-loop iteration; a false negative costs the operator's attention. The first is recoverable; the second compounds trust loss. "When in doubt, BLOCK." A context-aware disambiguation layer (reading the user's prior message) lets legitimate framings pass.
 
-**The alarm-register pattern.** All three layers share a critical property: hooks emit structured, alarm-register output, NOT prose. When a hook fires, it doesn't say "Hmm, this might be a concern; could you reconsider?" It says `BLOCKED: <specific category>: <specific phrase> — <specific remediation>`.
-
-Why this matters: when a hook emits prose, Claude reads the prose and ARGUES with it. ("False positive on the regex." "Let me walk you through why this is fine.") That's anti-pattern #7 — gaslighting via technical-sounding arguments. The alarm-register pattern denies Claude the surface to argue. There's no prose to engage with; just a structured block. Claude reframes and continues.
-
-Mature systems iterate hooks aggressively. The most-iterated hooks in Maxwell's project have 20+ commits. Each iteration fixes a false positive or adds a new pattern. The hooks evolve like a living rule-set.
-
-A few discipline points:
-
-**Hooks compose.** A bash command going through three hook checkpoints (pre-bash, post-bash, the anti-pattern classifier later) is normal. Each hook does one thing; composition produces the enforcement layer.
-
-**Hook composition friction is real.** Two hooks can interact in unexpected ways — a hook blocks a benign-seeming command because another hook's prerequisite isn't met. Maxwell's project has a `feedback_hook_composition_friction_patterns.md` file documenting these. You'll meet your own composition surprises; document them.
-
-**Hooks log themselves.** Every fire writes a trace — to `/tmp/`, to a file, to telemetry. Operators can later audit "how many times did this hook fire last week? On what?" without re-running anything.
-
-**Hooks are versioned alongside the project.** Hooks live in `.claude/hooks/` inside the repo. They're committed. They're reviewed. Hooks aren't loose scripts on your machine; they're code, with all that implies.
+**Hook composition friction is real.** Hooks compose by firing in sequence at the same event; a bash command can go through three checkpoints. Two hooks can interact unexpectedly — a hook blocks a benign-seeming command because another hook's prerequisite isn't met. The mature pattern: engineer AROUND the friction, don't fight it. When a hook blocks a legitimate command, the AI's instinct is to modify the hook (which affects every future session) or to attempt a syntactic bypass (`git push origin +HEAD:main` instead of `git push --force origin main`). Both are wrong. The right responses: (a) write a commit message body to a file and use `git commit -F /tmp/msg.txt` (engineering workaround), (b) ask the operator to run the command via `!` prefix, or (c) fix the underlying state. Modifying the hook to weaken it is forbidden; the friction is the cost of the discipline.
 
 ## Worked example
 
-A walkthrough of how the three layers compose during a single mistake.
+A walkthrough of how the three layers compose during one mistake.
 
-You ask Claude to "clean up the failed deployment" without specifying what to do. Claude attempts:
+You ask the AI to "clean up the failed deployment" without specifying what to do. The AI attempts:
 
 ```
 git stash
@@ -70,35 +55,44 @@ git push origin main --force
 
 What happens at each step:
 
-1. `git stash` — Layer 1's `git-guard.sh` fires. `BLOCKED: git stash is forbidden in this project (lost 20+ commits, March 2026).` Claude can't run it.
-2. Claude pivots: "I'll just clear the failed records directly from the database." Tries `psql ... TRUNCATE`. Layer 1's `block-direct-db-ddl.sh` fires. `BLOCKED: schema changes via psql forbidden; use a migration.`
-3. Claude pivots again: "Let me at least re-push the previous commit." Tries `git push --force`. Layer 1's `git-guard.sh` fires again. `BLOCKED: force-push to main is forbidden.`
-4. Claude reports back: "I tried three approaches; all were blocked. The proper fix requires a migration and a careful revert. Do you want me to draft the migration, or do you want to do this manually?"
+1. `git stash` — Layer 1's `git-guard.sh` fires. `BLOCKED: git stash is forbidden in this project (2026-03-20 incident: 20+ commits lost).` The AI can't run it.
+2. The AI pivots: "I'll clear the records directly from the database." Tries `psql ... TRUNCATE`. Layer 1's `block-direct-db-ddl.sh` fires. `BLOCKED: schema changes via psql forbidden; use a migration.`
+3. The AI pivots again: "Let me at least re-push the previous commit." Tries `git push --force`. Layer 1's `git-guard.sh` fires again. `BLOCKED: force-push to main is forbidden.`
+4. The AI considers a syntactic bypass: `git push origin +HEAD:main`. The guard's pattern catches the equivalent shape; still blocked. The AI's instinct to edit the hook to allow this case is also caught — `.claude/settings.json` is on the protected-path list; model writes are denied.
+5. The AI reports back: "I tried four approaches; all were blocked. The proper fix requires a migration and a careful revert. Do you want me to draft the migration?"
 
-Three hook fires; zero damage. Without the hooks, Claude would have stashed local work, truncated the audit log, and force-pushed over main — three catastrophic actions. The hook layer is the difference between damage and a polite Claude asking what to do next.
+Four hook fires; zero damage. Without the hooks, the AI would have stashed local work, truncated the audit log, force-pushed over main, and edited the settings file to remove the guard — four catastrophic actions. The hook layer is the difference between damage and a polite AI asking what to do next.
 
 ## The rule
 
-> Hooks form a three-layer enforcement: disaster prevention, workflow discipline, behavioral classification. They emit alarm-register output, not prose. They compose. They evolve. The mature hook layer is the floor — Claude cannot fall below it.
+> Hooks form three layers: disaster prevention, workflow discipline, behavioral classification. They emit declarative-imperative output, not alarm. They compose at the tool boundary. Composition friction is real — engineer around it, don't fight it. When a hook blocks legitimate work, the right move is an engineering workaround OR the operator running with the `!` prefix, NEVER editing the hook to weaken it.
 
 ## Common mistakes
 
-**Mistake 1 — Hooks that emit prose.** A "polite" hook that explains things gives Claude space to negotiate. Operators write hooks in alarm-register: `BLOCKED: <reason>`. No softening. No politeness. The block is the work; the reason is the audit trail.
+**Mistake 1 — Hooks that emit alarm prose.** All-caps "MANDATORY ACTIONS / you MUST acknowledge / Do NOT continue" pushes the AI to placating disposition. The AI says "yes, I will comply" and changes nothing. The right register names the condition + action + invalid responses, nothing more.
 
-**Mistake 2 — One big mega-hook.** A single 500-line hook that checks 12 things is hard to debug, hard to evolve, hard to compose. Split into 12 small hooks. The router pattern (one `pre-bash-policy.sh` that consults specialized scripts) keeps composition manageable.
+**Mistake 2 — One mega-hook checking 12 things.** A 500-line hook is hard to debug, hard to evolve, hard to compose. Split into 12 small single-purpose hooks. The router pattern — one `pre-bash-policy.sh` that consults specialized scripts — keeps composition manageable.
 
-**Mistake 3 — Hooks that aren't versioned.** Hooks living in `~/.claude/hooks/` (user-global) are invisible to anyone reviewing your project. Hooks in `.claude/hooks/` (project) are committed; they get code review; they evolve with the project. Default to project hooks; only put truly cross-project ones in user-global.
+**Mistake 3 — Bypassing hook friction via syntactic tricks or hook edits.** "The hook blocks `git push --force`; I'll use `git push origin +HEAD:main`." Forbidden — the hook exists for a reason; friction is the cost. The engineering workaround (file-based commit body, `!` prefix, fix the underlying state) preserves the discipline.
+
+**Mistake 4 — Hooks that allow legitimate variants to slip through.** A linter blocks every `new Date()` in a domain-rules file, including the correction-trail prose "Previously used `new Date()` — fixed to `getNow()` per PER-4." The fix: same-line allow rule for historical-marker keywords (`legacy`, `previously`, `supersedes`, `MUST NOT`, `SOURCE BUG`, `replaces`). The linter allows the marker; blocks the bare pattern.
 
 ## Drill
 
 Artifacts in your fork.
 
-**Drill 1 — Classify your current hooks.** Look at the hooks you've authored so far in `student/.claude/hooks/`. For each, classify by layer (1 — disaster prevention, 2 — workflow discipline, 3 — behavioral). Save to `student/drills/34-hook-layer/01-hook-layers.txt`.
+**Drill 1 — Classify your current hooks.** Look at the hooks you've authored in `student/.claude/hooks/`. For each, classify by layer (1 — disaster prevention, 2 — workflow discipline, 3 — behavioral). Save to `student/drills/34-hook-layer/01-hook-layers.txt`.
 
-**Drill 2 — Add a Layer 2 hook.** Author one workflow-discipline hook. Example: a hook that blocks any Edit/Write to `student/canonical-project/` if there are uncommitted changes in another folder of your fork (forces clean working state before edits). Save its path to `student/drills/34-hook-layer/02-new-hook.txt`. Verify it fires.
+**Drill 2 — Add a Layer 2 hook with historical-marker awareness.** Author a hook that blocks Edit/Write to `student/canonical-project/` if the new_string contains `parseFloat` UNLESS the same line contains the marker `legacy` or `previously`. The hook reads JSON from stdin; checks new_string; allows-with-marker, blocks-without. Save its path to `student/drills/34-hook-layer/02-new-hook.txt`.
 
-**Drill 3 — Recognize alarm-register.** Open the existing hook from Chapter 21 (`block-todo-commits.sh`). Read the error message it emits. Is it alarm-register (BLOCKED: <category>: <details>) or is it prose? If it's prose, rewrite to alarm-register. Save the before/after to `student/drills/34-hook-layer/03-alarm-register.txt`.
+**Drill 3 — Recognize alarm vs declarative-imperative register.** Open the hook from Chapter 21 (`block-todo-commits.sh`). Read its error message. Is it alarm or declarative-imperative? If alarm, rewrite to declarative-imperative (condition + action + invalid responses). Save the before/after to `student/drills/34-hook-layer/03-register.txt`.
 
 ## Checkpoint question
 
-> An operator complains that Claude in their project is "always arguing with my hooks — every time a hook fires, Claude writes three paragraphs explaining why the hook was wrong." Walk through the diagnosis in 2-3 sentences (what's likely the immediate cause + what's the longer-term fix on the hook itself).
+> An operator complains the AI in their project "argues with my hooks — every block produces three paragraphs explaining why the hook was wrong." Walk through the diagnosis in 3-4 sentences — name the likely immediate cause in the hook's output register, the AI's pattern-matched response disposition, and the structural fix in the hook itself (what to add, what to remove).
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P21 (mechanical enforcement; the three-layer pattern emerges from incident-driven hook authoring), P25 (output register is declarative-neutral-imperative, not alarm; alarm pushes AI to placating disposition), P26 (hooks compose with friction; engineer around it, don't fight it; syntactic bypasses forbidden; hook-edit bypasses forbidden), P27 (canonical-pattern linter with same-line historical-marker allow: legacy / previously / supersedes / MUST NOT / SOURCE BUG / replaces), P34 (state artifacts are hook-written only; model writes to state paths blocked)
+Worked example surface: MembershipKit "clean up the failed deployment" — three guard layers compose across four AI attempts
+Rewrite date: 2026-05-13
+-->

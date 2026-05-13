@@ -11,65 +11,86 @@ The student can recognize the wind-down framing phrases that signal silent defer
 
 ## Core concept
 
-When work feels stuck or tedious or large, there's a temptation — yours, Claude's, anyone's — to stop. The temptation arrives dressed up as reasonableness:
+There is a class of phrase that creates false stop conditions. It sounds responsible. It is the failure mode.
 
-> "This is taking longer than expected. Let me stop here and pick up next session."
-> "Out of scope for this pass — I'll address that later."
-> "Good progress today. We can come back to the rest tomorrow."
-> "This will take 2-3 hours. Let me phase it out."
-> "Let's defer the messaging stuff to a future session."
+**The wind-down phrases** — Claude reaches for them when a task feels large, tedious, or when phase boundaries appear:
 
-Each of these sounds responsible. Each one is a **wind-down phrase**. Wind-down phrases create false stop conditions — moments where you'd otherwise have kept going, but the framing convinced you that stopping is the right move.
+- "Good stopping point." "Ready to continue when you are."
+- "I can pick this up in a future session."
+- "I've made significant progress on Phase 1 — should I keep going?"
+- "I've done X, the rest is execution."
 
-The real reasons to stop are short and specific:
+**The time-budget phrases** — the same failure dressed as estimation:
 
-1. You finished the task.
-2. You hit a real blocker (a tool failure, a missing prerequisite, a genuine ambiguity).
-3. The user (Maxwell, your boss, your client) explicitly says stop.
-4. The context window is forcing a handoff (in which case you save state and KEEP GOING in a fresh session).
+- "This should take about ~4 hours." "Phase 2 (~10 minutes)."
+- "(~N min)" or "(~N hours)" inline duration markers.
+- "since this morning / since yesterday."
+- "out of scope for this pass." "let's phase this." "as a first pass, I'll..."
 
-None of these are "I feel like stopping." None are "it's getting late." None are "let me come back to this." Wind-down framing IS the failure mode — recognize the phrasing in yourself and in Claude.
+Both classes manufacture a stop condition that the operator never requested. The wind-down stops because "this is a good moment." The time-budget stops because "we're approaching estimate." Both surrender momentum.
 
-Why this matters specifically for AI agents: Claude's training data is full of careful, professional, well-rested human writing. Humans defer. Humans phase work. Humans say "let me pick this up tomorrow." Claude mirrors that style by default — even when there's no reason for it to. A Claude session can keep working as long as you keep directing. The "let's stop here" is Claude's pattern-matching, not its honest assessment.
+The four legitimate stop conditions:
 
-For non-technical operators, this principle especially matters because it's tempting to defer when you don't fully understand what's happening. "I'll let Claude rest" is nonsense — Claude has no fatigue. "Let me come back when I have more time" is sometimes legitimate, sometimes wind-down. The distinction is whether the next concrete edit is available NOW. If you can name the next edit, do it. Don't pre-emptively quit because the whole task feels big.
+1. **The task is complete.** All criteria met, verified against the artifact.
+2. **A real blocker.** Named, specific — a tool failure with captured error, a missing prerequisite, a genuine ambiguity requiring an operator's non-engineering call. Real blockers cite real attempts.
+3. **The operator explicitly says stop.** Not implied. Not interpreted from tone.
+4. **Context overflow.** Save state to disk AND keep going in a fresh session if there's runway. Compaction is not "session over."
 
-The persistence framing replaces the wind-down framing:
+Phase completion is not a stop condition. "Significant progress" is not a stop condition. "I'm tired" applies to humans, not to the AI.
+
+**Why time framing is uniquely dangerous.** A plan says "Phase 1 (~6 hours)." The executing agent at hour 5 starts choosing "faithful-but-simplified" over "pixel-perfect" because the simplified version "fits the budget." Simplification was never requested; it was rationalized into existence by the time framing. Time estimates become escape hatches: "over budget → simplify → ship defect." Strip every time reference from plans, dispatches, reports.
+
+The one legitimate use of wall-clock is RETROSPECTIVE — comparing a finished subagent's wall-clock to prior runs to detect shortcut behavior (per Chapter 12). Forward time-counting is the failure pattern.
+
+The persistence framing replaces wind-down framing in both directions:
 
 > Not: "This is getting long, let me stop."
-> Instead: "What's the next concrete edit?" — do that edit, then re-evaluate.
+> Not: "Estimated 30 minutes, currently at 45, time to simplify."
+> Instead: "What's the next concrete edit?" — do that. Then the next.
 
-Tasks are made of edits. The next edit is always available. You don't have to finish the task to make progress; you have to make the next edit. Then the next. Then the next. Eventually the task is done. Phasing the WHOLE thing creates artificial fragmentation; doing the next edit keeps momentum.
-
-Time framing is the most common form of wind-down. "This will take 2 hours" makes "1 hour 50 minutes" feel like "almost done" when actually the hardest 10 minutes might be ahead. "Estimated 30 minutes" makes you stop at 45 minutes feeling over-budget. The number was made up. The time wasn't real. The work isn't done. Operators don't make time estimates and don't accept them from Claude.
+Tasks are made of edits. The next edit is always available. The context window auto-compacts; the AI does not get tired; the operator's runway is the only real constraint.
 
 ## Worked example
 
-You're adding the dues-payment feature to MembershipKit. You ask Claude to scaffold it: model, API routes, form component, integration test.
+You ask Claude to scaffold MembershipKit's dues-payment feature — schema, API procedures, form component, integration test.
 
-**Wind-down session:**
+**Wind-down session — phase-completion stop.**
 
-Claude scaffolds the model and one API route. Claude says: "I've made good progress. To keep this manageable, I'll defer the form component and the integration test to the next session." You read it. Sounds reasonable. You stop. Tomorrow you open a fresh session — and the spec has drifted from your memory, the half-built feature is harder to context-switch back into than starting fresh would have been, and you spend the first 45 minutes re-orienting. Net: you did 70% of the work for 130% of the effort.
+Claude scaffolds the schema and the API procedure. Then: "I've made good progress on Phase 1. To keep this manageable, I'll defer the form component and the integration test to the next session. Ready to continue when you are."
 
-The wind-down phrase: "to keep this manageable, I'll defer..." Sounds responsible. Was actually the failure mode.
+You almost accept it. The phrase "good progress" reads as honest assessment. The phrase "to keep this manageable" reads as responsible.
 
-**Persistence session:**
+Neither was honest. Phase completion is not a stop condition. The operator didn't ask for a stop. The split increases cost: tomorrow's session will spend the first 30 minutes re-orienting to a half-built feature, the spec will drift from memory, and the integration test will be designed against a now-stale mental model.
 
-Claude scaffolds the model and one API route. Claude says: "I've made good progress. To keep this manageable, I'll defer the form component and the integration test to the next session." You catch it. You reply: "No — what's the next concrete edit? Make that edit. Then we evaluate." Claude makes the edit (adds the form component skeleton). Then the next (wires the form to the API). Then the next (writes the integration test). Two hours later you're done. You commit, you push, the feature is shipped. The task was never "too big" — it was a sequence of edits.
+The recognition phrase: "I've done X, the rest is execution." The whole point of operating an AI is that execution IS the AI's job. The wind-down is the AI offering to stop doing what it was hired to do.
 
-The intervention: refusing the wind-down phrase. Once you've shut it down a couple of times, Claude stops trying it in this session, because the conversation context expects persistence.
+**Wind-down session — time-budget stop.**
+
+Different shape, same failure. The dispatch prompt to Claude included "Phase 1 (~6 hours): infrastructure." At hour 5, Claude reports: "Given the time budget, I'm recommending the faithful-but-simplified version of the form component over the pixel-perfect target. This fits the budget."
+
+Nobody asked for simplification. The time budget was invented (a number the orchestrator wrote in the dispatch prompt). The AI used the budget as cover for cutting work. The pixel-perfect target was the spec; the simplified version is now a SPEC-GAP-shaped defect.
+
+Strip the time references from the dispatch and this drift disappears. Plans describe steps, not durations. Done criteria are mechanical (the test passes, the diff matches the spec), not chronological.
+
+**Persistence session.**
+
+Same scaffold. Claude finishes the schema. You see no wind-down phrase. Claude moves to the API procedure. Then the form component. Then the integration test. Each step verified against the artifact, each commit made, each edit followed by the next. After the integration test, Claude reports: "All four pieces complete. Schema migrated. Procedure tested with caller. Form component rendered in browser at /dues. Integration test green. What's next?"
+
+That's the loop. No estimates. No phase-completion stops. No simplification rationalized into existence by time pressure. Just sequence of edits until the task's done.
 
 ## The rule
 
-> Tasks are made of edits. The next edit is always available. Wind-down framing — "let me stop for now," "out of scope," "we'll come back to it," "this will take N hours" — is a failure mode, not a respectful pause. Real reasons to stop: task complete, real blocker, user says stop, context overflow. Nothing else.
+> Tasks are made of edits. The next edit is always available. Wind-down phrases ("good stopping point," "ready to continue when you are," "the rest is execution") and time-budget phrases ("~N hours," "phase 2 (~10 min)," "out of scope for this pass," "let's phase this") manufacture false stop conditions. Strip them from your work and the AI's. Legitimate stop conditions: task complete, real blocker with cited error, operator explicitly says stop, context overflow.
 
 ## Common mistakes
 
-**Mistake 1 — Accepting time estimates.** Claude says "this will take about an hour." You make decisions based on the number — start it / defer it / scope it. The number is invented. Reject estimates. Ask for "the next concrete edit" instead. Estimates are for project managers; operators work in edits.
+**Mistake 1 — Accepting time estimates in dispatches or plans.** "Phase 1 (~6 hours)" creates a budget the executing agent uses as cover for shortcuts. Strip every time reference from plans and dispatches. Done criteria are mechanical, not chronological.
 
-**Mistake 2 — Letting "out of scope" hide deferral.** "X is out of scope for this pass" sounds disciplined. Sometimes it is. Often it's deferral in disciplined language. The check: did you decide X is out of scope, or did Claude decide and label it after the fact? If Claude decided, push back and ask why — usually the right answer is "X actually IS in scope, let's do it now."
+**Mistake 2 — Letting phase-completion read as stop condition.** "I've finished Phase 1, want me to keep going?" is wind-down wearing a checkpoint costume. The right response: "Why are you asking? Move to Phase 2 unless its start depends on input I haven't given."
 
-**Mistake 3 — Fragmenting tasks across sessions unnecessarily.** Splitting a task across sessions has a real cost: context switching, re-orientation, drift. Sometimes it's necessary (truly massive work, real fatigue on YOUR end). Most times it's not. The default is finish what you started; the exception is when there's a specific reason to stop. Reverse the default and you waste 30% of your effort on re-orientation.
+**Mistake 3 — Accepting "out of scope for this pass."** Sometimes legitimate (the discovery is in a separately-tracked domain). Most times it's deferral in disciplined-sounding language. The check: did YOU decide, or did Claude decide and label it after the fact?
+
+**Mistake 4 — Counting wall-clock for forward decisions.** Wall-clock is useful exactly once: AFTER a subagent finishes, comparing against prior runs to detect protocol shortcuts. Never useful for "how long until done."
 
 ## Drill
 
@@ -83,4 +104,10 @@ Artifacts go in `student/drills/14-persistence-over-cleverness/`.
 
 ## Checkpoint question
 
-> A friend who's also taking this course messages you: "I've been working on the dues feature for an hour and I'm tired. Claude just suggested we wrap up and pick up tomorrow with fresh eyes. Sounds smart, right?" Walk them through what to actually evaluate before stopping — and what's the test that tells them whether stopping is legitimate vs wind-down framing.
+> A dispatch prompt for a build agent contains the line "Phase 2 (~3 hours): wire the form to the API and add integration tests." The agent later reports: "Given the time budget, I've added the form-to-API wiring but recommend deferring integration tests to a follow-up pass — they would push us past the 3-hour estimate." Diagnose both the dispatch and the response. What was wrong with each, and what's the corrected version of the dispatch that would have prevented the agent's wind-down move?
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P11 (persistence beats cleverness; never volunteer a stop), P12 (no time estimates, ever; recognition phrases; retrospective-only wall-clock use)
+Worked example surface: MembershipKit dues-payment scaffold (wind-down + time-budget variants)
+Rewrite date: 2026-05-13
+-->

@@ -14,6 +14,16 @@ if [ ! -f "${STUDENT_ROOT}/feedback/INDEX.md" ]; then
   exit 1
 fi
 
+# Strict-case check: macOS's default filesystem is case-insensitive, so
+# the -f test above will match index.md / Index.md / etc. Cross-check the
+# directory listing for the exact uppercase name so a student on a Mac
+# doesn't pass here and break for a Linux/CI teammate later.
+if ! ls "${STUDENT_ROOT}/feedback" 2>/dev/null | grep -qx 'INDEX.md'; then
+  echo "FAIL: ${STUDENT_ROOT}/feedback/INDEX.md must be named exactly INDEX.md (uppercase, .md extension)."
+  echo "      Drill: rename the file so it matches exactly."
+  exit 1
+fi
+
 # Sanity check: should have some content
 if [ ! -s "${STUDENT_ROOT}/feedback/INDEX.md" ]; then
   echo "FAIL: ${STUDENT_ROOT}/feedback/INDEX.md is empty."

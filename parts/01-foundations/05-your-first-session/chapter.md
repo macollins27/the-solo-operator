@@ -101,3 +101,8 @@ You'll capture three artifacts from your first sessions. They go in `student/dri
 ## Checkpoint question
 
 > You just ran a Claude Code session. Claude told you "I read the file and made the change you asked for." You did NOT see a tool-call box appear during the session. What does this tell you, and what's the next thing you'd say to Claude?
+
+<!-- Rewriter audit trail
+Mechanical chapter — starting/ending a session, permission prompts, slash commands. Checkpoint seeds the false-yes intuition (P4) that Chapter 12 develops. Core untouched in this rewrite pass.
+Rewrite date: 2026-05-13
+-->

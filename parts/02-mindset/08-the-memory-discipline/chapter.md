@@ -11,28 +11,21 @@ The student can recognize when they've been bitten by a specific AI failure mode
 
 ## Core concept
 
-Every time Claude bites you, you have a choice:
+When the operator corrects the AI, the correction is almost never a single-issue resolution. It's a **decision framework** that pre-empts a class of future questions. Most operators apply the answer and miss the framework — and the same family of failure recurs in a different surface form.
 
-1. **Fix the specific instance, move on, hope it doesn't recur.**
-2. **Write the rule. Save it. Apply it forward.**
+Example: the operator says "no time estimates." The AI strips estimates from the current plan. Five turns later the AI cites "~3-4 hours" in a different artifact because "that's a different document." The rule was about the reasoning, not the document. The framework wasn't extracted.
 
-Option 1 is the default. It's what almost everyone does. The cost: the same kind of mistake recurs in different surface forms — and you don't notice the pattern because each instance feels like a new problem. After three months you have 30 small recurring issues you keep solving for the first time.
+The discipline, both sides:
 
-Option 2 is the moat. Each incident becomes a durable rule that prevents the entire class of failures going forward. You build a corpus — your `feedback/` folder, your `CLAUDE.md`, your hooks. The corpus IS the moat. It's the thing no one else can copy because it's authored from your specific mistakes. After three months you have 30 rules and an AI that doesn't make those mistakes anymore.
+- **AI side:** when the operator answers any question, ask "what general principle does this encode? what classes of future questions does it pre-empt?" Save the principle as a durable rule on disk.
+- **Operator side:** every incident becomes a rule. Four lines, saved to `student/feedback/feedback_<slug>.md`:
 
-The discipline is small per incident, huge over time. Three to five sentences per rule. The shape that works:
+> **What happened.** One sentence — the failure.
+> **The mechanism.** One or two sentences — the cause, not the symptom.
+> **The rule.** One sentence in the form "When X, do Y. Never Z."
+> **Evidence.** Date, commit, session reference.
 
-> **What happened.** One-sentence description of the failure.
->
-> **The mechanism.** One or two sentences naming WHY it happened — the cause, not the symptom.
->
-> **The rule.** One sentence in the form "When X, do Y. Never Z." — actionable and memorizable.
->
-> **Evidence.** One reference to where this happened — a date, a session, a commit, a file path.
-
-That's it. Four lines. Save it as a `feedback_<short-name>.md` file in your fork's `student/feedback/` folder. Reference it from your `CLAUDE.md` (Part 3). Now every future Claude Code session in your project sees the rule.
-
-A worked example of the durable shape:
+A worked example of the shape:
 
 ```
 # feedback_no_silent_bandaids.md
@@ -48,65 +41,74 @@ Rule: When Claude proposes a try/catch, demand the specific error type
 being caught and a log statement. If Claude can't name the error type,
 the try/catch is a bandaid; refuse it.
 
-Evidence: 2025-03-14, session adding /api/pay endpoint; commit 3a7f2c1
-where I caught the bandaid; commit 5b9e441 fixing the actual db connection.
+Evidence: 2025-03-14, /api/pay endpoint session; commit 3a7f2c1.
 ```
 
-Notice what's in this file: zero generalities, all specifics. Notice what's NOT in this file: a long essay about how try/catches are bad in general. Operators write incident-specific rules; pundits write essays.
+Zero generalities. All specifics. No essay; an incident with a rule extracted.
 
-Some rules go in different places over time:
+**The promotion path.** Rules don't live in one place forever:
 
-- **First time** something happens, you write a feedback file. Specific, dated.
-- **Second time** a similar thing happens, you write a SECOND feedback file. Different incident, same family.
-- **Third time**, you notice the pattern. You consolidate the two feedback files into one rule in your `CLAUDE.md` ("Never use try/catch without a specific error type and a log statement"). The two feedback files get archived but stay readable.
-- **Fourth time**, the rule is in CLAUDE.md, Claude reads it at session start, the failure never happens again — unless something subtle differs. If it does, you write a new feedback file noting the subtle difference, and so on.
+- **First incident:** feedback file. Specific, dated, low ceremony.
+- **Second similar incident:** another feedback file. Same family, different surface.
+- **Third+:** you've found a pattern. Consolidate into a `CLAUDE.md` rule that fires at every session start.
+- **Mechanically detectable:** promote again — to a hook (Part 3). A hook fires at the tool boundary; it cannot be rationalized around.
 
-This is how Maxwell's hero-level system was built. Not from a master plan. From 30+ incidents, each producing a rule, accumulating into a corpus over 60 days. Your corpus starts here, with one rule.
+Most rules stop at the feedback file. Some climb to CLAUDE.md. The few that climb to hooks pay back forever — every future session, mechanically. The path from feedback file to hook is the maturation track of every load-bearing rule in your project.
 
-What KILLS the discipline: not writing the rule down. You think "oh, that won't happen again, I'll remember." You don't remember. Three weeks later the same family of bug bites you, and you debug from scratch.
+**The compaction trap.** When a long session approaches the context limit, the system auto-compacts — replaces older context with a generated summary optimized to "keep the agent functional," not to preserve corrections, decision reasons, deleted files. Within three messages post-compaction the AI commonly re-invokes a tool that was deleted earlier in the session, or repeats a mistake it had already been corrected on.
 
-What KEEPS the discipline: writing the rule down BEFORE you fix the bug, in the heat of the moment when you remember the mechanism most clearly.
+The repair: **write the memory file BEFORE compaction.** Save an artifact to disk covering files created/modified/deleted with reasons, current task state, architectural decisions with WHY, open questions. Commit. A fresh session reads the file and inherits the corrections; the auto-summary alone does not.
+
+What kills the discipline: thinking "I'll remember." You won't. Three weeks later the same bug shape returns and you debug from scratch. Write the rule when it's fresh.
 
 ## Worked example
 
-You're using Claude Code to add an event-creation form to MembershipKit. Claude implements the form, you ship it. A week later a community admin reports that creating an event with a date in the past silently succeeds — there's no validation. You spec'd "events must be in the future" but Claude omitted it.
+You catch Claude writing "(~30 min)" into a plan section in MembershipKit. You correct: "Strip time estimates from this plan."
 
-The fix is easy (add date validation). The DURABLE move is the rule:
+**Surface-fix interpretation.** Claude edits the plan, removes the estimate. You move on. Twenty turns later Claude writes a session-state file that includes "since this morning I've completed Phase 1." Different surface, same failure — wall-clock anchoring. Claude treats it as fresh because "session-state isn't a plan." The framework was never extracted.
+
+**Framework-extracted interpretation.** When you corrected the first time, you also wrote:
 
 ```
-# feedback_spec_completeness.md
+# feedback_no_time_framing.md
 
-What happened: Claude implemented the event-create form but skipped the
-"events must be in the future" validation from my spec. I missed it in
-review. A user created an event in the past.
+What happened: Claude wrote "(~30 min)" into a plan section. Pattern
+appeared again 20 turns later as "since this morning" in a session-state.
 
-Mechanism: My review compared the file Claude wrote to my own memory of
-the spec, not to the spec document. The omitted check wasn't visible
-without a line-by-line spec-to-code comparison.
+Mechanism: The training-data prior says agents produce estimates as
+helpful project management. Both inline durations AND retrospective
+wall-clock framing trigger the same prior. The pattern is about reasoning,
+not about which document.
 
-Rule: When reviewing AI-implemented features, compare the spec
-DOCUMENT (file in repo) to the code line by line. Don't trust memory of
-the spec. If the feature has 5 spec lines, the review has 5 confirmations.
+Rule: Strip every wall-clock and duration reference from forward-looking
+artifacts — plans, dispatches, session-states, reports. Wall-clock has
+exactly one legitimate use: RETROSPECTIVE comparison of a finished
+subagent against prior runs.
 
-Evidence: 2025-04-02, event-create feature; commit 8c4d1ae shipped the
-bug; commit 9e2f7b1 added the missing validation.
+Evidence: 2026-03-14, MembershipKit infrastructure planning session.
 ```
 
-Now this rule lives in `student/feedback/`. Your next `CLAUDE.md` update can reference it. Every future feature review you do follows the rule because you wrote it down when it was raw.
+Your CLAUDE.md references this file. The next session reads it at start and pre-empts every form of the failure — not just the one you saw.
 
-Without the rule, you'd hit the same family of bug (different spec line, different feature) in a month and have to figure out the lesson again.
+**Variant: memory before compaction.** You're 90 minutes into a session adding the dues-renewal job. You've created three migrations, deleted two, decided between Postgres NOTIFY versus polling cron (chose polling). The auto-compaction message appears. The system will summarize older context — keeping the agent functional but losing the deletion reasons and the NOTIFY-vs-polling rationale.
+
+The repair: before compaction triggers, ask Claude: "Write a session-state file at `student/state/session-2026-03-14.md` covering files kept, files deleted with reason, the NOTIFY-vs-polling decision and why I chose polling, current task state, and open questions. Commit immediately." Compaction runs against the now-redundant context. The next session reads the state file fresh and inherits the decisions cleanly.
 
 ## The rule
 
-> Every incident is a rule's first draft. Three sentences per rule, saved to your feedback folder, with the mechanism named. The corpus you build from incidents is the moat — nobody else has your specific rules because nobody else got bitten in your specific way. Write them down.
+> Every correction is a framework, not an answer. Write the framework as a four-line rule and save it. The corpus is the moat. Before any long session approaches the context limit, write the state file BEFORE auto-compaction — compaction is optimized to keep the agent functional, not to preserve corrections.
 
 ## Common mistakes
 
-**Mistake 1 — "I'll remember."** You won't. Memory degrades; the rule doesn't. Three weeks later the same bug shape returns and you debug from scratch. The 60 seconds to write the rule saves 60 minutes later.
+**Mistake 1 — Applying corrections as one-offs instead of frameworks.** The operator says "no time estimates here." The AI strips them from THIS plan and re-introduces them in the next artifact. Every correction should be saved as a feedback file with the general principle named, then re-read in subsequent sessions.
 
-**Mistake 2 — Writing essays instead of incidents.** A 2,000-word reflection on "AI failure modes I've observed" is a blog post, not a rule. Operators write 3-5 sentences per incident, with specifics. Brevity is what makes the corpus usable by future AI agents.
+**Mistake 2 — Trusting auto-compaction summaries.** A long session compacts. Three messages later the AI re-invokes a deleted tool, or repeats a mistake it had been corrected on. The compaction lost the corrections. Write the memory file to disk BEFORE compaction.
 
-**Mistake 3 — Storing rules where no one (including Claude) reads them.** A rule in a Google Doc is invisible to Claude Code. A rule in `student/feedback/some-bite.md` referenced from `CLAUDE.md` is visible at every session start. Put the rule where the tool can see it.
+**Mistake 3 — Writing essays instead of incidents.** A 2,000-word reflection on "AI failure modes" is a blog post. A four-line incident note IS a rule. Brevity makes the corpus usable — by you, and by AI sessions reading it at start.
+
+**Mistake 4 — Storing rules where Claude can't see them.** A rule in your notes app is invisible to a session. A rule in `student/feedback/some-bite.md` referenced from CLAUDE.md is visible at every session start. Put the rule where the tool reads from.
+
+**Mistake 5 — Failing to promote up the ladder.** Feedback file → CLAUDE.md → hook. Most rules stop at feedback file; the few that climb to hook pay back forever.
 
 ## Drill
 
@@ -120,4 +122,10 @@ Artifacts go in `student/drills/16-the-memory-discipline/` AND a new permanent f
 
 ## Checkpoint question
 
-> You've authored your first feedback file. A week later Claude does something stupid that vaguely resembles what your feedback file describes — same family, different surface. What do you do: write a brand new feedback file, edit the existing one, or consolidate? Answer in 2-3 sentences, and name the deciding factor.
+> You corrected Claude on Tuesday: "Don't ask which library to use for X; pick one with reasoning." On Thursday Claude proposes a recommendation correctly. On Friday it asks "Should I use library A or library B for Y?" — a different question, same shape. Diagnose what failed (was it the framework extraction or the memory across sessions), and walk through what you should have done differently between Tuesday and Friday.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P10 (frameworks outlive corrections; extract the rule, not the answer), P57 (memory before compaction; never trust post-compaction summaries), P21 (mechanical enforcement promotion path — feedback file → CLAUDE.md → hook)
+Worked example surface: MembershipKit time-estimate correction, dues-renewal session compaction
+Rewrite date: 2026-05-13
+-->

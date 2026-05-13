@@ -54,7 +54,7 @@ Same task, two patterns, very different operator experience. The first is audita
 
 ## The rule
 
-> The tool calls are the work. The text reply is the summary. Trust the work, verify the summary. When Claude reports "I made the change," look at the Edit (or Write) tool call to see exactly what it did — don't read the summary as if it were the truth.
+> Tool output is truth. Chat narration is hint. The tool calls show the work that actually happened; the text reply is a summary that may or may not match. When Claude reports "I made the change," look at the Edit (or Write) tool call to see exactly what it did — and look at the Bash output to see exactly what ran. Don't read the summary as if it were the truth.
 
 ## Common mistakes
 
@@ -62,7 +62,9 @@ Same task, two patterns, very different operator experience. The first is audita
 
 **Mistake 2 — Not reading the Bash command before approving it.** When Claude calls Bash and permission prompts you, the prompt shows the exact command. `git commit -m "Fix"` is fine. `git push --force origin main` is a different conversation. Read the command, not just the prompt's vibe.
 
-**Mistake 3 — Ignoring the tool-call output.** Bash tool calls show both the command and its output. The output is information. "Tests passed" is different from "Tests passed, but 14 warnings about deprecated APIs." Skim the output before moving on.
+**Mistake 3 — Ignoring the tool-call output.** Bash tool calls show both the command and its output. The output is information. "Tests passed" is different from "Tests passed, 14 skipped, 3 warnings." Skim the output before moving on.
+
+**Mistake 4 — Believing a "done" claim with no tool calls behind it.** Claude reports "I made the change," but no Edit or Write tool call appears in the session. Either Claude didn't actually do the work, or it did the work via a path you can't see. Either way the right response is: "I see your message but no Edit tool call. Show me where the change was written, or run it again." Chapter 12 turns this into a discipline; Chapter 7 introduces the muscle.
 
 ## Drill
 
@@ -87,3 +89,9 @@ Read — parts/01-foundations/02-the-terminal/meta.yml
 ## Checkpoint question
 
 > Claude reports: "I fixed the bug — the function was calling the wrong helper and I corrected it." You scroll back through the session. You see a `Read` of the buggy file, no `Edit` and no `Write`, then Claude's text summary. What happened, and what would you say to Claude next?
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P4 (false-yes / false-no symmetry — introductory framing), P5 (tool output is truth; chat narration is hint), P7 (verify against artifacts not summaries — beginner-level introduction)
+Worked example surface: README typo Edit vs Write comparison (no live MembershipKit yet — that comes Ch 8)
+Rewrite date: 2026-05-13
+-->

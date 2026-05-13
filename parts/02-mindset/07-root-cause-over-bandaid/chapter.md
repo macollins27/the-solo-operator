@@ -11,70 +11,74 @@ The student can recognize when Claude is layering defensive code around a sympto
 
 ## Core concept
 
-When something breaks, there are two ways to make it "stop breaking":
+When wrong output appears, two responses are possible:
 
-1. **Find the cause and fix it.** Three lines of code, usually.
-2. **Layer defenses around the symptom until you can't see it anymore.** Thirty lines of try/catches, fallback values, defensive checks, and type coercions.
+1. **Trace it to the cause and fix it there.** Usually a few lines. The mechanism stops being broken.
+2. **Layer defenses around the symptom.** Try/catches, fallback values, defensive guards, type coercions. The output stops being visible; the mechanism is unchanged.
 
-Both make the immediate problem disappear. Only one actually fixes anything. The second is a **bandaid** — and it's the failure mode Claude is most likely to drift toward if you don't intervene.
+The second pattern is the bandaid — the failure mode the AI reaches for by default. Every layer "can't break anything"; every wrap "handles edge cases." They stack.
 
-The reason this matters: bandaids accumulate. A try/catch swallows an error. Six months later you can't figure out why a feature isn't firing — because the error you needed to see is being eaten by the bandaid. A defensive `?.` chain lets `undefined` pass through. Three layers up, code that should have failed instead silently produces wrong output. A fallback value masks a config bug for a year. A type coercion makes a build error go away and you ship a runtime crash to production.
+The discipline is the **Feynman question**: keep asking "why?" until the answer names the source-of-the-source. A test fails. Why? The function returns null. Why? The upstream fetch errors. Why? The API returns 500. Why? The dev database isn't initialized. Fix at the source: add the connection init. Not at the symptom: not a `?.` chain papering over the null.
 
-Each bandaid feels small. Each adds friction. Stacked, they make codebases incomprehensible — which is exactly when AI starts performing badly, because AI works best on code where the cause-and-effect is clear.
+Specific bandaid shapes that recur:
 
-The shape of a bandaid:
+**Dispatch-correction bandaid.** A skill produces wrong output. The AI's instinct is to add "correction notes" to downstream dispatch prompts — patching consumers. Wrong. The broken skill produces wrong output for every future domain. Fix the skill.
 
-- Adding a try/catch where the function never threw before, in response to a new error.
-- Adding `?? default` to a value where you don't know why it's undefined.
-- Adding `as any` or `as unknown as X` to make a type error go away.
-- Adding a "validation" check that swallows the failing case silently.
-- Adding `if (!x) return;` early-exits with no logging — the function just silently does nothing.
+**Timeout-bump bandaid.** A subagent hits a wall-clock cap. The AI's instinct is to bump the cap. Measure first. If wall-clock is hitting the cap from legitimate growth, raise. If from new infrastructure thrash, raising hides the regression.
 
-The shape of a root-cause fix:
+**Test-noise bandaid.** A test emits stderr from a side-effect path. The AI's instinct is to extend the mock until stderr is silent. The stderr is the price for not over-mocking; silencing it removes future visibility.
 
-- "The value is undefined because the API returns a different shape than the type says. I'm fixing the type to match what the API actually returns, then handling the now-correctly-typed case."
-- "The function was throwing because we passed a null. I'm tracing back where the null came from. It came from line 47 of the parent component — there's a missing fetch. I'm adding the fetch."
-- "The type error says we're passing a string where the function expects a number. The string is `userId`; the function expects `userIdNumber`. The fix is to convert it once, not to cast it."
+**Gate-retry bandaid.** Gate fails. Agent re-runs hoping it passes. A gate that retries without a code change is a flake. "Investigating provenance" via `git blame` after a gate failure is the same pattern in deferral clothing — looking for someone else to blame.
 
-Notice what's different: the root-cause fix names the mechanism. It can be explained to someone else. The bandaid hides the mechanism — you can't say what went wrong, only that it's not visible anymore.
+**When stuck, dispatch diagnosis BEFORE further fix attempts.** When two fix attempts haven't converged, the third won't either — "diagnose from failure context" carries the same framing bias that produced the first two. Dispatch a read-only research subagent with full context. The subagent produces a written diagnosis. THEN apply fixes against the diagnosis, not guesses.
 
-The diagnostic you apply: "If I describe this problem to a colleague, can I name the mechanism?" If yes, you're fixing the cause. If you have to say "I added some defensive code and it works now," you've shipped a bandaid.
+**Three categories of CI failure you must distinguish before fixing.** A budget-style check fails (bundle size, secret scanner, threshold). The AI's reflex is "the code is wrong." Categories:
 
-Claude reaches for bandaids by default because they're SAFE-LOOKING. Defensive code "can't break anything." Wrapping in try/catch "handles edge cases." Adding `?.` is "robust." These framings get the code into "passes" state without solving the problem. They're failure modes wearing helpful clothes.
+- **Stale config.** Budget sized N commits ago; legitimate growth occurred. Fix: raise.
+- **Real regression.** Code crossed a real line. Fix: revert or refactor.
+- **False positive.** Test fixture, AWS doc example. Fix: allowlist.
+
+Output an explicit category before any code change. Conflating produces the wrong fix every time.
 
 ## Worked example
 
-Your MembershipKit dev server crashes when a member tries to view their profile. The error: `TypeError: Cannot read property 'name' of undefined`.
+CI on your MembershipKit fork fails on the bundle-budget check. The build output says the client bundle exceeds the configured threshold by 14 kB.
 
-**Bandaid session:**
+**Bandaid session — fix-without-diagnosis.**
 
-You: "Fix the crash on /profile."
+You: "Fix the bundle-budget failure."
 
-Claude: "I'll add defensive checks for the undefined case." Claude opens the profile component, finds the offending line `user.name`, changes it to `user?.name || 'Anonymous'`. Crash is gone. Page renders. Says "Anonymous" instead of the user's name. Claude reports: "Fixed — the page no longer crashes."
+Claude's first move: raise the threshold from 250 kB to 280 kB. Threshold passes. Claude reports: "Bundle budget adjusted." You merge. Two weeks later production load times have grown noticeably — the budget you "fixed" was actually a real regression. You shipped 30 kB of accidental dependency import.
 
-What just happened: the user IS defined somewhere upstream, but a fetch is broken. The page should be showing the actual name. The bandaid made the crash go away without finding out WHY user was undefined. Now you have a different bug — wrong data displayed — that's harder to notice than a visible crash. The visible crash was actually the more debuggable state.
+**Bandaid session — second-fix-without-diagnosis.**
 
-**Root-cause session:**
+Different attempt at the same problem. Claude's first move: drop a dependency that's used in three places. Threshold passes. Two weeks later three features that depended on the dropped library are broken. The fix was guessing-shaped; the cause was never diagnosed.
 
-You: "Fix the crash on /profile. Find the cause first; don't just defend the symptom."
+**Root-cause session — dispatch diagnosis BEFORE fix attempts.**
 
-Claude reads the profile component. Traces back: `user` comes from a hook called `useUser`. That hook fetches `/api/me`. Claude runs the API endpoint, finds it returns a 500 because the database connection isn't initialized in dev mode. Root cause: the db init step was skipped in the dev startup script. Claude reports: "Cause: `/api/me` fails because the db connection isn't initialized in dev. Fix: add `await db.connect()` to the dev startup. Should I do that, or is there a deeper reason connections are deferred?"
+You: "Bundle budget failed. Don't fix yet. Dispatch a read-only diagnosis subagent first with full context — the budget history, recent commits, and the build output."
 
-You approve. Claude adds the line. Crash gone. Profile shows the right name. Everything that depended on `useUser` now works correctly.
+The diagnosis subagent returns: "The threshold was set 6 weeks ago at 250 kB. 569 commits since then. Bundle has grown 22 kB in legitimate features (member-import flow, Stripe webhook handlers, event-checkin client logic). Of the 14 kB over budget, 12 kB is legitimate growth and 2 kB is a tree-shaking miss in `@membershipkit/icons` that pulls the full icon set instead of named imports. **Diagnosis: STALE CONFIG with legitimate growth + one fixable tree-shake.** Recommended fix: raise threshold to 275 kB and switch the icon import to named imports to recover the 2 kB."
 
-Same task. Same starting error. Different mental model. The first session shipped a hidden bug; the second fixed three latent bugs at once by finding the actual cause.
+Two distinct fixes, each addressing a real cause. You approve both. Bundle passes. No new latent bugs introduced.
+
+The three categories at work here: **stale config** (the 12 kB of legitimate growth) and a **real regression** (the 2 kB tree-shake miss). Without diagnosis, both would have been treated as either-or — and either choice alone would have shipped a defect.
 
 ## The rule
 
-> Find the mechanism. Three lines of root-cause fix beats thirty lines of defensive bandaid. If you can't describe WHY something was breaking, you haven't fixed it — you've hidden it. Demand the mechanism before you accept the fix.
+> Find the mechanism. Trace every wrong output backward to the source. If a class of error has repeated, dispatch diagnosis BEFORE further fix attempts — the same framing bias that produced fix attempts one and two will produce attempt three. For CI failures: distinguish stale config from real regression from false positive before any code change.
 
 ## Common mistakes
 
-**Mistake 1 — Accepting "added defensive checks" as a fix.** "Defensive" is a euphemism for "I didn't find the cause." Operators ask: defensive against WHAT? If the answer is specific ("defensive against the upstream API returning null when rate-limited"), it's a real defense. If the answer is vague ("defensive in case something goes wrong"), it's a bandaid. Push back.
+**Mistake 1 — Patching the consumer instead of fixing the source.** A skill produces wrong output. The AI adds "correction notes" to downstream dispatches. The skill keeps producing the same wrong output for every future call. Fix the skill.
 
-**Mistake 2 — Hiding errors with try/catch.** A try/catch that swallows the error is a bandaid 95% of the time. Acceptable use of try/catch: when you know which error CAN happen, you handle it specifically, and you log enough information to debug if it happens. Wrapping random code in try/catch "just in case" is masking, not handling.
+**Mistake 2 — Bumping a limit without measuring.** Subagent hits a wall-clock cap. The AI raises the cap. Measure first. Recognition phrase: "Extending the timeout to give it more headroom."
 
-**Mistake 3 — `as any` and friends.** Type assertions (`as any`, `as unknown as X`, `! non-null assertion`) tell the type-checker to trust you. If you don't have a reason to trust yourself ("I know this is a number because I just validated it"), the assertion is a bandaid. Operators flag every assertion in a Claude diff and ask Claude to justify it or remove it.
+**Mistake 3 — Silencing test stderr noise.** A test emits stderr from a side-effect path. The AI extends the mock until stderr is silent. The stderr was the signal; silencing it removes future visibility.
+
+**Mistake 4 — Re-running gate after failure without changing code.** A gate that passes "on retry" is a flake, not a fix. Recognition phrase: "Investigating whether the failure is 'pre-existing' or 'not your fault.'"
+
+**Mistake 5 — Accepting `as any` and `!` as fixes.** A type assertion tells the type-checker "trust me." Without a specific reason to trust yourself, the assertion is a bandaid. Flag every assertion; require justification or removal.
 
 ## Drill
 
@@ -88,4 +92,10 @@ Artifacts go in `student/drills/15-root-cause-over-bandaid/`.
 
 ## Checkpoint question
 
-> You're reviewing a Claude session from yesterday. You see this commit: "Fix payment processing error." The diff shows Claude wrapped the entire `processPayment` function in a try/catch that logs the error and returns false on failure. Tests pass. Your spidey sense tingles. What two questions do you ask Claude to determine whether this is a fix or a bandaid, and what's the answer that tells you it's a bandaid?
+> CI on your fork fails twice in a row with different errors — first a flaky integration test, then a secret-scanner alert on an AWS doc example used as a test fixture. Claude proposes Fix 1 (rerun the gate; the test usually passes) and Fix 2 (allowlist the AWS string). The first proposal feels off; the second sounds reasonable. Walk through: which is a bandaid and which is a legitimate fix, why, and what the right move is for the bandaid case.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P17 (root cause, not symptom; Feynman framing; workarounds compound), P18 (gate-retry-without-code-change is a flake; agents must not pretend otherwise), P19 (diagnosis subagent BEFORE fix attempts when error class repeats), P20 (stale config vs real regression vs false positive — three distinct CI failures)
+Worked example surface: MembershipKit bundle-budget CI failure
+Rewrite date: 2026-05-13
+-->

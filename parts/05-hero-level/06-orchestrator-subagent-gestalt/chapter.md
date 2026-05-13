@@ -11,84 +11,89 @@ The student can describe the orchestrator-and-subagent pattern at hero level —
 
 ## Core concept
 
-At hero level you (the operator) are running a SESSION that doesn't do much heavy lifting itself. It dispatches. The orchestrator session is small, light, focused. The actual work happens in subagents — sometimes a dozen running in parallel, sometimes a single chain of dependent dispatches.
+At hero level the operator runs a SESSION that doesn't do heavy lifting itself. It dispatches. The orchestrator session is small, light, focused. Actual work happens in subagents.
 
 The pattern:
 
-1. **Orchestrator orients.** First action: `mcp__orient__orient()`. The session knows where it is.
-2. **Orchestrator plans.** Decides the next step. Often: dispatch one or more subagents.
-3. **Orchestrator dispatches.** Forks (for context-aware work) or fresh subagents (for crisply-scoped work). Often in parallel — 3-7 subagents fired simultaneously.
-4. **Subagents work.** Each one runs its 50-200 tool calls. Output stays out of orchestrator context.
-5. **Subagents return structured signals.** Not prose; JSON or YAML blocks. "Stage X complete. Artifacts at <paths>. Findings: <list>."
-6. **Orchestrator composes.** Reads the structured signals. Decides the next dispatch (or commits / reports / wraps up).
-7. **Repeat.**
+1. **Orient.** First action: `mcp__orient__orient()`.
+2. **Plan.** Decide the next step. Often: dispatch one or more subagents.
+3. **Dispatch.** Forks for context-aware work; fresh for crisply-scoped. Often parallel — 3-7 simultaneously.
+4. **Subagents work.** Each runs 50-200 tool calls. Output stays out of orchestrator context.
+5. **Subagents return structured signals.** `STAGE-COMPLETE: <stage>` + JSON exit object. Not prose.
+6. **Compose.** Read the structured signals; decide the next dispatch (or commit / report / close).
+7. **Cross-skill input via authority documents.** Operator feedback flows by editing the on-disk authority file, NOT by passing string arguments. The next skill invocation reads the file fresh.
 
-The orchestrator is the conductor. It never plays the instruments itself. It cues. It listens. It cues again.
+The dispatch-prompt-length question is an unresolved tension in mature operating discipline. Two views, both evidence-backed:
 
-Why this matters at scale:
+**View A — long prompts for non-skilled subagents.** Dispatching a general-purpose subagent with no `/SKILL` invocation: the agent has nothing to anchor on except the dispatch. The mature pattern is labeled sections (Task, Required Reading, Background, Transformation Pattern, Forbidden List, Verification Criteria, Reporting Format), minimum ~7,000 characters for complex tasks. Short prompts produce drift; the subagent invents scope, modifies CLAUDE.md "while I'm here."
 
-A single context window can hold maybe 1-3 hours of full feature work before compaction starts to degrade quality. But a feature can require 20 hours of work. The pattern that resolves this: orchestrator stays clean and small; subagents do the chunks; the orchestrator composes the chunks over a longer wall-clock without ever filling its own context.
+**View B — minimal triggers for skilled subagents.** Dispatching a subagent that invokes `/SKILL`: the skill body owns the discipline. The dispatch is a minimal trigger ("Invoke `/page-build` with args: 'contacts --stage map'. Out-of-scope (each forbidden): CLAUDE.md, framework pins, `_shared/`."). Long prompts loaded with forensic citations warp the subagent's pattern-matching.
 
-This is what makes "20-40 engineer throughput" possible — not raw model speed, but the ARCHITECTURE that prevents context exhaustion at the orchestrator layer. The subagents are parallel; the composition is sequential; the operator is one person.
+The reconciliation: the views address different surfaces. Skill body carries discipline when the dispatch invokes a skill; the dispatch prompt carries it when there's no skill.
 
-Three patterns operators use at hero level:
+Three composition patterns: **parallel diagnostic dispatch** (high-stakes → 2+ agents independently briefed; triangulate; first catches bugs the second misses), **per-layer fan-out** (wrapper script dispatches one subagent per layer in parallel; orchestrator composes), **pipeline dispatch** (spec → contract → build → review → fix; orchestrator reads structured exit of each before the next).
 
-**Pattern A — Parallel diagnostic dispatch.** A high-stakes question (a tricky bug, a security review) gets dispatched to 2-3 subagents IN PARALLEL on the same question. Each returns its independent verdict. Convergence = high confidence. Divergence = each subagent is fallible, dig deeper. Maxwell's project uses this routinely.
+Discipline layer that keeps composition from chaos:
 
-**Pattern B — Per-layer fan-out via wrapper script.** When a single subagent can't hold all the context for a multi-layer artifact (e.g. a 16-layer build contract), a wrapper script (`scripts/contract-feature.ts`) dispatches one subagent per layer in parallel. Each subagent has fresh attention budget for just its layer. The orchestrator composes the layers after.
+**Mandate the skill; ban escape-hatch language.** "If the skill refuses, operate directly," "either path is acceptable," "you can do it without re-running the full skill protocol," "fallback to direct edits" — forbidden. The `block-skill-bypass-language.sh` hook catches these. Once the AI reads "either path is acceptable," it picks the lower-friction path and bypasses every quality check.
 
-**Pattern C — Pipeline dispatch.** A feature requires: spec → contract → build → review → fix. Each is a separate subagent. The orchestrator runs them in sequence, reading the structured exit of each before dispatching the next. The orchestrator never sees the full content of any stage — just the structured signal.
+**Destructive ops belong in the orchestrator turn.** `git checkout --`, `rm -rf`, framework downgrades — operator-in-the-loop, NOT in subagent prompts. Subagents can't execute them anyway (hooks block); worse, a destructive op named in a session-state file becomes a vector for a downstream agent to attempt it without confirmation.
 
-The discipline layer that keeps this from being chaos:
+**Mandatory exit sentinels.** Every staged skill emits `STAGE-COMPLETE: <stage>` as its first output line and at termination, plus a JSON exit object. Orchestrator parses mechanically; missing sentinel = process-compliance failure.
 
-**Dispatch prompts mandate skill invocation as sole entry point.** "Run /review-source" — not "review the code somehow." The skill is the contract; the prompt enforces it. NO escape-hatch language ("if the skill refuses, operate directly"). Maxwell's `feedback_no_skill_bypass_language` got an orchestrator fired over this exact failure.
+**Mandatory checkpoints before every tool call.** Subagent halts have a forensic signature where the JSONL ends with a successful tool_result and no follow-up assistant turn. Every tool call is preceded by `[CHECKPOINT N/M: about to <verb> <target>; last completed=<previous>; retries_used=K/3]`. On halt, the post-mortem reads the last checkpoint.
 
-**Dispatch prompts list forbidden modifications explicitly.** Subagents extrapolate from "in scope"; they refuse from "explicitly forbidden." So you list: "DO NOT modify CLAUDE.md, framework versions, _shared/ files."
-
-**Subagent returns are READ before next dispatch.** The `post-agent-review` hook from Chapter 34 forces this — the orchestrator can't skip reading what came back.
-
-**Failures surface specifically.** A subagent doesn't return "something went wrong." It returns: "FAIL: <category> at <file>:<line>. Evidence: <quote>." The orchestrator can act on that. Vague failures cascade into orchestrator confusion.
+**Retry caps non-negotiable.** Hard cap 3 retries per stage; all categories count (no re-categorization). On 4th failure: terminate with `STAGE-GATE-FAILED`, escalate. The 4th attempt signals the diagnosis is wrong, not that the budget should grow.
 
 ## Worked example
 
-You're shipping a new feature: live notifications across MembershipKit. The work involves: schema migration, backend API, real-time channel, client subscription, notification preferences UI, audit log integration. Six pieces.
+You're shipping live notifications across MembershipKit: schema migration, backend API, real-time channel, client subscription, preferences UI, audit log integration.
 
-Hero-level orchestrator flow:
+- Orient. Plan. Decide: shared infrastructure (notification dispatch) + per-domain integration.
+- Dispatch 1 (fresh, skilled): `/contract-feature notifications`. Returns `STAGE-COMPLETE: contract` + JSON with artifact path, layers, panel-review verdict.
+- The operator notices the contract missed a sub-entity. Rather than passing feedback as a string argument, you EDIT THE INTEGRATION DOC ON DISK. The next dispatch reads the updated file with no special args.
+- Dispatch 2: `/build-feature notifications --layer 0`. Returns `STAGE-COMPLETE: build-feature layer 0` + files/gate_sha/gate_result.
+- Dispatches 3-7 (parallel): one per per-domain layer. Each returns its sentinel.
+- Orchestrator collects 5 structured returns. Composes.
+- Dispatch 8: `/review-source notifications`. Returns 4 findings as JSON.
+- Dispatches 9-12 (parallel): one per finding, `/fix-source`. Each returns `fixed; gate passed`.
+- Dispatch 13: `/qa-audit notifications`. Returns `zero blockers`.
+- Commit; handoff; close.
 
-- Orient. Plan. Decide: feature requires shared infrastructure (notification dispatch) + per-domain integration (notifications to RSVPs, payments, role-changes).
-- Dispatch subagent 1 (fresh): run `/contract-feature notifications`. Subagent produces a 6-layer contract. Returns: "contract at .../contract-sheets/notifications.md; 6 layers; panel review pass; READY."
-- Dispatch subagent 2 (fresh): run `/build-feature notifications --layer 0` (shared infra). Returns: "Layer 0 built; gate passed; 3 files; SHA abc123."
-- Dispatch subagents 3-7 (fresh, in parallel): one per per-domain layer (layers 1-5). All run simultaneously. Each returns its own structured signal.
-- Orchestrator collects 5 structured returns. All passed. Composes.
-- Dispatch subagent 8 (fresh): run `/review-source notifications`. Returns 4 findings. Orchestrator reads.
-- Dispatch subagent 9-12 (fresh): one per finding, `/fix-source <finding>`. Parallel. Each returns: "fixed; gate passed."
-- Dispatch subagent 13 (fresh): `/qa-audit notifications`. Returns: zero blockers.
-- Orchestrator commits the work, writes the session handoff, closes.
-
-Total wall-clock: ~3 hours, much of it parallel. Total orchestrator context growth: ~10k tokens (the 13 structured returns). Total work done: ~6 hours of equivalent serial effort. The orchestrator stayed clean throughout.
+Orchestrator context growth: ~10k tokens (13 structured returns). The orchestrator stayed clean.
 
 ## The rule
 
-> The orchestrator dispatches; doesn't do. Subagents run in parallel where possible, return structured signals, and stay OUT of orchestrator context. The discipline layer (mandate-skill prompts, post-agent-review hook, explicit forbidden list) keeps composition reliable. Hero-level throughput is the architecture, not the model speed.
+> The orchestrator dispatches; doesn't do. Subagents run in parallel where possible, return structured signals, stay OUT of orchestrator context. Skill-invoking dispatches use minimal triggers; non-skill dispatches use long structured prompts with labeled sections. Cross-skill input flows through on-disk authority documents, never as string arguments. Retry cap is 3; the 4th attempt is a diagnosis failure, not a budget extension.
 
 ## Common mistakes
 
-**Mistake 1 — Orchestrator doing the work itself.** You dispatch one subagent, get the return, and then START EDITING FILES yourself. Now the orchestrator's context fills with file contents. Two more dispatches and the orchestrator is compacting. The fix: orchestrator dispatches; subagents edit; orchestrator only composes.
+**Mistake 1 — Orchestrator doing the work itself.** You dispatch one subagent, get the return, and then START EDITING FILES yourself. The orchestrator's context fills with file contents. Two more dispatches and the orchestrator is compacting. The fix: orchestrator dispatches; subagents edit; orchestrator only composes.
 
-**Mistake 2 — Vague dispatch prompts.** "Audit my code" gives the subagent license to define the audit. Different runs produce different audits. The fix: mandate a specific skill, list forbidden modifications, specify the structured return format. Tight dispatch prompts produce repeatable work.
+**Mistake 2 — Vague dispatch prompts to non-skilled subagents.** "Audit my code" lets the subagent define the audit. Different runs produce different audits. The fix is the long-prompt discipline: labeled sections, forbidden list enumerated, structured-return format specified. Minimum ~7,000 characters for complex tasks.
 
-**Mistake 3 — Skipping the post-agent-review.** Subagent returns. Orchestrator reads only the first line of the return ("PASS"). The return contained important caveats further down. Decisions get made on the summary, not the substance. The `post-agent-review` hook forces full read; even without the hook, the discipline is: read the entire structured return before dispatching the next thing.
+**Mistake 3 — Over-prompting a skilled subagent.** Dispatching `/page-build` with a 2,000-character briefing full of forensic citations and forbidden-pattern enumeration warps the skilled subagent's pattern-matching. The skill body owns the discipline; the dispatch should be a minimal trigger.
+
+**Mistake 4 — Passing user feedback as a string argument.** "Run `/contract-feature notifications` AND make sure to include the X sub-entity." The string is opaque to the skill body and contaminates the dispatch. The mature pattern: edit the on-disk authority file to add X; dispatch with no special args. The next skill invocation reads the file fresh.
+
+**Mistake 5 — Re-categorizing failures across retries.** "Attempt 1 was a prettier issue; attempt 2 was a typecheck issue; they don't both count toward the cap." Forbidden. Every retry counts. On 4th failure, terminate and escalate; the 4th attempt is the signal the diagnosis is wrong.
 
 ## Drill
 
 Artifacts in your fork.
 
-**Drill 1 — Map your current orchestrator pattern.** Write 4-6 sentences at `student/drills/37-orchestrator-gestalt/01-my-pattern.txt` describing how you currently use Claude. Are you doing work in the orchestrator session or dispatching? If dispatching, are dispatches parallel or serial? Where does context live?
+**Drill 1 — Map your current orchestrator pattern.** Write 4-6 sentences at `student/drills/37-orchestrator-gestalt/01-my-pattern.txt` describing how you currently use the AI. Are you doing work in the orchestrator session or dispatching? If dispatching, are dispatches parallel or serial? Where does context live? Where does cross-step input flow — string arguments, or on-disk authority documents?
 
-**Drill 2 — Dispatch in parallel.** In a Claude Code session, dispatch THREE fresh subagents in a single message (using three Agent tool calls in parallel). Each one does a small audit task (e.g., "summarize what Chapter X teaches"). Save the three structured returns to `student/drills/37-orchestrator-gestalt/02-parallel-returns.txt`.
+**Drill 2 — Dispatch in parallel.** In a Claude Code session, dispatch THREE fresh subagents in a single message (three Agent tool calls in parallel). Each does a small audit task (e.g., "summarize what Chapter X teaches"). Save the three structured returns to `student/drills/37-orchestrator-gestalt/02-parallel-returns.txt`.
 
-**Drill 3 — Write a tight dispatch prompt.** Author a dispatch prompt template you'd reuse for any future subagent dispatch. Should include: skill mandate, forbidden modifications list, structured return format. Save to `student/drills/37-orchestrator-gestalt/03-dispatch-template.txt`.
+**Drill 3 — Write two dispatch prompt templates.** Author two reusable dispatch templates at `student/drills/37-orchestrator-gestalt/03-dispatch-templates.txt`: (a) a long structured template for a non-skilled subagent (with labeled sections: Task, Required Reading, Background, Forbidden List, Verification Criteria, Reporting Format); (b) a minimal trigger template for a skilled subagent (`/SKILL` invocation + one-line forbidden list). Include the forbidden phrases the `block-skill-bypass-language` hook would catch — and confirm your templates avoid them.
 
 ## Checkpoint question
 
-> You're orchestrating a feature build and notice your context is at 60% after only 90 minutes of work. You haven't even started the implementation phase. What's likely happening, and what would you change in your dispatch pattern to stay clean for the next 3-4 hours of work?
+> You're orchestrating a feature build and notice your context is at 60% after only ninety minutes of work. You haven't even started the implementation phase. Walk through 3-4 sentences naming what's likely happening, where in the dispatch pattern context is leaking, what specifically to change at the next subagent boundary (skill-invoking vs non-skill-invoking dispatch style), and what the retry cap tells you if your "fix" attempts on this leak fail twice in a row.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P29 (skill bypass language forbidden in dispatch prompts; ~80% → ~100% compliance step; hook with 19 patterns), P30 (destructive ops belong in orchestrator turn, not subagent prompts), P31 (subagent dispatch prompt length — extractor divergence WEAK; long prompt discipline for non-skilled subagents vs minimal trigger for skilled subagents; reconciliation hypothesis preserved), P36 (mandatory exit sentinels for staged workflows; STAGE-COMPLETE first line + JSON exit), P37 (mandatory checkpoint emissions before every tool call for halt observability), P38 (subagent halt signatures forensically distinct), P39 (retry caps non-negotiable; re-categorizing across retries forbidden; 3-attempt cap; SOUNDNESS-STOP on 4th), P40 (authority-document editing as cross-skill input channel, not string arguments)
+Worked example surface: MembershipKit live notifications — 13 staged dispatches with sentinels + edit-authority-doc-not-args pattern + minimal-trigger style
+Rewrite date: 2026-05-13
+-->

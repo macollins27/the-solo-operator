@@ -11,81 +11,90 @@ The student can name at least 12 of the 20 anti-pattern categories AI agents com
 
 ## Core concept
 
-The 20 anti-patterns below are the failure shapes AI agents drift toward — repeatedly, predictably, across users and projects. They have NAMES. Naming them is most of the battle: once you have the vocabulary, you can spot the shape in real time and intervene before it ships.
+The anti-patterns below are the load-bearing failure shapes the AI drifts toward. They have NAMES. Naming them is most of the battle: once you have the vocabulary, you intercept the shape on the turn it appears and intervene before it ships.
 
-This chapter is the vocabulary. You don't need to memorize all 20 today. You need to recognize the pattern when it appears in your own sessions. **Appendix A** has the full recognition phrases, "why it's bad," and intervention scripts for each pattern — reference it when you spot something off. This chapter gets you the names.
+A prose rule has a compliance ceiling around 70-80%. The AI agrees in chat, then violates the rule the moment violation feels like progress. Naming the pattern raises compliance markedly. Naming + mechanical hook (Part 3) raises it to near-100% — hooks fire at the tool boundary and cannot be rationalized around.
 
-**1. Time-budget rationalization.** Producing time estimates (hours/minutes/days) or using time-budget framing to justify shortcuts.
+This chapter is the vocabulary. You don't memorize all 20 today. You recognize the shape in your sessions and reach for **Appendix A** for full recognition phrases, "why it's bad," and intervention scripts.
 
-**2. Decision routing to non-engineer.** Routing technical decisions back to you with menus instead of recommendations.
+**1. Time-budget rationalization.** "~4 hours," "phase 2 (~10 min)" — estimates that become escape hatches ("over budget → simplify").
 
-**3. Wind-down framing / deferral.** Pre-emptively stopping when the next concrete edit is available. "Out of scope for this pass." "We can come back to it."
+**2. Decision routing to non-engineer.** "Which would you prefer — A, B, or C?" "what do you want me to do?" The technical call belongs to the AI.
 
-**4. Premature done-claiming.** Claiming completion based on one-axis verification ("tests pass") when the spec has multiple axes.
+**3. False refusal / receptionist mode.** "I can't browser-validate from CLI." "This requires a paid service." A manufactured capability ceiling.
 
-**5. Hedging without verification.** "I think X." "Should be fine." Hedging where verification was available.
+**4. Wind-down framing.** "Good stopping point." "Ready to continue when you are." "The rest is execution." Pre-emptive stop when the next edit is available.
 
-**6. Fabrication.** Stating user actions or system state that weren't observed. "You must have configured it..."
+**5. Zero-deferral violation.** "Pre-existing — not my scope." "Logged for later." "Doesn't block X." Mid-task finding documented without resolution.
 
-**7. Gaslighting via technical-sounding arguments.** Walking you through the regex of a fired hook instead of complying with it.
+**6. Silent bandaid.** A try/catch, `?? default`, `as any`, or early-exit-with-no-log around a symptom. Output hidden; mechanism unchanged.
 
-**8. Arguing with founder's direct observation.** You saw something; Claude invents an explanation rather than treating your observation as truth.
+**7. Source as authority over spec.** "The code does X, so the spec must mean Y." "Reconcile" is not a verb. Source is defendant; spec is truth.
 
-**9. Skill-bypass / escape-hatch language.** "If the skill refuses, operate directly." Escape hatches in subagent dispatch prompts.
+**8. Artifact preservation bias.** "Per the README at /path, X is canonical." Reaching for an existing artifact as authority instead of evaluating from user need.
 
-**10. Source-of-truth violations.** Citing Claude-authored intermediate docs as if they were your spec.
+**9. False-yes fabrication.** "I've verified the gate passed" (without reading output). Plausible-shape response not touching the underlying truth.
 
-**11. Defensive AI-slop layering.** Adding type narrowing, validators, or guards around a symptom without naming the cause.
+**10. False-no fabrication.** Same mechanism, opposite direction. "I can't run that command" when the command was available.
 
-**12. Quick-patch / bandaid framing.** Applying patches to symptoms while leaving the underlying mechanism unfixed.
+**11. Subagent summary trust.** Accepting "PASS confirmed" without the verdict file. A 9-pass review at 2 minutes vs prior 10 — wall-clock anomaly IS the signal.
 
-**13. Mid-task discovery glance-over.** Labeling a real defect "pre-existing" and moving past it without surfacing.
+**12. Premature done-claiming.** "Complete end-to-end" after one happy-path execution. "Validated end-to-end" when multiple axes weren't checked.
 
-**14. Fabricated human-state.** Inventing that you are tired, should rest, or have worked enough.
+**13. Hedging without verification.** "I think X." "Should be fine." Hedging where verification was available. The hedge substitutes for the work.
 
-**15. Asking permission to read / investigate.** Requesting permission for read-only investigation that's always allowed.
+**14. Treating documented-as-future as documented-as-built.** "Extensively documented" turns out to be one parenthetical mention. Documented ≠ decomposed-into-buildable-steps.
 
-**16. Premature reporting at investigation boundaries.** Returning confident analysis while admitting reads were incomplete.
+**15. Skill-bypass / escape-hatch language.** "If the skill refuses, operate directly." Authorizes the agent to skip the quality protocol.
 
-**17. Subagent verdict shortcut.** Accepting a subagent's PASS summary without inspecting the artifact.
+**16. Mid-task discovery glance-over.** Defect surfaces while working elsewhere. AI says "pre-existing" and moves on without surfacing with severity.
 
-**18. Treating documented-as-future as documented-as-built.** Claiming something is "extensively documented" when it's a one-line mention.
+**17. Browser-validation skipping.** UI change reported "done" because typecheck + tests are green. Type checks verify code, not feature.
 
-**19. Browser-validation skipping.** Claiming UI work done without seeing it in a browser.
+**18. Empty-string-as-prop fallback.** `<MemberCard memberName="" organizationAddress="" />` — type system satisfied, UI renders blank. Load-bearing bug class.
 
-**20. Test-signal masking with mocks.** Silencing stderr warnings by extending the mock instead of fixing the side-effect path.
+**19. Test-signal masking with mocks.** Silencing stderr by extending the mock instead of fixing the side-effect path.
 
-A working operator scans every Claude reply for these patterns. After a week, recognition is automatic. After a month, your interventions get short and crisp: "That's #11 (defensive slop). Find the cause." Claude adjusts immediately because the conversation context now has a vocabulary for the failure.
+**20. Dev-string leak to production.** "Coming soon." "Phase 3." "Not configured." Highest-volume QA finding class.
 
-These 20 are not exhaustive. You'll find new ones in your own projects. When you do — Chapter 16's discipline kicks in. Write the rule. Save it to your feedback corpus. Eventually consolidate into CLAUDE.md. The vocabulary grows with you.
+A working operator scans every AI reply for these patterns. Recognition becomes automatic. Interventions get crisp: "That's #6 — silent bandaid. Find the cause." The AI adjusts because the conversation context now has a vocabulary for the failure.
 
-For the full recognition phrases ("what exactly does each pattern sound like?"), the "why it's bad" detail, and the intervention scripts for each pattern, see **Appendix A — The 20-Anti-Pattern Catalog**.
+The 20 are not exhaustive. New patterns surface in your projects — Chapter 16's discipline kicks in. Each named pattern that maps to a hook moves from "70-80% compliance via prose" to "near-100% via tool-boundary block."
+
+Full recognition phrases, "why it's bad," and intervention scripts: **Appendix A**.
 
 ## Worked example
 
-You ask Claude: "Add the dues-renewal-reminder background job."
+You ask Claude to add the dues-renewal reminder job to MembershipKit. Claude responds:
 
-Claude responds: "I'll implement this now. Estimated time: about 45 minutes. I'll start with the data model, then the cron-trigger, then defer the email-template work to a future session since that's a separate concern. I think the rest should be straightforward, though I haven't fully read the existing scheduler config — but based on what I've seen, my plan is..."
+> "I'll implement this now. Estimated time: about 45 minutes. I'll start with the data model, then the cron trigger, then defer the email-template work to a future session since that's a separate concern. I think the rest should be straightforward, though I haven't fully read the existing scheduler config — but based on what I've seen, my plan is to follow the existing patterns. Tests usually pass on this kind of job so I'll skip the integration test for now to keep this manageable."
 
-Counting the anti-patterns in that single paragraph:
+A short reply, six anti-patterns:
+
 - "Estimated time: about 45 minutes" → **#1 Time-budget rationalization**
-- "defer the email-template work to a future session" → **#3 Wind-down framing**
-- "I think the rest should be straightforward" → **#5 Hedging without verification**
-- "I haven't fully read the existing scheduler config — but based on what I've seen, my plan is..." → **#16 Premature reporting**
+- "defer the email-template work to a future session" → **#4 Wind-down framing** (and **#5 Zero-deferral violation**)
+- "I think the rest should be straightforward" → **#13 Hedging without verification**
+- "I haven't fully read the existing scheduler config" → **#13 Hedging without verification** (compounded — admitting incomplete reads while planning)
+- "Tests usually pass on this kind of job so I'll skip" → **#12 Premature done-claiming** + **#5 Zero-deferral violation**
+- "to keep this manageable" → **#4 Wind-down framing** (the "manageable" framing offloads work)
 
-That's four anti-patterns in one short reply. A vocabulary-equipped operator catches all four and redirects in one sentence: "Skip the estimate. Don't defer the email template. Read the scheduler config in full before planning. Proceed."
+A vocabulary-equipped operator intercepts the entire reply in one sentence: "Drop the estimate. Don't defer the email template. Read the scheduler config in full before planning. Include the integration test. Proceed."
+
+The intervention is fast precisely because each pattern is named. Without the vocabulary the operator's response would be a paragraph of negotiation; with it, six failures get a single line.
 
 ## The rule
 
-> The 20 anti-patterns are the catalog. When you see one in the wild, name it ("that's #3 — wind-down framing"). Naming makes the intervention fast. Appendix A has the recognition phrases and scripts when you need them. Over time you'll add new patterns to YOUR catalog from your own incidents.
+> The 20 anti-patterns are the catalog. When you see one, name it in your reply ("that's #4 — wind-down framing"). Naming raises compliance. Promote the patterns you see most often from "I name them in chat" (prose, ~80% compliance) to "CLAUDE.md re-reads them every session" (durable, higher compliance) to "a hook mechanically blocks the recognition phrase" (tool-boundary, near-100% compliance).
 
 ## Common mistakes
 
-**Mistake 1 — Trying to memorize all 20 today.** You can't. You don't need to. Recognize the 5-6 that appear most in your sessions; the rest you'll meet over time. Reference Appendix A when something looks off.
+**Mistake 1 — Trying to memorize all 20 today.** You can't, and you don't need to. Recognize the 5-6 that show up most in your sessions; meet the rest over time. Reference Appendix A when something feels off.
 
-**Mistake 2 — Naming the pattern but not intervening.** Spotting "#5 hedging" without saying anything to Claude wastes the catch. The intervention is short — "skip the hedge, run the verification" — but it has to happen. Recognition without intervention is just frustration.
+**Mistake 2 — Naming the pattern but not intervening.** Spotting "#13 hedging" silently in your head wastes the catch. Recognition without intervention is just frustration. The intervention is short — say it.
 
-**Mistake 3 — Treating the catalog as exhaustive.** Your specific project will produce new failure shapes. Add them. Promote them through Chapter 16's discipline. The catalog grows with you.
+**Mistake 3 — Not promoting recurring patterns up the enforcement ladder.** Same pattern appears in three sessions. The right move is not "name it harder in chat." Add the rule to CLAUDE.md; if it's still appearing, build a hook. Prose has a ceiling; hooks don't.
+
+**Mistake 4 — Treating the catalog as exhaustive.** Your project will produce new failure shapes. Each new pattern goes through Chapter 16's discipline: incident → feedback file → CLAUDE.md rule → hook.
 
 ## Drill
 
@@ -101,4 +110,10 @@ Artifacts go in `student/drills/18-the-anti-pattern-vocabulary/`.
 
 ## Checkpoint question
 
-> You're reviewing yesterday's session transcript with a friend. Your friend asks: "I see a lot of phrases like 'I think,' 'should be fine,' and 'about an hour or so' — what's the actual problem here?" Walk them through what those phrases are signaling, which anti-patterns they belong to, and what the intervention is — in three sentences total.
+> You catch yourself naming the same anti-pattern (#5 zero-deferral — "pre-existing, out of scope") in three different sessions over a week. Each time you intervene in chat and Claude corrects in that session. The pattern keeps coming back. Walk through: what's the right next step (it isn't "name it harder in chat"), how it fits the prose → CLAUDE.md → hook promotion ladder, and what kind of artifact would catch this pattern at the tool boundary.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P21 (mechanical enforcement beats behavioral rules; ~70-80% compliance ceiling for prose; hooks at tool boundary); recognition phrases drawn from P1 (operator routing), P2 (decision menus), P3 (false refusal), P4 (false-yes), P5 (tool output is truth), P7 (subagent summary trust), P8 (artifact preservation), P9 (source as authority), P11 (wind-down), P12 (time estimates), P13 (zero deferral), P17 (bandaid), P46 (browser-validate), P47 (empty-string defaults), P49 (dev-string leak), P60 (premature done; documented vs decomposed)
+Worked example surface: MembershipKit dues-renewal reminder job dispatch
+Rewrite date: 2026-05-13
+-->

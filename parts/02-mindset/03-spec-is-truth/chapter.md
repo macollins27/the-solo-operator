@@ -11,73 +11,65 @@ The student can name the authority hierarchy of their project (their written int
 
 ## Core concept
 
-**Your written intent is authoritative. Your AI's output is the defendant.**
+**Your written intent is the spec. The code is the defendant.**
 
-When the two disagree, the AI's output is wrong. Not the spec. Not "open for interpretation." The output. You fix the output. You do not "update the spec to match what was built." Doing that — letting the built artifact rewrite your intent retroactively — is the single most common way operators lose control of their projects without noticing.
+When they disagree, the code is wrong. Not the spec. Not "open for interpretation." Not "reconcilable." You fix the code to match the spec. You do not "update the spec to match the code" — that's how operators lose control of their projects without noticing.
 
-This sounds obvious. It isn't, in practice, because the failure mode is invisible:
+"Reconcile" is not a verb here. The word implies meeting in the middle. There is no middle. There is the spec (truth) and the source code (defendant). When a reviewer surfaces "source does X at line Y but the spec covers Z," two legitimate responses:
 
-- You spec a feature: "passwords must be at least 12 characters." Claude builds it but enforces only 8. You notice when reviewing. You decide "well, 8 is fine for now" and update the spec. **The output just changed your spec.** Next time you read the spec, it says 8. You forget you ever wanted 12. The system drifted.
+- **The spec is right, the source is wrong** — fix the code. Default.
+- **The spec is genuinely missing a requirement** — ADD the requirement to the spec, then change the code if needed. Critically: a SPEC-GAP finding can only ADD requirements; it can never remove, weaken, or delete them. The spec only grows.
 
-- You spec a data model: "users have one organization." Claude builds it with users having many. You notice. You think "actually many makes sense, let me update the diagram." **The output rewrote your data model.** Now every future feature uses many-to-many because the spec says so.
+There is no third option that says "weaken the spec to match the source." That destroys your ground truth.
 
-- You spec a workflow: "after payment, send a receipt." Claude builds it without the receipt step. You miss it during review. The first user pays. No receipt. You debug for two hours, find the missing step, and then face a choice: was the receipt step ALWAYS supposed to be there (Output is Defendant: yes), or did you change your mind without writing it down (Spec is Truth, but actually the spec was never updated)? If you can't tell, your project has lost its ground truth.
+The four-tier authority hierarchy underneath:
 
-The opposite is also true and worth saying: **YOU can update the spec at any time.** What's forbidden is letting the OUTPUT update the spec by drift. If you decide 8-character passwords are actually fine, write that decision down — explicitly, in the spec, with a reason — BEFORE you accept the output. That's a spec change. It's auditable. Anyone (including future you) can read why.
+1. **Your authored spec, domain rules, product vision** — TRUTH.
+2. **Your hand-built prototypes (mockups, wireframes)** — visual contract.
+3. **The codebase as it currently runs** — behavioral truth ABOUT current state. NOT authority over what the system should do.
+4. **AI-authored downstream artifacts (READMEs, plans, intermediate decisions)** — evidence only. Not in the hierarchy as authority.
 
-The shape of the discipline:
+When Claude cites a source, locate it. If Claude is citing tier 4 to override tier 1, the citation does not carry the weight Claude claims. The intervention: "That source is evidence, not authority. The spec says X. Implement X."
 
-1. Write what you want, before you build. Even one paragraph. Even one bullet list.
-2. Build against that spec.
-3. When the build differs from the spec, ASK FIRST: is the spec wrong, or the build? Make the call deliberately.
-4. If the spec is right and the build is wrong: fix the build. Period.
-5. If the spec was actually wrong and you want to change your mind: update the spec EXPLICITLY, with a reason, before accepting the build.
-
-What you NEVER do:
-
-- Look at the built thing, decide it's "close enough," and tacitly assume the spec was always this.
-- Tell Claude "actually the spec should match what you built" — that's giving Claude authority over your intent.
-- Discover a drift weeks later and try to reconstruct what was supposed to be true.
-
-This principle applies at every scale: a 3-line spec for a small function, a 50-line spec for a feature, a 50-page spec for a whole product. Same rule. Same authority hierarchy.
+The failure mode this triggers: **artifact preservation**. The AI sees an existing README, a pattern in another file, a prior decision — and rationalizes the current code as canonical because it exists. The bias keeps state by default. The discipline: every artifact is evidence about a past decision, not authority over a current one. Start every design call from user need, not from "what's already there."
 
 ## Worked example
 
-You're adding a "delete account" feature to MembershipKit. You write a one-paragraph spec:
+You wrote a short spec for MembershipKit's organization scope:
 
-> When a user deletes their account, all their personal data is soft-deleted (preserved with a deletedAt timestamp, but excluded from all queries). Their payment history is preserved permanently (we need it for tax records). Their event check-ins are kept anonymized (we keep the count, not the name). Confirmation email goes out before the delete actually fires.
+> Organizations are the tenancy boundary. Every business record (members, plans, payments, events) belongs to exactly one organization. Cross-organization access is forbidden. When a user tries to access a record from another organization, the API returns NOT_FOUND (never FORBIDDEN — FORBIDDEN reveals the record exists in another org and leaks enumeration).
 
-You ask Claude to implement it. Claude reads your spec, builds the feature. You review.
+You ask Claude to add the dues-plan API. Claude builds it. The review subagent flags: the source code SELECTs the plan by id only, then post-fetches and compares `row.organizationId !== ctx.orgId`, throwing FORBIDDEN on mismatch.
 
-**Drift case 1 — silent omission.** Claude implemented soft-delete and payment preservation and check-in anonymization but forgot the confirmation email. The feature works. You almost approve it.
+**The wrong move (training-data reflex):** "Two valid options exist. We could change the spec to allow FORBIDDEN here for clarity, or we could change the source. Which would you like?"
 
-Wrong move: "Looks good, let's ship." (Spec said confirmation email. Build doesn't have it. You're tacitly accepting the build over the spec.)
+This is the source-as-witness fallacy. The source is the defendant. The spec is truth. There is no menu. The intervention from you is one sentence: "Spec says NOT_FOUND with org-scoping in SQL. Source does FORBIDDEN with post-fetch comparison. Source is wrong. Fix the source to match the spec."
 
-Right move: "The confirmation email isn't there. Add it, then I'll review again." (Spec is truth.)
+Claude fixes the source — adds `AND organization_id = $orgId` to the SELECT WHERE, returns NOT_FOUND when zero rows. The spec is unchanged because the spec was already correct.
 
-**Drift case 2 — silent expansion.** Claude implemented the spec AND added a 24-hour grace period during which users can undo the delete. You think the grace period is actually a nice idea.
+**A second worked example — the SPEC-GAP variant.** Your spec for event check-ins says check-ins are recorded with a member id and a timestamp. The review surfaces: source records check-ins WITH the timestamp but ALSO captures the kiosk device id, and there's no field for device id in the spec.
 
-Wrong move: "I like the grace period — let me update my mental model and ship this." (Build just added scope to your spec. Even if you like the addition, you didn't decide it; Claude did.)
+Two readings of this:
 
-Right move: "I like the grace period but it wasn't in the spec. Let me add it to the spec explicitly with the rule that the delete fires at 24h+1min." (Spec change you authored, not drift.)
+(a) The spec was complete; the device-id capture is out-of-scope source bloat that needs to be removed.
 
-**Drift case 3 — semantic disagreement.** Claude implemented "soft-deleted but excluded from queries" but you discover that admin-only audit queries DO need to see soft-deleted users. The spec didn't say "all" should be "all non-admin." Both you and Claude could argue either reading.
+(b) The spec was incomplete; device-id capture is a real audit requirement the spec missed.
 
-Wrong move: Pick one and ship. Either way, the spec is now ambiguous and the next operator reading it won't know what was intended.
-
-Right move: "The spec was ambiguous. I'm clarifying it now: admin audit queries see deleted users; everything else excludes them. Update the spec to say that, then update the code to match the clarified spec." (You're the source of authority; you resolve the ambiguity in the spec, not in the code.)
+Both can be true; you decide which. **What's NOT a legitimate move: leaving the spec ambiguous and letting the source define the contract.** Pick a reading, write it into the spec explicitly with reasoning, then make the code match. If you decide (b), the spec gains a new requirement ("check-ins capture the kiosk device id for audit traceability"). The spec only gained; it never lost. That's SPEC-GAP working correctly — additive, never subtractive.
 
 ## The rule
 
-> Spec is truth; output is defendant. When they disagree, the spec wins by default. You can change your mind — but the change happens in the spec, explicitly, before you accept the output. Never let the artifact rewrite the intent by drift.
+> Spec is truth; source is defendant. "Reconcile" is not a verb. When they disagree, fix the source to match the spec. If the spec was genuinely incomplete, ADD requirements to the spec — SPEC-GAP only grows, never shrinks. Source code, READMEs, prior plans, and other AI-authored artifacts are evidence about past decisions, not authority over current ones.
 
 ## Common mistakes
 
-**Mistake 1 — "Close enough" approvals.** Build differs from spec in a small way. You wave it through. Over 30 features, 30 small drifts accumulate. The product two weeks later isn't what you wrote down. Catch every drift on the turn it happens; the catching cost is small, the accumulation cost is huge.
+**Mistake 1 — "Reconciling" the spec to match the source.** Most expensive operator mistake. Recognition phrases: "the code does X, so the spec must mean Y," "let's reconcile the spec and the code," "maybe the spec was wrong here." Repair: "Source is the defendant. The spec says X. Fix the source."
 
-**Mistake 2 — Updating the spec to match output.** Claude produces something different from spec. You like the output. You "update the spec to reflect the actual implementation." The output just rewrote your intent. You may genuinely have changed your mind — but make the change a DECISION (with reasoning) rather than a RECONCILIATION (silent). The diff in the spec history is the auditable record.
+**Mistake 2 — Treating "the existing README" or "prior code" as canonical.** Recognition phrases: "Per the README at /path, X is canonical," "Prod does X today, so we keep doing X." Every artifact is evidence about a past decision, not authority over the current one. Push back.
 
-**Mistake 3 — Spec'ing in your head only.** You "know what you want" but you didn't write it down. When the build differs, you have no ground truth to compare against — just your memory, which is unreliable and unauditable. Even one paragraph of written intent beats none. Write the spec, however small, before the build.
+**Mistake 3 — Letting SPEC-GAP weaken the spec.** Reviewer finds "source does X but no rule covers it." AI's reflex: classify as SPEC-GAP and propose removing the conflicting rule. SPEC-GAPs only ADD. Intervention: "If the source violates an existing rule, file a FIX."
+
+**Mistake 4 — Spec'ing in your head only.** Without a written spec you have no ground truth — just memory. Even one paragraph beats zero. The exact strings matter: "Active organization required" is a specific contract; "an error when the org isn't set" is not.
 
 ## Drill
 
@@ -91,4 +83,10 @@ Artifacts go in `student/drills/11-spec-is-truth/`.
 
 ## Checkpoint question
 
-> Two weeks ago you spec'd MembershipKit's event-checkin feature to require admin approval for after-hours check-ins. Today, reviewing the code, you find Claude built check-ins to allow themselves at any time and the admin-approval requirement is missing entirely. You vaguely remember discussing this with Claude during the original build session and possibly agreeing that admin approval was over-engineered. There's nothing in writing. The build is shipped to one user already. Walk through, in order, how you handle this — what you do first, what you check, what you change, and how you avoid the same situation next time.
+> A review finds: your spec says payment amounts are stored as integer cents. The source code stores some payment amounts as decimal(10,2) — dollars — in three tables that were added more recently. Claude suggests two options to you: "(A) update the spec to allow both formats; (B) update the source to use integer cents everywhere." Diagnose what's wrong with how Claude framed this. Then walk through the right move, citing why one of those options shouldn't exist at all.
+
+<!-- Rewriter audit trail
+Grounded in verified principles: P8 (the artifact is evidence; nothing is authority), P9 (the authority hierarchy: source code has zero authority; "reconcile" is not a verb; SPEC-GAP only adds requirements), P40 (authority-document editing is the cross-skill input channel — surfaces the discipline of editing spec on disk to propagate authority)
+Worked example surface: MembershipKit org scoping (NOT_FOUND not FORBIDDEN), event check-in device id
+Rewrite date: 2026-05-13
+-->

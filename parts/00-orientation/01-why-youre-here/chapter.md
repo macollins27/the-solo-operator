@@ -45,15 +45,25 @@ By month two, Person A's progress is linear. Person B's is exponential. Person B
 
 ## Drill
 
-This chapter has no machine-checkable drill. The orientation chapter's drill is to do the next three things in order, on your own machine, while I (Claude) walk you through them in the next chapter:
+Your moat starts now. Even before you write code, you start a habit: when something bites you, you write it down. The course teaches this discipline in Chapter 16, but the habit's container is created here.
 
-**Drill 1 — Install Claude Code.** Follow the README at the root of this course repo. After this drill, `claude` runs in your terminal.
+**Drill 1 — Create your feedback corpus directory.** Open Finder (Mac) or File Explorer (Windows). Navigate to your fork of the course repo. Inside the `student/` folder, create a folder named `feedback`. You should now have `student/feedback/`.
 
-**Drill 2 — Open this repo in Claude Code.** Navigate to the repo directory in your terminal, run `claude`, and confirm you see a welcome message.
+**Drill 2 — Author the INDEX file.** Inside `student/feedback/`, create a plain text file named `INDEX.md`. Open it in any text editor. Paste the following three lines and save:
 
-**Drill 3 — Type "teach me."** I will read your state (none yet — you're a new student), call this orientation chapter, and start your real first chapter.
+```
+# My feedback corpus
 
-You complete these by reaching Chapter 1 in the AI tutor. There is no verify.sh for this orientation chapter; the proof of completion is that you're talking to Claude inside the repo and you've reached the next chapter.
+(Each time an AI bites me, I add an entry here pointing to a feedback_<slug>.md file in this folder.)
+```
+
+After this, `student/feedback/INDEX.md` exists. It will accumulate entries every time you author a feedback rule from one of your own incidents (Chapter 16 will show you the format).
+
+**Drill 3 — Run the verify script.** Per the AI tutor's instructions, run `bash parts/00-orientation/01-why-youre-here/verify.sh ./student`. If your file is in the right place, the script exits 0 and the tutor advances you to Chapter 1.
+
+By the end of this drill you have created the literal first artifact of your operating system: a place where the rules YOU author will live. The moat begins.
+
+> **See Appendix E** for a reading list of external references that pair with this course. You don't need any of them to start — they're optional, calibrated to where you'll be after Parts 1-3.
 
 ## Checkpoint question
 

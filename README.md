@@ -12,95 +12,104 @@ You do not need any prior computer experience. If you can use a web browser and 
 
 ## What you'll need
 
-**Hardware:** a Mac (any model from the last 5 years) or a Windows PC (Windows 10 or later, with at least 8 GB of RAM).
+**Hardware:** a Mac (macOS 13 or later, any Mac from the last 5 years) or a Windows PC (Windows 10 1809+, with at least 4 GB of RAM).
 
 **Internet connection.** You'll be using AI services that talk to the internet.
 
-**About 30 minutes for the one-time setup below.** After that, you can take the course at any pace.
+**Accounts you'll need (both free to create):**
 
-**One free account:**
-- An **Anthropic account** at https://console.anthropic.com — this is the company that makes Claude (the AI you'll be working with). The free tier gives you enough usage to do the first several chapters. Later you may want a paid plan.
+- **A Claude account with a paid plan.** Claude Code requires a Pro, Max, Team, or Enterprise subscription — the free Claude.ai tier does NOT work for Claude Code. Sign up at `https://claude.com/`. The cheapest plan that includes Claude Code is Pro.
+- **A GitHub account** at `https://github.com/`. Free. Used to fork this course repo to your own copy.
 
-**One free tool you'll install:**
-- **Claude Code** — Anthropic's official AI engineering tool. It runs in your terminal (the black-screen text-input thing on your computer). You don't need to know what a terminal is yet; the setup below shows you exactly where to find it.
-
-That's it. Nothing else to buy, sign up for, or learn before starting.
+**About 30 minutes** for the one-time setup. After that you can take the course at any pace.
 
 ---
 
-## Setup — Mac
+## Setup — macOS
 
-Do each step in order. If a step doesn't work, scroll down to the Troubleshooting section.
+Do each step in order. After every step there's a verification command — run it; you should see the output it describes. If you don't, scroll down to Troubleshooting.
 
 ### Step 1 — Open your Terminal
 
-Press `⌘ + Space` to open Spotlight search. Type `Terminal` and press Return.
+Press `⌘ + Space` to open Spotlight search. Type `Terminal` and press Return. A window opens with a small prompt that looks something like `username@MacBook ~ %`. This is your **terminal**. Leave it open; you'll use it for every step below.
 
-A window opens with a small prompt that looks something like `username@MacBook ~ %`. This is your **terminal**. It's how you talk to your computer using text instead of clicking.
+### Step 2 — Install Claude Code
 
-Leave this window open. You'll use it for every step below.
-
-### Step 2 — Install Homebrew
-
-Homebrew is the standard tool for installing other tools on a Mac. You install it once and then use it to install everything else.
-
-Copy this entire line, paste it into your terminal, and press Return:
+Copy this command, paste it into your terminal, and press Return:
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-It will ask for your Mac password (the one you use to log in). Type it and press Return. (You won't see the characters as you type — that's normal.)
+The installer downloads Claude Code and puts it in `~/.local/bin/`. When it finishes, **close your terminal completely and reopen it** (so the new PATH takes effect).
 
-The install takes a few minutes. When it finishes, you'll see the prompt again. If the output mentions a "Next steps" section asking you to run two more commands, run those too.
-
-### Step 3 — Install Python and Git
-
-In the same terminal window, run:
-
-```
-brew install python@3.11 git
-```
-
-This installs Python 3.11 (used by the course's tutor backend) and Git (used to fork and clone the course). Wait for it to finish.
-
-### Step 4 — Install Claude Code
-
-In the same terminal window, run:
-
-```
-brew install anthropics/claude-code/claude-code
-```
-
-When it finishes, confirm it worked by running:
+**Verify:** in the new terminal, run:
 
 ```
 claude --version
 ```
 
-You should see a version number. If you see "command not found," close your terminal, reopen it (⌘ + Space → Terminal), and try `claude --version` again.
+You should see a version number like `2.x.x`. If you see "command not found," see Troubleshooting.
 
-### Step 5 — Sign in to Claude Code
+### Step 3 — Install Python and Git
 
-Run:
+Claude Code is installed. Now we install two more tools the course needs.
+
+If you don't already have Homebrew (most beginners won't), install it first:
+
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+It will ask for your Mac login password. Type it (the characters won't appear — that's normal) and press Return. When it finishes, look for a "Next steps" section in the output. On Apple Silicon Macs (M1/M2/M3/M4 — any Mac from 2020 onward), it will tell you to run two commands that look like:
+
+```
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+Run them exactly as printed. This step is load-bearing on Apple Silicon — without it, `brew` won't be on your PATH.
+
+**Verify:**
+
+```
+brew --version
+```
+
+You should see a version number. Then install Python 3.11+ and Git:
+
+```
+brew install python git
+```
+
+**Verify:**
+
+```
+python3 --version
+git --version
+```
+
+Both should print version numbers (Python 3.11.x or later; any git version).
+
+### Step 4 — Sign in to Claude Code
 
 ```
 claude
 ```
 
-Claude Code will open and ask you to sign in. Follow the prompts — it'll open a browser to the Anthropic site, you sign in (or create an account), and the browser sends you back to your terminal.
+Claude Code opens and asks you to sign in. It opens a browser to claude.com — sign in with your Claude account. The browser sends you back to your terminal.
 
-When you see a chat prompt that says something like `>` waiting for your input, you're signed in. Type `/exit` and press Return to close it for now.
+When you see a small prompt that says `>` waiting for your input, you're signed in. Type `/exit` and press Return to close it for now.
 
-### Step 6 — Fork this course on GitHub
+### Step 5 — Fork this course on GitHub
 
-In your web browser, go to the URL of this course's repo (the same place you got this README). On the upper-right of the page, click the **Fork** button. This creates your own personal copy of the course on GitHub.
+In your web browser, visit `https://github.com/macollins27/the-solo-operator`. On the upper-right of the page, click the **Fork** button. This creates your own personal copy of the course on GitHub at `https://github.com/YOUR-USERNAME/the-solo-operator`.
 
-If you don't have a GitHub account yet, sign up at https://github.com — it's free. Then fork.
+If you don't have a GitHub account yet, sign up first at `https://github.com/` — it's free.
 
-### Step 7 — Clone your fork
+### Step 6 — Clone your fork
 
-Back in your terminal, run:
+In your terminal, run (replace `YOUR-USERNAME` with your actual GitHub username):
 
 ```
 cd ~
@@ -108,25 +117,34 @@ git clone https://github.com/YOUR-USERNAME/the-solo-operator.git
 cd the-solo-operator
 ```
 
-Replace `YOUR-USERNAME` with your actual GitHub username. After this, your terminal is "inside" the course repo on your computer.
+**Verify:**
 
-### Step 8 — Install the course's MCP server
+```
+ls
+```
 
-The course has a small backend service that tracks your progress. Install it:
+You should see folders including `appendices/`, `canonical-project/`, `parts/`, `mcp-servers/`, and files including `README.md`, `CLAUDE.md`, `LICENSE`.
+
+### Step 7 — Install the course's MCP server
+
+The course has a small backend service that tracks your progress. Install it inside a virtual environment so it doesn't affect any other Python on your machine:
 
 ```
 cd mcp-servers/course-curriculum
 python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
+.venv/bin/pip install -e .
 cd ../..
 ```
 
-You should see no errors. If you do, skip to Troubleshooting.
+**Verify:**
 
-### Step 9 — Start your first session
+```
+ls mcp-servers/course-curriculum/.venv/bin/python3
+```
 
-Run:
+Should print the path (no "no such file" error). The course's `.mcp.json` is pre-configured to use this Python interpreter, so Claude Code will find the MCP server automatically when you next run `claude` from the repo root.
+
+### Step 8 — Start your first session
 
 ```
 claude
@@ -144,54 +162,75 @@ And press Return.
 
 The tutor reads your state (you're a new student), opens the orientation chapter, and starts your first lesson. From here on, the tutor takes over. You'll have a conversation. The tutor will explain, ask questions, give you small exercises, and verify your work. You progress one chapter at a time. The course remembers where you left off between sessions.
 
+**What success looks like:** after typing `teach me`, you should see Claude respond with a welcome question — not a dump of chapter content. Something like "Welcome. Before we get into anything, a question: have you ever asked an AI to write code and gotten something that looked right but didn't actually work?" If you see that, the tutor is loaded. If Claude responds generically (like a normal chat), see Troubleshooting.
+
 ---
 
 ## Setup — Windows
 
-Do each step in order. If you get stuck, scroll down to Troubleshooting.
+Do each step in order.
 
 ### Step 1 — Open PowerShell
 
-Press the Windows key. Type `PowerShell`. Right-click "Windows PowerShell" and choose "Run as administrator."
+Press the Windows key. Type `PowerShell`. Right-click "Windows PowerShell" and choose "Run as administrator." A blue window opens with a prompt that starts with `PS C:\`.
 
-A blue window opens with a prompt. This is your **terminal** on Windows.
+### Step 2 — Allow PowerShell to run scripts (one-time setup)
 
-### Step 2 — Install Git and Python
-
-In the PowerShell window, run:
+By default, Windows blocks PowerShell from running scripts. Run this once to allow it:
 
 ```
-winget install --id Git.Git -e
-winget install --id Python.Python.3.11 -e
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-Close the PowerShell window and reopen it (so the new tools are available).
+Press `Y` and Return when prompted. This affects only your user, only locally — it's the standard developer setup.
 
 ### Step 3 — Install Claude Code
 
-In the new PowerShell window:
-
 ```
-winget install --id Anthropic.ClaudeCode -e
+irm https://claude.ai/install.ps1 | iex
 ```
 
-When it finishes, confirm with:
+The installer downloads Claude Code. When it finishes, **close PowerShell and reopen it** (so the new PATH takes effect).
+
+**Verify:** in the new PowerShell window:
 
 ```
 claude --version
 ```
 
-### Step 4 — Sign in to Claude Code
+You should see a version number.
 
-Run `claude`. Sign in via the browser prompt. Then `/exit` to close.
+### Step 4 — Install Git and Python
 
-### Step 5 — Fork the course on GitHub
+```
+winget install --id Git.Git -e
+winget install --id Python.Python.3.12 -e
+```
 
-Same as the Mac instructions, Step 6. Use your web browser. Click "Fork" on the GitHub page.
+Close PowerShell and reopen it.
 
-### Step 6 — Clone your fork
+**Verify:**
 
-In PowerShell:
+```
+git --version
+python --version
+```
+
+Both should print version numbers.
+
+### Step 5 — Sign in to Claude Code
+
+```
+claude
+```
+
+Sign in via the browser prompt. Then `/exit`.
+
+### Step 6 — Fork the course on GitHub
+
+Same as the Mac instructions, Step 5. Visit `https://github.com/macollins27/the-solo-operator` and click **Fork**.
+
+### Step 7 — Clone your fork
 
 ```
 cd $HOME
@@ -199,25 +238,26 @@ git clone https://github.com/YOUR-USERNAME/the-solo-operator.git
 cd the-solo-operator
 ```
 
-Replace `YOUR-USERNAME`.
+Replace `YOUR-USERNAME` with your actual GitHub username.
 
-### Step 7 — Install the MCP server
+### Step 8 — Install the MCP server
 
 ```
 cd mcp-servers\course-curriculum
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -e .
+.\.venv\Scripts\pip install -e .
 cd ..\..
 ```
 
-If PowerShell complains about script execution policy, run this first and then re-try:
+**Verify** the venv Python exists:
 
 ```
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+dir mcp-servers\course-curriculum\.venv\Scripts\python.exe
 ```
 
-### Step 8 — Start your first session
+If the path printed, you're good. (On Windows the venv puts `python.exe` under `Scripts/` instead of `bin/`. The course's `.mcp.json` assumes the Mac/Linux `bin/python3` path — if Claude Code can't find the MCP server on Windows, open `.mcp.json` in any text editor and change the command line from `mcp-servers/course-curriculum/.venv/bin/python3` to `mcp-servers\course-curriculum\.venv\Scripts\python.exe` and save.)
+
+### Step 9 — Start your first session
 
 ```
 claude
@@ -245,23 +285,23 @@ There are 44 chapters across 6 parts (plus a Part 0 orientation). You don't have
 
 ## Troubleshooting
 
-**"command not found: claude" after installing.** Close your terminal completely, reopen it, and try again. If it still says that, the install probably failed; re-run the install command and watch for error messages.
+**"command not found: claude" after installing.** Close your terminal completely, reopen it, and try again. If still missing, the installer's PATH update didn't take effect — on Mac add `export PATH="$HOME/.local/bin:$PATH"` to `~/.zshrc` and reopen; on Windows reboot.
 
-**"command not found: brew" on Mac.** The Homebrew installer printed "Next steps" you didn't run. Look back in your terminal for those lines (they start with `echo` and `eval`) and run them.
+**"command not found: brew" on Mac.** The Homebrew installer printed "Next steps" with `eval` lines you didn't run. Look back in your terminal for them; they need to run before `brew` works.
 
-**Python install issues on Mac.** Run `brew doctor` to diagnose. If it suggests `xcode-select --install`, run that.
+**Python install issues on Mac.** Run `brew doctor`. If it suggests `xcode-select --install`, run that.
 
-**"could not authenticate" when signing in to Claude Code.** Visit https://console.anthropic.com directly, sign in successfully there first, then re-run `claude`.
+**"could not authenticate" when signing in to Claude Code.** Visit `https://claude.com/` directly, sign in successfully there (with a Pro/Max/Team account), then re-run `claude`. The free tier doesn't include Claude Code.
 
-**Forgot your GitHub username.** Log in at https://github.com and look at the top-right corner.
+**The MCP server fails to start (you see "MCP server failed" or no tutor response).** From the repo root, run `mcp-servers/course-curriculum/.venv/bin/python3 mcp-servers/course-curriculum/server.py` manually and read the error. Most likely the venv install in Step 7 didn't complete — re-run it.
 
-**Git asks for credentials when cloning.** If it's a public repo, you shouldn't need any. If git asks anyway, press Return to skip — it should still work.
+**Forgot your GitHub username.** Log in at `https://github.com/` and look at the top-right corner.
 
-**The MCP install fails with `pip: command not found`.** On Mac, try `pip3` instead. On Windows, make sure you've activated the virtual environment with the activation script in Step 7.
+**You typed "teach me" and got a generic Claude reply instead of the tutor.** The pedagogy SKILL isn't loading. Confirm: (a) you're inside the cloned repo (`pwd`), (b) the file `.claude/skills/pedagogy/SKILL.md` exists (`ls .claude/skills/pedagogy/`), (c) the file `.mcp.json` exists at the repo root, (d) the MCP venv from Step 7 was installed. If all four are present and it still doesn't work, type this in your session: "Read .claude/skills/pedagogy/SKILL.md and follow it. The student_id is 'default-student'." That force-bootstraps the tutor.
 
-**You typed "teach me" and nothing useful happened.** Check that Claude said something like "Welcome back" or asked you about prompting vs. operating. If Claude is talking about something unrelated, type "I'm taking the Solo Operator's Manual course; please load the pedagogy SKILL and the course-curriculum MCP." If that still doesn't work, exit (`/exit`), re-open in the repo directory, and try again.
+**Windows PowerShell vs CMD.** If you see `'irm' is not recognized as an internal or external command`, you're in CMD, not PowerShell. Your prompt shows `PS C:\` when you're in PowerShell. If you're in CMD, switch to PowerShell (Windows key → type "PowerShell" → right-click → Run as administrator).
 
-**Something else broke.** Type a description of the problem into Claude — it can usually diagnose. If it can't, open an issue on the original course repo (the one you forked from).
+**Something else broke.** Type a description of the problem into Claude — it can usually diagnose. If it can't, open an issue on the source repo at `https://github.com/macollins27/the-solo-operator/issues`.
 
 ---
 

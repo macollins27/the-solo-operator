@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-course-curriculum = "server:mcp.run"
+course-curriculum = "server:main"
 
 [build-system]
 requires = ["hatchling"]

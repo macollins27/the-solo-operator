@@ -37,7 +37,7 @@ Three patterns operators use:
 
 **Pattern 1 — Parallel diagnostics on the same question.** When a problem is high-stakes and you want confidence, dispatch 2-3 subagents on the same diagnostic question. Convergence on the same answer = high confidence. Divergence = each agent is fallible. Maxwell's project uses this routinely; this course encourages it.
 
-**Pattern 2 — Decompose a big task.** A 50-chapter audit is impossible in one session. Dispatching 50 forks, one per chapter, returns 50 terse summaries while the heavy work happens in parallel. Your context stays focused on synthesis.
+**Pattern 2 — Decompose a big task.** A whole-curriculum audit is impossible in one session. Dispatching one fork per chapter returns terse summaries while the heavy work happens in parallel. Your context stays focused on synthesis.
 
 **Pattern 3 — Isolate dangerous work.** Some work shouldn't pollute your main thread — reading legacy code, doing experimental analysis, generating throwaway content. A fresh subagent does the work in isolation; the result you keep is just the conclusion.
 

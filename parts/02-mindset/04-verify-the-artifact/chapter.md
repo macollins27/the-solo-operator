@@ -73,6 +73,8 @@ Artifacts go in `student/drills/12-verify-the-artifact/`.
 
 **Drill 3 — Behavioral verification.** Ask Claude to modify the home page (`student/canonical-project/app/page.tsx`) to display the text "MembershipKit". After Claude finishes, start the dev server (`pnpm dev` in another terminal), open `http://localhost:3000`, and confirm visually that the text is there. Take a screenshot and save it to `student/drills/12-verify-the-artifact/03-browser-screenshot.png`. (The point is: code-level verification isn't enough; you actually have to see it in the browser to verify a UI change.)
 
+> When something breaks mid-session (build fails, dev server crashes, a hook fires), **see Appendix C** for the recovery recipes — twenty specific "when X happens, do Y" patterns.
+
 ## Checkpoint question
 
 > Claude reports: "I added the email-sending logic and confirmed it works." You're about to deploy this to real users. List the four things you check before you believe Claude — in the order you'd check them, and what each one would catch that the previous one would not.

@@ -63,6 +63,8 @@ Open your course repo in your terminal (you'll learn the terminal properly next 
 
 After all three files exist, your tutor will run `verify.sh` to confirm them mechanically.
 
+> Any technical term in this chapter you don't recognize? **See Appendix D** for the glossary — every term in the course defined in plain English.
+
 ## Checkpoint question
 
 > You just typed in your favorite music app and saved a new playlist. Then you quit the app. Where did the playlist go — to the counter, to the pantry, or both? And how do you know it'll still be there when you reopen the app tomorrow?

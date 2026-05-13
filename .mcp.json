@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/mcp.json",
   "mcpServers": {
     "course-curriculum": {
-      "command": "python3",
+      "command": "mcp-servers/course-curriculum/.venv/bin/python3",
       "args": ["mcp-servers/course-curriculum/server.py"],
       "env": {}
     }

@@ -2,7 +2,7 @@
 
 This is the running example every chapter of the course builds against.
 
-You — the student — are going to build a working membership manager from scratch, one feature at a time, across all 50 chapters. By the end you'll have a real piece of software you can deploy and use for any community you belong to.
+You — the student — are going to build a working membership manager from scratch, one feature at a time, across the course's chapters. By the end you'll have a real piece of software you can deploy and use for any community you belong to.
 
 The course's `canonical-project/` is the REFERENCE implementation. Your own work lives in `student/canonical-project/` inside your fork of the course repo. Each drill adds one feature to your fork. You compare your work against the reference when you're stuck.
 

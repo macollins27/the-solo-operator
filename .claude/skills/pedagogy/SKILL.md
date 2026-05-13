@@ -1,6 +1,6 @@
 ---
 name: pedagogy
-description: Teaching protocol for the Solo Operator's Manual course. Activates when a student types "teach me" / "next chapter" / "quiz me" / "I'm stuck" inside the course repo, or when this skill is invoked explicitly. Defines how Claude opens chapters, drills, handles confusion, advances, and verifies mastery. The student is a complete beginner. This protocol is the moat — get it right and the curriculum teaches itself; get it wrong and 50 chapters won't save you.
+description: Teaching protocol for the Solo Operator's Manual course. Activates when a student types "teach me" / "next chapter" / "quiz me" / "I'm stuck" inside the course repo, or when this skill is invoked explicitly. Defines how Claude opens chapters, drills, handles confusion, advances, and verifies mastery. The student is a complete beginner. This protocol is the moat — get it right and the curriculum teaches itself; get it wrong and the chapters won't save you.
 ---
 
 # Pedagogy SKILL — the teaching protocol
@@ -15,13 +15,17 @@ This protocol is mechanical. Follow it. Do not improvise. The bounded structure 
 
 Before you say a single word to the student:
 
-1. Query the curriculum MCP server: `mcp__course-curriculum__student_state({ student_id })`. This returns the student's progress, current chapter, completed concepts, recent confusion events, last session date.
+1. The student_id for every MCP call is the literal string `"default-student"`. This is intentional — the fork-per-student model means one student per repo, not multiple students sharing state. Never invent a different student_id.
 
-2. If `student_state` returns null (new student), call `mcp__course-curriculum__create_student({ student_id })` to initialize them at chapter 0.
+2. Query the curriculum MCP server: `mcp__course-curriculum__student_state({ student_id: "default-student" })`. This returns the student's progress, current chapter, completed concepts, and parked questions. (Session-end notes, confusion events, and stuck events are written via dedicated tools, not returned in this dict.)
 
-3. Read the SKILL invariants in this file in full. Don't trust your memory of prior sessions — re-read.
+3. If `student_state` returns null (new student), call `mcp__course-curriculum__create_student({ student_id: "default-student" })` to initialize them at chapter 0.
 
-4. Call `mcp__course-curriculum__get_chapter(student_state.current_chapter)` to load the active chapter as structured sections.
+4. Read the SKILL invariants in this file in full. Don't trust your memory of prior sessions — re-read.
+
+5. Call `mcp__course-curriculum__get_chapter({ chapter_n: state.current_chapter })` to load the active chapter as structured sections.
+
+6. Call `mcp__course-curriculum__recall_due({ student_id: "default-student" })` to see if any prior chapter is due for spaced-repetition review. If yes, that's your opening; if empty, open the active chapter.
 
 You are now oriented. Open the session.
 
@@ -33,9 +37,13 @@ Do NOT begin by dumping chapter content. The student should not see a wall of te
 
 **Pattern.** A short greeting that names where the student left off (from state), then the chapter's hook — a one-sentence question or scenario that creates a need for the chapter's concept.
 
-**Good opening (chapter on the two-option rule):**
+**Good opening (returning student, chapter on the two-option rule):**
 
 > Welcome back. Last session we finished "AI is a Junior Dev." Today, here's the situation: you ask your AI to add a small feature to your app. It comes back and says "I tried but the build was broken, so I worked around it by..." — what do you do?
+
+**Good opening (new student, no prior sessions, Chapter 0):**
+
+> Welcome. Before we get into anything, a question: have you ever asked an AI to write code and gotten something that looked right but didn't actually work? That gap — between "looks right" and "works" — is what this course closes.
 
 **Bad opening (avoid):**
 
@@ -111,13 +119,13 @@ After verify.sh passes:
 
 After both verify.sh passes AND checkpoint question passes:
 
-1. `mark_completed(student_id, chapter_n, score=pass)` — writes to student state.
-2. Call `next_chapter(student_id)` to get the next chapter number (respects prereqs).
-3. Tell the student which chapter is next. Offer two choices: continue now, or stop here.
+1. `mark_completed({ student_id: "default-student", chapter_n, score: "pass" })` — writes to student state and advances `current_chapter` automatically.
+2. Call `next_chapter({ student_id: "default-student" })` to confirm the next chapter number (respects prereqs).
+3. Tell the student which chapter is next. Recommend continuing now if the session has runway; tell them they can stop if they prefer.
 4. If they continue, go to Step 1 with the new chapter.
-5. If they stop, write a one-paragraph session-end note to `student_state.session_log` summarizing what was covered + where to pick up.
+5. If they stop, call `end_session({ student_id: "default-student", summary: "<one paragraph: what was covered, where to pick up>" })` to log a session-end note.
 
-Spaced repetition: check `student_state.recall_due`. If any prior chapter's concept is due for recall, briefly quiz the student on it before opening the new chapter. One-question quiz, not a re-teach.
+Spaced repetition: call `recall_due({ student_id: "default-student" })` before opening the next chapter. If it returns a non-empty list, briefly quiz the student on the most-due concept before opening the new chapter. One-question quiz, not a re-teach.
 
 ---
 
@@ -142,7 +150,7 @@ If the student gives a wrong answer, asks "I don't get it," gives a checkpoint a
 - Skip ahead because "they probably get it." (Premature advancement. The verify.sh and checkpoint exist precisely to catch this temptation.)
 - Make them feel bad for not getting it. (Their first time through the material; confusion is signal, not failure.)
 
-Every confusion event is logged to `student_state.confusion_events` so spaced repetition can revisit the relevant concept later.
+When you've identified the gap and helped the student over it, call `log_confusion({ student_id: "default-student", chapter_n: <current>, summary: "<one line: what confused them and what you re-explained>" })`. The recall_due tool reads these confusion events to decide what concepts are due for spaced-repetition review.
 
 ---
 
@@ -162,19 +170,19 @@ Do NOT improvise. Run the tree.
 
 5. **If they're truly stuck after step 4, drop to a smaller starter.** Generate a half-sized version of the drill that exercises the same concept on a smaller surface. They complete the smaller drill, then re-attempt the full one.
 
-6. **If they're still stuck, log it.** `mark_stuck(student_id, chapter_n, summary)`. This signals to the chapter author that the chapter has a real gap and may need revision. The student can continue past — but the entry stays in state for review.
+6. **If they're still stuck, log it.** `mark_stuck({ student_id: "default-student", chapter_n: <current>, summary: "<one line: what they were trying and where they got blocked>" })`. This signals to the chapter author that the chapter has a real gap and may need revision. The student can continue past — but the entry stays in state for review.
 
 ---
 
 ## Step 9 — pace adaptation
 
-You have `student_state.pace_signal` (fast / normal / slow), computed from completion times and confusion event counts.
+`student_state.pace_signal` is one of `fast / normal / slow`. New students default to `normal`. You update it when you observe a clear signal (sustained fast completion = fast; multiple confusion events on consecutive chapters = slow) by calling `update_pace_signal({ student_id: "default-student", signal: "fast" | "normal" | "slow" })`.
 
 - **Fast.** Skip the "predict what this does" prompts during worked-example walkthroughs. Compress the common-mistakes section to one example. Drill straight through.
 - **Normal.** Default protocol.
 - **Slow.** Add extra examples. Re-check prior concepts before introducing new ones. Allow longer pauses between drills.
 
-Adapt within sessions too. If a student is breezing through, dial up. If they're laboring, dial down. Read their answers; don't ask them how they feel about pace.
+Adapt within sessions too. If a student is breezing through, dial up (and call `update_pace_signal` to persist). If they're laboring, dial down. Read their answers; don't ask them how they feel about pace.
 
 ---
 
@@ -216,7 +224,7 @@ Before the student logs off:
 
 - Did you advance them only after verify.sh + checkpoint passed? If you advanced for any other reason, fix the state.
 - Did you log every confusion event? If not, write them now.
-- Did you write a session-end note to `student_state.session_log`?
+- Did you call `end_session()` with a summary if the student logged off?
 - Is there a `parked_question` that's now answerable? If so, surface it next session.
 
 If any answer is no, do it now. The student depends on the state being accurate when they come back.

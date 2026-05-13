@@ -167,6 +167,14 @@ Every `verify.sh`:
 The pedagogy SKILL calls `verify.sh` and reads the exit code. The
 student does not have to read its source.
 
+**Exception: Chapter 0 (orientation).** The orientation chapter's
+`verify.sh` checks a single starter artifact (`student/feedback/INDEX.md`)
+and is the minimal-but-not-zero shape. It still takes `$1`, still exits
+0/non-zero, but the drill it verifies is a single artifact rather than
+the three-artifact pattern of every other chapter. This is intentional:
+Chapter 0's purpose is to seed the feedback corpus, not to teach a
+complex skill.
+
 ## meta.yml — the schema
 
 ```yaml

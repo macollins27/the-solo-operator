@@ -43,7 +43,7 @@ Two final disciplines for the long arc:
 
 **2. Don't skip consolidation.** A year of feedback files without consolidation is unusable. Run consolidation passes quarterly; spend the 30-90 minutes; preserve the bodies; document the drop log.
 
-The course ends here. From this point forward you're operating your own system on your own project. The 50 chapters were the map; the 60 days of actual operating are the territory.
+The course ends here. From this point forward you're operating your own system on your own project. The chapters were the map; the 60 days of actual operating are the territory.
 
 ## Worked example
 

@@ -215,7 +215,10 @@ def next_chapter(student_id: str) -> int | None:
 
 @mcp.tool()
 def mark_completed(student_id: str, chapter_n: int, score: str = "pass") -> dict[str, Any]:
-    """Record chapter completion + write concepts_taught into concepts_known."""
+    """Record chapter completion + write concepts_taught into concepts_known.
+
+    Promotes current_chapter to the next eligible chapter on a passing score.
+    """
     if score not in ("pass", "partial"):
         raise ValueError("score must be 'pass' or 'partial'")
     conn = _db()
@@ -230,10 +233,16 @@ def mark_completed(student_id: str, chapter_n: int, score: str = "pass") -> dict
                 "INSERT OR IGNORE INTO concepts_known (student_id, concept) VALUES (?, ?)",
                 (student_id, concept),
             )
+    # Commit completion + concepts BEFORE computing the next chapter so the
+    # nested next_chapter() call sees the just-inserted row.
+    conn.commit()
+
+    if chapter and score == "pass":
         nxt = next_chapter(student_id)
         if nxt is not None:
             conn.execute("UPDATE students SET current_chapter = ? WHERE id = ?", (nxt, student_id))
-    conn.commit()
+            conn.commit()
+
     return {"student_id": student_id, "chapter_n": chapter_n, "score": score}
 
 
@@ -328,10 +337,61 @@ def end_session(student_id: str, summary: str) -> dict[str, Any]:
     return {"logged": True}
 
 
+@mcp.tool()
+def recall_due(student_id: str, limit: int = 5) -> list[dict[str, Any]]:
+    """Return chapters due for spaced-repetition review.
+
+    Logic: chapters where the student had a confusion event AND has since
+    completed the chapter. Returns up to `limit` results, oldest confusion
+    first. Empty list means nothing is currently due for review.
+    """
+    conn = _db()
+    rows = conn.execute(
+        """
+        SELECT ce.chapter_n, ce.summary, ce.occurred_at
+        FROM confusion_events ce
+        WHERE ce.student_id = ?
+          AND ce.chapter_n IN (
+            SELECT chapter_n FROM completed_chapters
+            WHERE student_id = ? AND score = 'pass'
+          )
+        ORDER BY ce.occurred_at ASC
+        LIMIT ?
+        """,
+        (student_id, student_id, limit),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+@mcp.tool()
+def update_pace_signal(student_id: str, signal: str) -> dict[str, Any]:
+    """Update the student's pace_signal to one of 'fast' | 'normal' | 'slow'.
+
+    Called by the pedagogy SKILL when sustained completion-time or
+    confusion-event signals justify a pace change.
+    """
+    if signal not in ("fast", "normal", "slow"):
+        raise ValueError("signal must be 'fast', 'normal', or 'slow'")
+    conn = _db()
+    cur = conn.execute(
+        "UPDATE students SET pace_signal = ? WHERE id = ?",
+        (signal, student_id),
+    )
+    conn.commit()
+    if cur.rowcount == 0:
+        raise ValueError(f"no student with id={student_id!r}")
+    return {"student_id": student_id, "pace_signal": signal}
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Console-script entry point (referenced from pyproject.toml)."""
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()

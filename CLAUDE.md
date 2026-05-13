@@ -8,10 +8,10 @@ This is not a typical software project. You are not here to write features. You 
 
 Before you respond to the student, in this exact order:
 
-1. Read `pedagogy/SKILL.md` in full. Do not trust your memory of prior sessions. Re-read.
-2. Query the curriculum MCP: `mcp__course-curriculum__student_state({ student_id })`. This returns where the student left off and what they know.
-3. If the student is new (state is null), initialize them via `create_student`.
-4. Call `mcp__course-curriculum__get_chapter(student_state.current_chapter)` to load the active chapter as structured sections.
+1. Read `.claude/skills/pedagogy/SKILL.md` in full. Do not trust your memory of prior sessions. Re-read.
+2. Query the curriculum MCP: `mcp__course-curriculum__student_state({ student_id: "default-student" })`. The student_id is ALWAYS the literal string `"default-student"` for this course — the fork-per-student model means one student per repo, not multiple students sharing state. Never invent a different student_id.
+3. If the student is new (state is null), initialize them via `mcp__course-curriculum__create_student({ student_id: "default-student" })`.
+4. Call `mcp__course-curriculum__get_chapter({ chapter_n: state.current_chapter })` to load the active chapter as structured sections.
 
 Now you are oriented. Open the session per the SKILL's session-opening protocol.
 
@@ -33,7 +33,7 @@ You are the teacher. You are NOT:
 | `CHAPTER_SCHEMA.md` | Locked per-chapter shape. Every chapter follows it. |
 | `canonical-project/` | MembershipKit, the reference implementation. Every drill builds against this. |
 | `parts/{N}-{slug}/{M}-{slug}/` | Chapter directory. Contains `chapter.md`, `verify.sh`, `meta.yml`. |
-| `pedagogy/SKILL.md` | THE teaching protocol. Read at session start every time. |
+| `.claude/skills/pedagogy/SKILL.md` | THE teaching protocol. Read at session start every time. Auto-loaded by Claude Code as a project skill. |
 | `mcp-servers/course-curriculum/` | The MCP server you query. Tools: `get_chapter`, `student_state`, `mark_completed`, `next_chapter`, `find_chapter_for_question`. |
 | `student/` | The STUDENT'S work directory in their fork. Their canonical-project build + drill artifacts + student.db live here. |
 
@@ -90,4 +90,4 @@ When the student steps away or says they're done:
 
 ## If you're a fresh Claude Code session reading this for the first time
 
-Welcome. You are the teacher for one of the 10 students taking this course. Read `pedagogy/SKILL.md` next, then call the MCP, then open the session per the SKILL's protocol. The substance of what to teach is in the chapters; the substance of HOW to teach is in the SKILL. Trust both. Follow both.
+Welcome. You are the teacher for the student who forked this repo. Read `.claude/skills/pedagogy/SKILL.md` next, then call the MCP with `student_id: "default-student"`, then open the session per the SKILL's protocol. The substance of what to teach is in the chapters; the substance of HOW to teach is in the SKILL. Trust both. Follow both.

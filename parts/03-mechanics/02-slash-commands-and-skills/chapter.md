@@ -118,11 +118,11 @@ Now from any session you type `/finish-chapter` and that whole 4-command flow ru
 
 Artifacts go in your fork. The skill is a real, working skill.
 
-**Drill 1 — Author a starter skill.** Create the folder `.claude/skills/finish-chapter/` in your fork. Write a `SKILL.md` inside it with the frontmatter (name + description) and a numbered body. The skill's purpose: verify the current chapter's drills (`bash parts/.../verify.sh ./student`) and commit if it passes. You can copy the structure from the worked example above but write it in your own voice.
+**Drill 1 — Author a starter skill.** Create the folder `student/.claude/skills/finish-chapter/` in your fork. Write a `SKILL.md` inside it with the frontmatter (name + description) and a numbered body. The skill's purpose: verify the current chapter's drills (`bash parts/.../verify.sh ./student`) and commit if it passes. You can copy the structure from the worked example above but write it in your own voice.
 
 **Drill 2 — Invoke your skill.** Start a Claude Code session in your fork. Type `/finish-chapter`. Watch Claude follow the protocol. Save Claude's session output (the sequence of tool calls + final result) summary to `student/drills/20-skills/01-invocation-log.txt`. (Snapshot of the session is fine; don't paste an entire transcript.)
 
-**Drill 3 — Author a second, different skill.** Pick another small workflow you've done at least twice in this course (examples: "summarize the last 5 chapters I completed," "show me my feedback corpus stats"). Author it as `.claude/skills/<your-skill-name>/SKILL.md`. Document the workflow in 5-10 numbered steps. Save the skill's path to `student/drills/20-skills/02-second-skill.txt`.
+**Drill 3 — Author a second, different skill.** Pick another small workflow you've done at least twice in this course (examples: "summarize the last 5 chapters I completed," "show me my feedback corpus stats"). Author it as `student/.claude/skills/<your-skill-name>/SKILL.md`. Document the workflow in 5-10 numbered steps. Save the skill's path to `student/drills/20-skills/02-second-skill.txt`.
 
 ## Checkpoint question
 

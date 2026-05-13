@@ -26,4 +26,5 @@ recall_chapters:
 
 drill:
   artifact: parts/00-orientation/01-why-youre-here/verify.sh
-  produces: []
+  produces:
+    - student/feedback/INDEX.md

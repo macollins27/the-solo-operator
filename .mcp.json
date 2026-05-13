@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/mcp.json",
+  "mcpServers": {
+    "course-curriculum": {
+      "command": "python3",
+      "args": ["mcp-servers/course-curriculum/server.py"],
+      "env": {}
+    }
+  }
+}

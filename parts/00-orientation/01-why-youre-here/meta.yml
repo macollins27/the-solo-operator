@@ -1,0 +1,29 @@
+chapter:
+  number: 0
+  part: 0
+  slug: why-youre-here
+  title: "Why You're Here"
+
+learning_objective: >
+  The student can explain in their own words the difference between
+  "prompting an AI" and "operating an AI engineering system," and why
+  the second is what this course teaches.
+
+prerequisites:
+  chapters_completed: []
+  concepts_required: []
+
+concepts_taught:
+  - prompting-vs-operating
+  - system-as-moat
+  - compounding-vs-linear-ai-use
+
+complexity: low
+
+recall_chapters:
+  - 9 # surfaces when introducing the mindset section
+  - 32 # surfaces when teaching hero-level composition
+
+drill:
+  artifact: parts/00-orientation/01-why-youre-here/verify.sh
+  produces: []

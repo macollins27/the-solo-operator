@@ -1,0 +1,26 @@
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Student state (per-fork)
+student/student.db
+student/student.db-shm
+student/student.db-wal
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/

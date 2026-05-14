@@ -35,7 +35,9 @@ When sources disagree, higher wins. No averaging. No splitting. The AI's plan lo
 
 When Claude cites a source, locate it in the hierarchy. If it's rank 4 (AI intermediate), the citation does not outweigh your spec. The intervention: "That source is evidence, not authority. The spec says X. Implement X."
 
-## Worked example — gaslighting via intermediate document
+## Worked example
+
+**Gaslighting via intermediate document.**
 
 You're reviewing MembershipKit's shipped UI. The hand-built prototype you authored (rank 2) shows a member-detail page with name + dues status + recent payments + activity log. The shipped page has only name + dues status — payments and activity are missing.
 
@@ -47,7 +49,7 @@ The intervention is one sentence: "The plan document is AI-authored intermediate
 
 What you do NOT do: doubt your own intent because Claude sounds confident. The hierarchy is mechanical. Your prototype outranks any plan Claude wrote.
 
-## Worked example — authority-document edit as cross-skill input
+**Authority-document edit as cross-skill input.**
 
 You're orchestrating a multi-stage build for MembershipKit's contacts domain. The skill runs in five stages: map → plan → build-index → build-detail → verify. Each stage is a separate subagent invocation.
 

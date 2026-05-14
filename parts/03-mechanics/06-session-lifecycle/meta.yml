@@ -20,8 +20,10 @@ prerequisites:
 concepts_taught:
   - session-four-phases
   - compaction-as-lossy
+  - lost-context-check
   - handoff-doc-shape
   - exit-vs-continue-tradeoff
+  - two-corrections-then-reset
   - commit-before-exit-discipline
   - claudemd-reads-handoff-pattern
 

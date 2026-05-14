@@ -46,7 +46,9 @@ The AI claims a capability ceiling that doesn't exist — either because tools a
 
 The two patterns — false menu, false refusal — are mirror images. The menu offloads a decision that's the AI's; the refusal offloads work that's within reach. The operator's posture is the same in both directions: push back where it belongs, with one short sentence.
 
-## Worked example — the false menu
+## Worked example
+
+**False menu.**
 
 You ask Claude to add member search to MembershipKit.
 
@@ -60,7 +62,7 @@ Claude returns: "Live-updating substring search using Postgres pg_trgm. Reasonin
 
 You read the reasoning. It's coherent. You say "proceed." The total cost of this exchange: 30 seconds. The cost of the menu version would have been a slower product and a follow-up debug cycle.
 
-## Worked example — the false refusal
+**False refusal.**
 
 A different session. You ask Claude to verify the new sign-in page renders correctly. Claude returns: "I can't browser-validate from a CLI session. Can you check it yourself and tell me what you see?"
 

@@ -31,7 +31,9 @@ The dispatch-prompt-length question is an unresolved tension in mature operating
 
 The reconciliation: the views address different surfaces. Skill body carries discipline when the dispatch invokes a skill; the dispatch prompt carries it when there's no skill.
 
-Three composition patterns: **parallel diagnostic dispatch** (high-stakes → 2+ agents independently briefed; triangulate; first catches bugs the second misses), **per-layer fan-out** (wrapper script dispatches one subagent per layer in parallel; orchestrator composes), **pipeline dispatch** (spec → contract → build → review → fix; orchestrator reads structured exit of each before the next).
+Three composition patterns: **parallel diagnostic dispatch** (high-stakes -> 2+ agents independently briefed; triangulate), **per-layer fan-out** (one subagent per layer; orchestrator composes), **pipeline dispatch** (spec -> contract -> build -> review -> fix; structured exit before next stage).
+
+Effort scaling is part of orchestration. One agent is enough for simple fact-finding. Two to four agents fit comparisons or independent audits. Ten-plus agents only make sense for broad, high-value work with strict output contracts and review capacity. Every dispatch needs four parts: objective, output format, tool/source guidance, and task boundaries. Missing any one invites drift.
 
 Discipline layer that keeps composition from chaos:
 
@@ -60,7 +62,7 @@ You're shipping live notifications across MembershipKit: schema migration, backe
 - Dispatch 13: `/qa-audit notifications`. Returns `zero blockers`.
 - Commit; handoff; close.
 
-Orchestrator context growth: ~10k tokens (13 structured returns). The orchestrator stayed clean.
+Orchestrator context stays small because only structured returns come back.
 
 ## The rule
 
@@ -70,9 +72,9 @@ Orchestrator context growth: ~10k tokens (13 structured returns). The orchestrat
 
 **Mistake 1 — Orchestrator doing the work itself.** You dispatch one subagent, get the return, and then START EDITING FILES yourself. The orchestrator's context fills with file contents. Two more dispatches and the orchestrator is compacting. The fix: orchestrator dispatches; subagents edit; orchestrator only composes.
 
-**Mistake 2 — Vague dispatch prompts to non-skilled subagents.** "Audit my code" lets the subagent define the audit. Different runs produce different audits. The fix is the long-prompt discipline: labeled sections, forbidden list enumerated, structured-return format specified. Minimum ~7,000 characters for complex tasks.
+**Mistake 2 — Vague dispatch prompts to non-skilled subagents.** "Audit my code" lets the subagent define the audit. The fix is labeled sections, forbidden list, and structured-return format.
 
-**Mistake 3 — Over-prompting a skilled subagent.** Dispatching `/page-build` with a 2,000-character briefing full of forensic citations and forbidden-pattern enumeration warps the skilled subagent's pattern-matching. The skill body owns the discipline; the dispatch should be a minimal trigger.
+**Mistake 3 — Over-prompting a skilled subagent.** A long briefing can warp a skilled subagent's pattern-matching. The skill body owns the discipline; the dispatch should be a minimal trigger.
 
 **Mistake 4 — Passing user feedback as a string argument.** "Run `/contract-feature notifications` AND make sure to include the X sub-entity." The string is opaque to the skill body and contaminates the dispatch. The mature pattern: edit the on-disk authority file to add X; dispatch with no special args. The next skill invocation reads the file fresh.
 
@@ -86,7 +88,7 @@ Artifacts in your fork.
 
 **Drill 2 — Dispatch in parallel.** In a Claude Code session, dispatch THREE fresh subagents in a single message (three Agent tool calls in parallel). Each does a small audit task (e.g., "summarize what Chapter X teaches"). Save the three structured returns to `student/drills/37-orchestrator-gestalt/02-parallel-returns.txt`.
 
-**Drill 3 — Write two dispatch prompt templates.** Author two reusable dispatch templates at `student/drills/37-orchestrator-gestalt/03-dispatch-templates.txt`: (a) a long structured template for a non-skilled subagent (with labeled sections: Task, Required Reading, Background, Forbidden List, Verification Criteria, Reporting Format); (b) a minimal trigger template for a skilled subagent (`/SKILL` invocation + one-line forbidden list). Include the forbidden phrases the `block-skill-bypass-language` hook would catch — and confirm your templates avoid them.
+**Drill 3 — Write two dispatch prompt templates.** Author two reusable dispatch templates at `student/drills/37-orchestrator-gestalt/03-dispatch-templates.txt`: (a) a long structured template for a non-skilled subagent with objective, output format, tool/source guidance, task boundaries, forbidden list, and verification criteria; (b) a minimal trigger template for a skilled subagent (`/SKILL` invocation + one-line forbidden list). Include the forbidden phrases the `block-skill-bypass-language` hook would catch — and confirm your templates avoid them.
 
 ## Checkpoint question
 

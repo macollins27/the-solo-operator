@@ -1,0 +1,42 @@
+chapter:
+  number: 46
+  part: 7
+  slug: task-tool-and-model-selection
+  title: "Operating in the Wild: task, tool, and model selection"
+
+learning_objective: >
+  The student can choose the right agent surface, context boundary, and
+  model tier for a task, then justify the choice using risk, ambiguity,
+  verification, and cost.
+
+prerequisites:
+  chapters_completed:
+    - 45
+  concepts_required:
+    - three-tier-model-routing
+    - worktree-as-parallel-write-isolation
+    - lethal-trifecta
+
+concepts_taught:
+  - agent-surface-selection
+  - autocomplete-chat-agent-background-automation
+  - local-agent-vs-subagent-vs-worktree-agent
+  - background-agent-ticket-shape
+  - three-tier-model-routing
+  - review-bandwidth-as-concurrency-limit
+
+complexity: medium
+
+recall_chapters:
+  - 12
+  - 23
+  - 44
+  - 45
+
+drill:
+  artifact: parts/07-operating-in-the-wild/03-task-tool-and-model-selection/verify.sh
+  produces:
+    - student/drills/46-task-tool-model-selection/01-surface-choices.txt
+    - student/drills/46-task-tool-model-selection/02-model-routing.txt
+    - student/drills/46-task-tool-model-selection/03-ai-ready-ticket.txt
+

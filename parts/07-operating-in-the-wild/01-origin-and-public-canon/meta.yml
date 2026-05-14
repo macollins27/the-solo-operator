@@ -1,0 +1,42 @@
+chapter:
+  number: 44
+  part: 7
+  slug: origin-and-public-canon
+  title: "Operating in the Wild: origin and public canon"
+
+learning_objective: >
+  The student can explain what parts of this course are field-tested
+  operating doctrine, what parts are public reference workflows, and
+  how to compare them without treating either as universal law.
+
+prerequisites:
+  chapters_completed:
+    - 43
+  concepts_required:
+    - corpus-as-moat
+    - mature-instruction-architecture
+    - three-tier-model-routing
+
+concepts_taught:
+  - course-origin-framing
+  - public-reference-workflows
+  - tool-landscape-orientation
+  - field-tested-not-universal-law
+  - claude-code-as-lab-bench
+  - universal-agent-operating-spine
+
+complexity: medium
+
+recall_chapters:
+  - 19
+  - 23
+  - 32
+  - 43
+
+drill:
+  artifact: parts/07-operating-in-the-wild/01-origin-and-public-canon/verify.sh
+  produces:
+    - student/drills/44-origin-and-public-canon/01-origin-bias.txt
+    - student/drills/44-origin-and-public-canon/02-public-canon-map.txt
+    - student/drills/44-origin-and-public-canon/03-operating-stance.txt
+

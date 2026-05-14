@@ -1,0 +1,3 @@
+[mcp_servers.course-curriculum]
+args = ["mcp-servers/course-curriculum/server.py"]
+command = "mcp-servers/course-curriculum/.venv/bin/python3"

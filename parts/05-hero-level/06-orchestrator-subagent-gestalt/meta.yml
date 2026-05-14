@@ -22,6 +22,9 @@ prerequisites:
 concepts_taught:
   - orchestrator-dispatches-not-edits
   - three-dispatch-patterns
+  - effort-scaling
+  - four-part-subagent-contract
+  - artifact-pattern
   - mandate-skill-no-escape-hatch
   - forbidden-modifications-explicit
   - post-agent-review-discipline

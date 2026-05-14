@@ -2,13 +2,12 @@ chapter:
   number: 19
   part: 3
   slug: claudemd
-  title: "CLAUDE.md"
+  title: "AGENTS.md and CLAUDE.md"
 
 learning_objective: >
-  The student can write their own CLAUDE.md for the MembershipKit
-  project, place it at the right path so Claude Code reads it at
-  session start, and verify that Claude is following the rules they
-  wrote.
+  The student can write a portable AGENTS.md for MembershipKit, layer
+  a Claude-specific CLAUDE.md on top, and verify that the active agent
+  is following the rules they wrote.
 
 prerequisites:
   chapters_completed:
@@ -19,7 +18,9 @@ prerequisites:
     - operator-as-manager
 
 concepts_taught:
+  - what-is-agentsmd
   - what-is-claudemd
+  - agentsmd-portable-base-claudemd-overlay
   - project-level-vs-per-directory-vs-user-global
   - claudemd-anatomy
   - standing-rules-section
@@ -36,6 +37,7 @@ recall_chapters:
 drill:
   artifact: parts/03-mechanics/01-claudemd/verify.sh
   produces:
+    - student/AGENTS.md
     - student/CLAUDE.md
     - student/drills/19-claudemd/01-claude-summary.txt
     - student/drills/19-claudemd/02-promoted-rule.txt

@@ -44,6 +44,10 @@ A mature project doesn't have one MCP server — it has six or eight. Each expos
 
 The MCP-first protocol that makes the federation pay off: in CLAUDE.md or in a SessionStart hook, the AI is instructed to call orient (or its equivalent) as its first action, and to query specific servers before reading raw files. Without that instruction, the AI defaults to Read+Grep and the federation goes unused.
 
+MCP is not "more tools is better." Every server is executable code with permissions. Add a server only when it unlocks a real repeated workflow, and know its job, data boundary, and verification path. The right MCP server is workflow-shaped, not API-shaped: too granular and the agent has to guess a brittle sequence of calls; too coarse and the agent loses flexibility.
+
+Security frame: an MCP server can create the **lethal trifecta** if it gives the agent private data, processes untrusted content, and provides an external communication path. Private data means files, databases, source code, credentials, or user records. Untrusted content means issues, emails, webpages, PDFs, comments, logs, or tool output controlled by someone else. External communication means posting, emailing, calling arbitrary APIs, loading remote URLs, or otherwise sending data out. If all three are present, prompt instructions are not enough. Remove or constrain one leg at the tool, API, sandbox, network, or review layer.
+
 ## Worked example
 
 You want to know whether prior CTO decisions cover dues-plan deletion when there are active subscribers. Two paths:
@@ -68,6 +72,8 @@ The federation pays for itself in a single multi-hour session. Across a project 
 
 **Mistake 4 — Not telling the AI to use the federation.** You build six servers; you don't update CLAUDE.md. The AI grep's anyway. The MCP-first protocol has to be explicit, prioritized, and (for mature projects) reinforced via a SessionStart hook that prints the MCP roster at the top of every session.
 
+**Mistake 5 — Trusting MCP because it feels official.** MCP servers are programs. They can read files, hold tokens, call APIs, or expose bad tool contracts. Run trusted servers, keep scopes narrow, prefer read-only tools where possible, and treat tool descriptions as prompts the agent will follow.
+
 ## Drill
 
 Artifacts go in `student/drills/22-mcp-servers/`.
@@ -80,7 +86,7 @@ Artifacts go in `student/drills/22-mcp-servers/`.
 
 ## Checkpoint question
 
-> You're starting a new project where you'll build a community library catalog with 50,000 books. You expect to be asking the AI things like "find books by author X," "list books due back this week," "show me books in the 'romance' category." Should you have the AI `Read` your catalog every time, `Bash` SQLite queries, or expose an MCP server? Walk through the tradeoffs in 3-4 sentences, naming one specific cost ratio and one specific failure mode the federation prevents.
+> You're starting a new project where you'll build a community library catalog with 50,000 books. You expect to ask the AI things like "find books by author X" and "list books due back this week." Should you have the AI `Read` your catalog every time, `Bash` SQLite queries, or expose an MCP server? Walk through the tradeoffs in 3-4 sentences, naming one specific cost ratio, one failure mode the federation prevents, and whether this server creates any leg of the lethal trifecta.
 
 <!-- Rewriter audit trail
 Grounded in verified principles: P58 (MCP-first protocol replaces grep-on-files with structured queries; ~2.5KB context replaces ~30KB of file reads on orientation), and informed by P59/P60 (verify before stating; documented means decomposed — the federation enables fast verification queries that prose-reading discourages)

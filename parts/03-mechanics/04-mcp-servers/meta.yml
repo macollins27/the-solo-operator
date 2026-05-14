@@ -23,6 +23,9 @@ concepts_taught:
   - mcpjson-configuration
   - mcp-tool-naming-prefix
   - when-to-use-mcp-vs-read-vs-bash
+  - mcp-minimalism
+  - mcp-tool-contracts
+  - lethal-trifecta
   - mcp-federation-pattern
 
 complexity: medium

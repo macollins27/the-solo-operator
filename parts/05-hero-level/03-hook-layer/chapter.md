@@ -15,7 +15,7 @@ At hero level, `.claude/hooks/` contains 25-30 small scripts. They cluster into 
 
 **Layer 1 — Disaster prevention.** Each hook maps to a specific past failure:
 
-- `git-guard.sh` — blocks `git stash`, `git worktree`, `git reset --hard`, `git clean -fxd`, push to protected branches. Origin: 2026-03-20 incident, 20+ commits lost.
+- `git-guard.sh` — blocks `git stash`, unmanaged/destructive `git worktree` operations, `git reset --hard`, `git clean -fxd`, push to protected branches. Origin: 2026-03-20 incident, 20+ commits lost.
 - `block-direct-db-ddl.sh` — blocks `psql ... ALTER TABLE` / `DROP`, anything bypassing migrations.
 - `block-skill-bypass-language.sh` — scans subagent dispatch prompts for skill-bypass wording; nineteen recognition patterns; sentence-level negation awareness; forces positive-only framing.
 - `pre-edit-write-policy.sh` — composite router; protects state-artifact paths from model writes (state files are hook-written only; direct model writes would allow state fabrication).
@@ -39,7 +39,7 @@ The three layers share two critical properties:
 
 **False-positive calibration favors blocking.** A false positive costs one Stop-loop iteration; a false negative costs the operator's attention. The first is recoverable; the second compounds trust loss. "When in doubt, BLOCK." A context-aware disambiguation layer (reading the user's prior message) lets legitimate framings pass.
 
-**Hook composition friction is real.** Hooks compose by firing in sequence at the same event; a bash command can go through three checkpoints. Two hooks can interact unexpectedly — a hook blocks a benign-seeming command because another hook's prerequisite isn't met. The mature pattern: engineer AROUND the friction, don't fight it. When a hook blocks a legitimate command, the AI's instinct is to modify the hook (which affects every future session) or to attempt a syntactic bypass (`git push origin +HEAD:main` instead of `git push --force origin main`). Both are wrong. The right responses: (a) write a commit message body to a file and use `git commit -F /tmp/msg.txt` (engineering workaround), (b) ask the operator to run the command via `!` prefix, or (c) fix the underlying state. Modifying the hook to weaken it is forbidden; the friction is the cost of the discipline.
+**Hook composition friction is real.** Hooks compose by firing in sequence at the same event; a bash command can go through three checkpoints. Two hooks can interact unexpectedly — a hook blocks a benign-seeming command because another hook's prerequisite isn't met. The mature pattern: engineer AROUND the friction, don't fight it. When a hook blocks a legitimate command, the AI's instinct is to modify the hook (which affects every future session) or to attempt a syntactic bypass (`git push origin +HEAD:main` instead of `git push --force origin main`). Both are wrong. The right responses: (a) use the approved command path the hook recognizes, such as an orchestrator-approved worktree creation script, (b) write a commit message body to a file and use `git commit -F /tmp/msg.txt` (engineering workaround), (c) ask the operator to run the command via `!` prefix, or (d) fix the underlying state. Modifying the hook to weaken it is forbidden; the friction is the cost of the discipline.
 
 ## Worked example
 
@@ -73,7 +73,7 @@ Four hook fires; zero damage. Without the hooks, the AI would have stashed local
 
 **Mistake 2 — One mega-hook checking 12 things.** A 500-line hook is hard to debug, hard to evolve, hard to compose. Split into 12 small single-purpose hooks. The router pattern — one `pre-bash-policy.sh` that consults specialized scripts — keeps composition manageable.
 
-**Mistake 3 — Bypassing hook friction via syntactic tricks or hook edits.** "The hook blocks `git push --force`; I'll use `git push origin +HEAD:main`." Forbidden — the hook exists for a reason; friction is the cost. The engineering workaround (file-based commit body, `!` prefix, fix the underlying state) preserves the discipline.
+**Mistake 3 — Bypassing hook friction via syntactic tricks or hook edits.** "The hook blocks `git push --force`; I'll use `git push origin +HEAD:main`." Forbidden — the hook exists for a reason; friction is the cost. The engineering workaround (approved worktree path, file-based commit body, `!` prefix, fix the underlying state) preserves the discipline.
 
 **Mistake 4 — Hooks that allow legitimate variants to slip through.** A linter blocks every `new Date()` in a domain-rules file, including the correction-trail prose "Previously used `new Date()` — fixed to `getNow()` per PER-4." The fix: same-line allow rule for historical-marker keywords (`legacy`, `previously`, `supersedes`, `MUST NOT`, `SOURCE BUG`, `replaces`). The linter allows the marker; blocks the bare pattern.
 

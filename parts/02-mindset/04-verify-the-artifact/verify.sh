@@ -35,5 +35,10 @@ if ! grep -qiE 'typecheck|pnpm|pass|fail|tsc|error' "${DRILL_DIR}/02-claim-vs-re
   exit 1
 fi
 
+if ! grep -q 'Do NOT write implementation yet' "${DRILL_DIR}/02-claim-vs-reality.txt"; then
+  echo "FAIL: Drill 2 — include a failing-test-first prompt with the exact phrase: Do NOT write implementation yet"
+  exit 1
+fi
+
 echo "Chapter 12 verified — verify-the-artifact drills complete."
 exit 0

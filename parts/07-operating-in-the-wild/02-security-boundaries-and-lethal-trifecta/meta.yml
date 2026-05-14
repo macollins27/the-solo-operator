@@ -1,0 +1,42 @@
+chapter:
+  number: 45
+  part: 7
+  slug: security-boundaries-and-lethal-trifecta
+  title: "Operating in the Wild: security boundaries"
+
+learning_objective: >
+  The student can apply the lethal-trifecta frame to an agent workflow,
+  identify which security boundary is missing, and choose a structural
+  mitigation instead of relying on prompt instructions.
+
+prerequisites:
+  chapters_completed:
+    - 44
+  concepts_required:
+    - lethal-trifecta
+    - mcp-tool-contracts
+    - tool-landscape-orientation
+
+concepts_taught:
+  - lethal-trifecta
+  - private-data-untrusted-content-external-communication
+  - prompt-injection-as-data-instruction-confusion
+  - structural-security-boundaries
+  - mcp-plugin-security-review
+  - protected-agentic-primitive-files
+
+complexity: high
+
+recall_chapters:
+  - 21
+  - 22
+  - 34
+  - 35
+
+drill:
+  artifact: parts/07-operating-in-the-wild/02-security-boundaries-and-lethal-trifecta/verify.sh
+  produces:
+    - student/drills/45-security-boundaries/01-trifecta-map.txt
+    - student/drills/45-security-boundaries/02-boundary-fix.txt
+    - student/drills/45-security-boundaries/03-protected-surfaces.txt
+

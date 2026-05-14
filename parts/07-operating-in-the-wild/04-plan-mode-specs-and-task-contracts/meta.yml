@@ -1,0 +1,42 @@
+chapter:
+  number: 47
+  part: 7
+  slug: plan-mode-specs-and-task-contracts
+  title: "Operating in the Wild: plan mode and task contracts"
+
+learning_objective: >
+  The student can decide when planning is required, write an agent task
+  contract with Goal / Context / Constraints / Done When, and recognize
+  when planning has become deferral.
+
+prerequisites:
+  chapters_completed:
+    - 46
+  concepts_required:
+    - agent-surface-selection
+    - background-agent-ticket-shape
+    - spec-as-authority
+
+concepts_taught:
+  - plan-mode-without-deferral
+  - when-to-plan-vs-skip-plan
+  - goal-context-constraints-done-when
+  - spec-driven-development-spectrum
+  - four-part-subagent-contract
+  - planning-as-reviewable-artifact
+
+complexity: medium
+
+recall_chapters:
+  - 11
+  - 12
+  - 23
+  - 46
+
+drill:
+  artifact: parts/07-operating-in-the-wild/04-plan-mode-specs-and-task-contracts/verify.sh
+  produces:
+    - student/drills/47-plan-mode-task-contracts/01-plan-classification.txt
+    - student/drills/47-plan-mode-task-contracts/02-task-contract.txt
+    - student/drills/47-plan-mode-task-contracts/03-subagent-dispatch.txt
+

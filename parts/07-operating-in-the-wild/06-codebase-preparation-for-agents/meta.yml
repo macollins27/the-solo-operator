@@ -1,0 +1,42 @@
+chapter:
+  number: 49
+  part: 7
+  slug: codebase-preparation-for-agents
+  title: "Operating in the Wild: codebase preparation"
+
+learning_objective: >
+  The student can prepare a repository so an AI agent can install it,
+  run it, test it, verify changes, and recover from failures without
+  repeated setup guessing.
+
+prerequisites:
+  chapters_completed:
+    - 48
+  concepts_required:
+    - agent-surface-selection
+    - verification-ladder
+    - mature-instruction-architecture
+
+concepts_taught:
+  - codebase-preparation-for-agents
+  - runnable-verifiable-seeded-failure-readable
+  - failure-output-as-context-engineering
+  - agent-readable-setup-contract
+  - seed-data-for-verification
+  - environment-failures-look-like-agent-failures
+
+complexity: medium
+
+recall_chapters:
+  - 12
+  - 19
+  - 46
+  - 48
+
+drill:
+  artifact: parts/07-operating-in-the-wild/06-codebase-preparation-for-agents/verify.sh
+  produces:
+    - student/drills/49-codebase-preparation/01-setup-checklist.md
+    - student/drills/49-codebase-preparation/02-failure-signal.txt
+    - student/drills/49-codebase-preparation/03-setup-contract.txt
+

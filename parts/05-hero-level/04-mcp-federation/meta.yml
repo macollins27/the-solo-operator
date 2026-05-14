@@ -23,6 +23,10 @@ concepts_taught:
   - query-before-grep-protocol
   - federation-as-token-savings
   - servers-stay-small-and-independent
+  - mcp-tool-contract-design
+  - mcp-granularity
+  - mcp-minimalism
+  - lethal-trifecta
   - auto-rebuild-on-file-changes
 
 complexity: high

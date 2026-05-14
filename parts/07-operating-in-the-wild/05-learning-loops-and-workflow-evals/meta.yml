@@ -1,0 +1,43 @@
+chapter:
+  number: 48
+  part: 7
+  slug: learning-loops-and-workflow-evals
+  title: "Operating in the Wild: learning loops and workflow evals"
+
+learning_objective: >
+  The student can turn repeated agent failures into a learning loop,
+  decide what becomes a rule, skill, hook, or automation, and write a
+  small workflow eval that tests whether the change helped.
+
+prerequisites:
+  chapters_completed:
+    - 47
+  concepts_required:
+    - mature-instruction-architecture
+    - skill-iteration-protocol
+    - plan-mode-without-deferral
+
+concepts_taught:
+  - learnings-md-scratch-layer
+  - promotion-rule
+  - manual-skill-automation-maturity
+  - workflow-eval
+  - llm-as-judge-caveats
+  - builder-validator-separation
+
+complexity: high
+
+recall_chapters:
+  - 16
+  - 32
+  - 40
+  - 47
+
+drill:
+  artifact: parts/07-operating-in-the-wild/05-learning-loops-and-workflow-evals/verify.sh
+  produces:
+    - student/learnings.md
+    - student/drills/48-learning-loops-evals/01-learnings-excerpt.txt
+    - student/drills/48-learning-loops-evals/02-promotion-decision.txt
+    - student/drills/48-learning-loops-evals/03-workflow-eval.txt
+

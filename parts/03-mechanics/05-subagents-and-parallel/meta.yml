@@ -5,10 +5,10 @@ chapter:
   title: "Subagents and parallel work"
 
 learning_objective: >
-  The student can describe the difference between a fork subagent and
-  a fresh subagent, predict when each is appropriate, dispatch one of
-  each from their own session, and read the results without polluting
-  their main conversation.
+  The student can describe fork subagents, fresh subagents, and
+  worktrees; predict when each is appropriate; dispatch one of each
+  subagent type; and explain why parallel write work needs isolated
+  file states.
 
 prerequisites:
   chapters_completed:
@@ -22,6 +22,9 @@ concepts_taught:
   - fresh-subagent-zero-context
   - when-to-fork-vs-fresh
   - subagent-output-stays-out-of-context
+  - worktree-as-parallel-write-isolation
+  - context-isolation-vs-file-isolation
+  - three-tier-model-routing
   - parallel-diagnostics-pattern
   - decompose-big-task-pattern
   - dont-peek-dont-race-verify-return

@@ -1,0 +1,42 @@
+chapter:
+  number: 51
+  part: 7
+  slug: governance-auditability-and-cost-controls
+  title: "Operating in the Wild: governance and cost controls"
+
+learning_objective: >
+  The student can define review gates, audit trails, attribution,
+  protected surfaces, and cost limits for agent work in solo or team
+  settings.
+
+prerequisites:
+  chapters_completed:
+    - 50
+  concepts_required:
+    - protected-agentic-primitive-files
+    - review-bandwidth-as-concurrency-limit
+    - workflow-eval
+
+concepts_taught:
+  - agent-governance
+  - solo-and-team-audit-trails
+  - ai-authored-ai-reviewed-ai-committed
+  - protected-primitive-file-review
+  - cost-controls
+  - no-ai-exception-paths
+
+complexity: high
+
+recall_chapters:
+  - 12
+  - 19
+  - 45
+  - 50
+
+drill:
+  artifact: parts/07-operating-in-the-wild/08-governance-auditability-and-cost-controls/verify.sh
+  produces:
+    - student/drills/51-governance-cost/01-review-gates.txt
+    - student/drills/51-governance-cost/02-audit-entry.md
+    - student/drills/51-governance-cost/03-cost-controls.md
+

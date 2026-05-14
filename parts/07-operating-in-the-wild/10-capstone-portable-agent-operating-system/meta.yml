@@ -1,0 +1,42 @@
+chapter:
+  number: 53
+  part: 7
+  slug: capstone-portable-agent-operating-system
+  title: "Operating in the Wild: portable agent operating system"
+
+learning_objective: >
+  The student can assemble a portable agent operating system for their
+  project: instructions, setup, security boundaries, task contracts,
+  review gates, learning loop, and automation policy.
+
+prerequisites:
+  chapters_completed:
+    - 52
+  concepts_required:
+    - universal-agent-operating-spine
+    - agent-governance
+    - workflow-eval
+
+concepts_taught:
+  - portable-agent-operating-system
+  - build-the-system-not-the-prompt
+  - instruction-base-tool-overlay
+  - repo-carried-operating-layer
+  - final-gap-audit
+  - cross-agent-portability
+
+complexity: high
+
+recall_chapters:
+  - 19
+  - 44
+  - 48
+  - 51
+
+drill:
+  artifact: parts/07-operating-in-the-wild/10-capstone-portable-agent-operating-system/verify.sh
+  produces:
+    - student/drills/53-portable-agent-os/01-system-map.txt
+    - student/drills/53-portable-agent-os/02-first-session-protocol.txt
+    - student/drills/53-portable-agent-os/03-gap-audit.txt
+

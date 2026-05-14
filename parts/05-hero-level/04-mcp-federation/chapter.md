@@ -13,7 +13,7 @@ The student can describe how a mature project exposes its state through a federa
 
 At hero level, your project doesn't have one MCP server — it has six or eight. Each one exposes a slice of project state. Together they form a **federation**. The AI queries the federation instead of grepping the filesystem.
 
-The token-cost contrast is dramatic. A naive AI operating on a mature project might Read CLAUDE.md every session (4-15k tokens), Read the spec files for the current feature (3-10k tokens), Read prior decisions to check for past rulings (5-30k tokens), grep the codebase to find a function (variable per query).
+The token-cost contrast is dramatic. A naive AI might read instruction files, specs, decisions, and grep output every session. The federation returns the relevant slice.
 
 The federation replaces this with structured queries:
 
@@ -22,37 +22,45 @@ The federation replaces this with structured queries:
 - `mcp__findings__recent_findings()` — latest QA findings; with `find_similar_bug(...)` for matching prior incidents.
 - `mcp__memory__search_memory(query)` — matching feedback corpus entries.
 
-Each query is a few hundred tokens. Cumulative token spend per session drops roughly 70-90%. The savings compound: smaller context = faster sessions = more iterations per day = better quality. Empirically, on a mature project, the orient call ships roughly 2.5KB of structured context that replaces roughly 30KB of file reads on a typical session opening.
+Each query is a few hundred tokens. Cumulative token spend per session drops roughly 70-90%. Smaller context means faster sessions and fewer compaction failures.
 
 The six to eight servers a mature project typically has:
 
-**1. Orient.** The one-call orientation server. First action of every session: `orient()`. Returns project status, finish-line criteria, latest decisions, open dispatches, findings summary, federation list. Replaces re-reading CLAUDE.md / constitution / current-state files on every open.
+**1. Orient.** First action: `orient()`. Returns project status, finish-line criteria, latest decisions, open dispatches, findings summary, federation list.
 
-**2. Memory.** Indexed access to the feedback corpus. `list_memory()`, `search_memory(query)`, `get_memory(slug)`, `recent_memory()`. Replaces `grep .claude/memory/*.md`.
+**2. Memory.** Indexed access to the feedback corpus.
 
-**3. Decisions.** Indexed access to past CTO / operator decisions. `list_decisions()`, `query_decisions(topic)`, `get_decision(id)`, `decisions_for_domain(domain)`. Replaces `grep decisions.md`.
+**3. Decisions.** Indexed access to past operator decisions.
 
-**4. Findings.** Indexed access to QA findings / open bug reports. `recent_findings()`, `query_findings(filter)`, `find_similar_bug(query)`. Replaces direct queries against a findings store.
+**4. Findings.** Indexed access to QA findings and open bug reports.
 
-**5. Ledger.** Dispatch + run history. `recent_dispatches()`, `runs_history()`, `last_completed()`. Replaces inspecting orchestrator state files directly.
+**5. Ledger.** Dispatch and run history.
 
-**6. Code graph.** AST-based graph of the codebase. `god_nodes()` (most-connected functions), `get_neighbors(node)` ("who calls X"), `shortest_path(a, b)`. Replaces grep for "where is this used" / "what does this connect to."
+**6. Code graph.** AST-based "who calls X" and dependency queries.
 
-**7. Domain-rules graph.** Same idea over your domain-rules documents. `god_nodes()` shows most-cited rules; `get_community(topic)` returns related rule clusters. Replaces grepping domain-rules markdown.
+**7. Domain-rules graph.** Related rule clusters and most-cited domain rules.
 
 **8. Project-specific.** Whatever your domain needs — student state for a course, customer state for a CRM, asset graph for a media app.
 
-These all stay SMALL (~150-300 lines each). The pattern is "thin Python (or TS) wrapping SQLite or markdown parsing." None is a heavy backend. Each does one job: expose one slice of project state as queryable tools.
+These stay small. Each does one job: expose one slice of project state as queryable tools.
+
+Tool design is part of the product. `decisions_query(topic)` beats `search(query)` when many servers expose search. Parameters should be unambiguous, and responses should include source paths or ids.
+
+Granularity is the hard part. A server that exposes one tool per raw API endpoint makes the agent reconstruct a workflow it does not understand. A server that bundles a whole workflow into one giant "do everything" tool hides the checkpoints. Mature MCP tools are workflow-shaped: one tool answers one operator question with enough evidence to verify it.
+
+The security boundary stays central. A federation with private memory, untrusted issue text, and a posting/API tool can create the lethal trifecta. The fix is structural: least privilege, read-only defaults, allowlists, auth, schema validation, idempotency, and human review before external sends.
 
 The discipline that makes the federation actually pay off:
 
-**1. The MCP-first protocol is in CLAUDE.md AND in a SessionStart hook.** Without an explicit instruction telling the AI to query the federation before reading files, the AI defaults to Read+Grep — that's the training-data prior. The mature pattern injects the MCP roster at session start via a hook ("Before reading from `.claude/docs/domain-rules/`, STOP. Query `mcp__decisions__query_decisions` or the corresponding MCP. Files are still authoritative; MCPs are the precision-targeting layer that replaces grep.").
+**1. The MCP-first protocol is in instructions and a SessionStart hook.** Without explicit instruction, the AI defaults to Read+Grep. The hook injects the MCP roster at session start.
 
-**2. Each server is independent.** They don't depend on each other. The MCP federation appears AS-IF unified to the AI; each server is its own process. Failure of one server doesn't take down the others.
+**2. Each server is independent.** Failure of one server doesn't take down the others.
 
-**3. Servers update automatically.** A launchd / cron / watchman process rebuilds graphs and indexes when source files change. Stale-by-default kills trust; auto-fresh maintains it.
+**3. Servers update automatically.** Stale-by-default kills trust; auto-fresh maintains it.
 
-**4. Hard rule: query before you read.** Codified in CLAUDE.md. Reinforced via the SessionStart hook injecting the roster. Without that, agents default to grep, the federation goes unused, and the token-savings disappear.
+**4. Hard rule: query before you read.** Without this, the federation goes unused.
+
+**5. Hard rule: curate before you connect.** If the operator cannot explain which server should answer which question, the agent will not reliably choose either. Start with one or two servers that remove obvious repeated waste. Add the next server only after the repeated workflow is real.
 
 ## Worked example
 
@@ -78,7 +86,7 @@ Across hundreds of similar questions per project lifetime, federation savings do
 
 ## The rule
 
-> Agents query, not read. Build small MCP servers (~150-300 lines each) exposing project state as structured tools. The federation pays for itself in a single multi-hour session via ~70-90% token reduction. First action of every session: `orient()` — a 2.5KB summary replaces ~30KB of file reads. The MCP-first protocol lives in CLAUDE.md AND in a SessionStart hook; without explicit instruction, agents default to Read+Grep.
+> Agents query, not read. Build small, curated MCP servers exposing project state as structured tools. The federation pays for itself via ~70-90% token reduction on indexed queries, but every server needs a purpose, permission boundary, verification path, and lethal-trifecta check.
 
 ## Common mistakes
 
@@ -90,19 +98,21 @@ Across hundreds of similar questions per project lifetime, federation savings do
 
 **Mistake 4 — Treating MCP as magic.** MCP servers are programs on disk. When something behaves weirdly, open the server source and read it. You don't need to be a Python expert to spot the obvious bugs. The federation isn't a black box — it's a small set of small files.
 
+**Mistake 5 — Vague tools in a crowded federation.** Six servers all expose a tool named `search`. The agent guesses which one to call, mixes results, and fabricates a bridge between them. Namespacing and descriptions are not polish; they are how the nondeterministic caller finds the deterministic tool.
+
 ## Drill
 
 Artifacts in your fork.
 
 **Drill 1 — Audit your federation.** Look at your `.mcp.json`. How many servers are wired? Name each, with one-line "what slice of state it exposes." Save to `student/drills/35-mcp-federation/01-my-federation.txt`. For most students at this point, there's one server: `course-curriculum`.
 
-**Drill 2 — Identify a missing server.** Think about your fork. What's a slice of state you'd want queryable that ISN'T currently? Examples: a server over your `student/feedback/` corpus; over your `student/specs/` files; one indexing the canonical-project's domain entities. Pick one. Describe what it'd expose and why. Save to `student/drills/35-mcp-federation/02-missing-server.txt`.
+**Drill 2 — Identify a missing server.** Think about your fork. What's a slice of state you'd want queryable that ISN'T currently? Examples: a server over your `student/feedback/` corpus; over your `student/specs/` files; one indexing the canonical-project's domain entities. Pick one. Describe what it'd expose, why, and which lethal-trifecta legs it does or does not create. Save to `student/drills/35-mcp-federation/02-missing-server.txt`.
 
 **Drill 3 — Add MCP-first to CLAUDE.md.** Edit `student/CLAUDE.md`. Add a section (or amend standing rules) instructing the AI to use MCP queries before grepping or reading raw files. Save the diff to `student/drills/35-mcp-federation/03-mcp-first.txt`.
 
 ## Checkpoint question
 
-> A new operator looks at your `.mcp.json` and sees six servers wired. They ask "isn't this over-engineered? Couldn't I just have the AI Read and Grep?" Defend the federation in 3-4 sentences — name the specific cost ratio (KB-of-structured-context vs KB-of-file-reads), the specific orient pattern, and the specific failure mode the federation prevents.
+> A new operator looks at your `.mcp.json` and sees six servers wired. They ask "isn't this over-engineered? Couldn't I just have the AI Read and Grep?" Defend the federation in 3-4 sentences — name the specific cost ratio, the orient pattern, the failure mode the federation prevents, and the security check every new server must pass before being added.
 
 <!-- Rewriter audit trail
 Grounded in verified principles: P58 (MCP-first protocol replaces grep-on-files with structured queries; SessionStart hook injects MCP roster; ~2.5KB context replaces ~30KB of file reads on orientation; "files are still authoritative; MCPs are the precision-targeting layer that replaces grep")

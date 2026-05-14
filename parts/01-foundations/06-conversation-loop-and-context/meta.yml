@@ -20,9 +20,12 @@ prerequisites:
 concepts_taught:
   - conversation-turns
   - context-window-finite
+  - context-engineering
+  - context-offload-reduce-retrieve-isolate
   - what-is-a-token
   - context-compaction-is-lossy
   - context-pollution-as-failure-mode
+  - context-poisoning-distraction-confusion-clash
   - fresh-session-as-tool
 
 complexity: medium

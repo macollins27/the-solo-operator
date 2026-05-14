@@ -1,0 +1,42 @@
+chapter:
+  number: 50
+  part: 7
+  slug: parallel-work-and-orchestration
+  title: "Operating in the Wild: parallel work and orchestration"
+
+learning_objective: >
+  The student can design a parallel agent workflow that separates
+  read-only audits from write tasks, uses worktrees for parallel edits,
+  and dispatches subagents with bounded contracts and review capacity.
+
+prerequisites:
+  chapters_completed:
+    - 49
+  concepts_required:
+    - worktree-as-parallel-write-isolation
+    - four-part-subagent-contract
+    - review-bandwidth-as-concurrency-limit
+
+concepts_taught:
+  - parallel-readonly-vs-parallel-write
+  - worktree-orchestration
+  - orchestrator-worker-pattern
+  - effort-scaling
+  - artifact-pattern
+  - shared-resource-coordination
+
+complexity: high
+
+recall_chapters:
+  - 23
+  - 37
+  - 47
+  - 49
+
+drill:
+  artifact: parts/07-operating-in-the-wild/07-parallel-work-and-orchestration/verify.sh
+  produces:
+    - student/drills/50-parallel-orchestration/01-worktree-plan.md
+    - student/drills/50-parallel-orchestration/02-effort-scaling.txt
+    - student/drills/50-parallel-orchestration/03-dispatch-pack.txt
+

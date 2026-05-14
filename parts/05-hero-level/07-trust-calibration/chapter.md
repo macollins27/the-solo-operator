@@ -38,13 +38,15 @@ Crucially: the arc CAN MOVE BACKWARD. A trust break — a session where the syst
 
 Trust breaks happen even on mature systems. The mature pattern is to keep an `audit-throughput.md` style document tracking the operator's adjusted throughput — features shipped per day with debt amortized. Naive throughput counts features-per-day at face value; adjusted throughput charges the cleanup cost of the prior period's defects back to that period's rate. An adjusted measurement shows a different picture: a methodology with 9 features in 39 days at face value but with 7 days of cleanup amortizes to roughly 1 feature per 4.3 days. Audit-first, throughput-second prevents the illusion of velocity that ships defect-density disasters.
 
-Three discipline points about the arc:
+Four discipline points about the arc:
 
 **Move forward gradually.** Trust is earned in small increments. After many successful dispatches without anti-pattern fires, allow a thirty-minute autonomous window. Operators who try to leap from Stage 1 to Stage 3 produce regressions.
 
 **Use the walk test.** A simple operational metric: can you step away from your laptop for fifteen minutes during a dispatch without anxiety? Thirty minutes? An hour? The walk-test duration measures current trust level. It grows as guardrails grow.
 
 **Document trust breaks.** When something erodes trust, write the rule (Chapter 16's discipline). Save it. Promote to CLAUDE.md or hook. The break is the input; the durable rule is the output.
+
+**Measure cost and fatigue.** Agent work can feel faster while increasing review load. Track cycle time, rework, bug rate, review time, cost, and cleanup. Cost caps and model tiers are safety rails; they are not time estimates.
 
 ## Worked example
 
@@ -61,7 +63,7 @@ Sixty days, four trust stages, one trust break, recovery via mechanical hardenin
 
 ## The rule
 
-> Trust calibration moves forward as mechanical guardrails replace human supervision. Move forward gradually; expect occasional regressions on trust breaks; respond by encoding the missing prevention. Measure throughput honestly — audit-first, throughput-second — so the feature-per-day rate is debt-amortized rather than face-value. The destination (background operation with sampled supervision) is what high-throughput solo operation actually means. It's an architecture, not a leap.
+> Trust calibration moves forward as mechanical guardrails replace human supervision. Move gradually; expect regressions on trust breaks; encode the missing prevention. Measure throughput and cost honestly — audit-first, throughput-second — so the feature rate is debt-amortized rather than face-value.
 
 ## Common mistakes
 
@@ -71,7 +73,7 @@ Sixty days, four trust stages, one trust break, recovery via mechanical hardenin
 
 **Mistake 3 — Confusing length-of-autonomy with depth-of-trust.** "I left the AI running for 4 hours; it must be trustworthy." Or: "It crashed after 20 minutes; it must be untrustworthy." Depth of trust is depth of mechanical guarding, not duration. A 20-minute run with thorough guards is more trustworthy than a 4-hour run without.
 
-**Mistake 4 — Face-value throughput accounting.** Counting features-per-day without amortizing the cleanup cost of defects shipped in the prior period inflates apparent velocity. The same methodology that ships nine features in thirty-two days plus seven days of cleanup is one feature per 4.3 days, not one per 3.6. The honest number drives honest investment decisions; the inflated number ships defect-density disasters.
+**Mistake 4 — Face-value throughput accounting.** Counting features-per-day without cleanup, review time, bug rate, and model cost inflates velocity. The honest number drives honest investment; the inflated number ships defects.
 
 ## Drill
 
@@ -81,7 +83,7 @@ Artifacts in your fork.
 
 **Drill 2 — Map mechanical guards.** List the mechanical guards currently in your fork (hooks, MCP servers, CLAUDE.md rules, skills with sentinels). For each, name the human-supervision activity it replaces. Save to `student/drills/38-trust-calibration/02-guards-vs-supervision.txt`.
 
-**Drill 3 — Plan your next mechanical step.** Pick ONE concrete mechanical guard you'd add to move forward by half a stage. Could be a new hook, a new MCP query, a sharpened CLAUDE.md rule, a new sentinel-emitting skill. Describe it + the supervision activity it replaces + the trust break it would have prevented. Save to `student/drills/38-trust-calibration/03-next-guard.txt`.
+**Drill 3 — Plan your next mechanical step.** Pick ONE concrete mechanical guard you'd add to move forward by half a stage. Could be a hook, MCP query, sharpened instruction rule, sentinel-emitting skill, or cost/stop condition. Describe it + the supervision activity it replaces + the trust break it would have prevented. Save to `student/drills/38-trust-calibration/03-next-guard.txt`.
 
 ## Checkpoint question
 

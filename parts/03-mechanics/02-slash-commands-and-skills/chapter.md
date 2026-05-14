@@ -40,7 +40,7 @@ description: Commit the currently staged changes with a message
 
 # commit-with-context
 
-## Forbidden behaviors
+Forbidden behaviors:
 
 Do NOT use `--no-verify`.
 Do NOT use `git add -A` or `git add .` — stage specific paths.
@@ -48,7 +48,7 @@ Do NOT use `git stash` (banned project-wide per the incident
 of 2026-03-20).
 Do NOT modify `package.json` framework version pins.
 
-## Protocol
+Protocol:
 
 1. Run `git status` and confirm files are staged.
 2. Ask the operator for a one-line summary of what was done.
@@ -79,7 +79,7 @@ description: Review the most recent commit's diff against the
 
 # review-my-commit
 
-## Forbidden behaviors
+Forbidden behaviors:
 
 Do NOT call Edit, Write, or Bash with any mutating command.
 Do NOT modify the commit history.
@@ -88,7 +88,7 @@ Do NOT defer findings ("logged for later"); every finding is
 either FIX (sent to the operator with severity) or
 WORKING_AS_INTENDED (cited rule + reasoning).
 
-## Protocol
+Protocol:
 
 1. Read CLAUDE.md and list every standing rule and forbidden
    item as a numbered checklist.

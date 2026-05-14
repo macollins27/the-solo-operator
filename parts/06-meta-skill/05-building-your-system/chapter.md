@@ -15,21 +15,21 @@ This is the final chapter. Everything in this course pointed here: you, operatin
 
 The early arc of solo operation produces most of your system. Here's the cadence:
 
-**Initial setup.** Install Claude Code (done). Clone or scaffold your project. Author the minimal CLAUDE.md: 3-5 standing rules, an authority hierarchy (operator-authored spec at top; source code at zero authority; AI-authored intermediate documents as evidence not authority), a forbidden section with 2-3 entries. Get a working `claude` session in your project.
+**Initial setup.** Choose your lab bench. Claude Code is the course default, but the system must be portable. Author minimal `AGENTS.md` first: project identity, authority hierarchy, setup commands, done criteria, protected paths. Add `CLAUDE.md` only as the Claude-specific overlay.
 
 **Early operating.** Operate the project. Don't try to be clever. Just work. Every time something bites you — the AI does something wrong, you have to correct, a session goes sideways — STOP and author a feedback file. The bite is the evidence; the file captures the rule. Don't promote yet; collect.
 
-**Pattern recognition.** Continue operating. Notice patterns. Some bites recur on different surfaces with the same underlying family. When you see the second instance, promote the rule into CLAUDE.md. Sessions start feeling more directed because CLAUDE.md gives the AI project-specific context.
+**Pattern recognition.** Continue operating. Notice patterns. When you see the second instance, promote the rule into the right layer: portable rule in `AGENTS.md`, tool-specific rule in an overlay, deterministic rule in a hook or linter.
 
 **First mechanical layer.** Add the first hook. By now there's at least one failure mode that recurs even after CLAUDE.md rule. The hook is the response — the bite frequency justifies the maintenance cost. Author the hook; wire into `settings.json`; verify it fires. The promotion from CLAUDE.md prose to hook is the discipline ladder operationalized.
 
 **First skill.** Author your first skill. By now you've done some workflow three or more times. Package it. The skill is small (50-100 lines of SKILL.md). Frontmatter (name + description), Forbidden Behaviors section (imperative bans), numbered protocol body. Invoke via slash command. The first skill is the proof you understand the SKILL.md anatomy; subsequent skills compose into your workflow library.
 
-**Consolidation territory.** The feedback corpus is now meaningful. You do your first consolidation pass — ~50 feedback files → CLAUDE.md grows from 30 lines to 50; the active corpus drops back to 15-20 files. Your hook layer grows. Your skill library grows.
+**Consolidation territory.** The feedback corpus is now meaningful. You do your first consolidation pass — feedback files shrink, `AGENTS.md` / overlays sharpen, hook layer grows, skill library grows.
 
 **Hero level emerges.** The system is real. You're operating at Stage 2 of the trust-calibration arc most of the time. Walk-test is solid for shorter windows. Your moat is forming. You're authoring your own MCP servers; `.mcp.json` has 2-3 entries.
 
-**Background-operation arc begins.** The walk-test extends. You're authoring scheduled audits. Your role is system-author, not active supervisor.
+**Universal layer begins.** The walk-test extends. You add security boundaries, worktree policy, cost controls, workflow evals, and tool contracts. Your role is system-author, not active supervisor.
 
 The moat-building loop, in one sentence: **bite → feedback file → (recurs) → CLAUDE.md rule → (still bites) → SKILL.md amendment or ast-grep rule → (still bites) → hook → (language-level pattern) → anti-pattern classifier catalog → bite no longer possible.**
 
@@ -43,13 +43,13 @@ Three disciplines for the long arc:
 
 **3. Audit-first, throughput-second.** Don't measure features-per-day at face value. Amortize debt back to the prior period. The honest number drives honest investment decisions; the inflated number ships defect-density disasters.
 
-The course ends here. From this point forward you're operating your own system on your own project. The chapters were the map; operating IS the territory.
+Part 7 extends this into the public tool landscape. The chapters were the map; operating is the territory.
 
 ## Worked example
 
 Imagine yourself well into operating on your own project (NOT MembershipKit — your real thing).
 
-Your CLAUDE.md has fifteen rules. Your `.claude/hooks/` has 2-3 hook scripts (block-todo-commits and one or two project-specific). Your `.claude/skills/` has the finish-chapter equivalent and a project-specific skill. Your `feedback/` has ~25 files; INDEX.md groups them by theme.
+Your `AGENTS.md` has portable rules. Your `CLAUDE.md` has Claude-specific habits. Your hooks, skills, and feedback corpus are small but real.
 
 You start a session. First message: "Read the latest handoff doc in `state/`." The AI does. Orients in one turn. The next focused window is productive — you ship a feature, hit two anti-patterns, intervene cleanly, commit per step.
 
@@ -57,9 +57,9 @@ End of session. You realize the AI tried a new flavor of `as any` you hadn't see
 
 Tomorrow you start fresh. The AI reads the handoff. The AI has ~25 feedback files indexed in your CLAUDE.md. The AI has fifteen rules to follow. The AI is becoming, specifically, YOUR junior dev.
 
-Later, your CLAUDE.md is fifty lines. Your feedback corpus is fifty files. You do your first consolidation pass — drops the active corpus to eighteen files; promotes eight new rules into CLAUDE.md. The system is sharper after.
+Later, your feedback corpus is large enough to consolidate. You promote portable rules into `AGENTS.md`, Claude-specific rules into `CLAUDE.md`, and enforcement rules into hooks.
 
-Eventually, you have an MCP federation, dozens of skills, dozens of hooks, and you can walk away while a feature ships. That's hero level. It got there one bite at a time.
+Eventually, you have a portable operating system that works across agents. That's hero level. It got there one bite at a time.
 
 ## The rule
 
@@ -87,7 +87,7 @@ Final drill. Artifacts in your fork.
 
 ## Checkpoint question
 
-> You finish this course. Tomorrow you start operating on your own project (a small e-commerce shop, your portfolio site, whatever it is). At some point on the arc — not measured in calendar time — what does success look like, not in terms of features shipped, but in terms of the system you've built around your operation? Describe it in 3-4 sentences, naming specifically the artifacts that exist (CLAUDE.md shape, hook count, skill count, MCP federation state) and the trust-calibration stage you'd be at.
+> You finish this course. Tomorrow you start operating on your own project. At some point on the arc — not measured in calendar time — what does success look like, not in terms of features shipped, but in terms of the portable system you've built? Describe it in 3-4 sentences, naming specifically the artifacts that exist (`AGENTS.md`, tool overlay, hooks, skills, MCP/tool state, evals) and the trust-calibration stage you'd be at.
 
 <!-- Rewriter audit trail
 Grounded in verified principles: P10 (frameworks outlive corrections; extract the rule, not the answer — applied as the cross-bite-accumulation discipline that builds the system over time), P21 (mechanical-enforcement promotion ladder is the moat-building loop), P80 (audit-first, throughput-second; debt amortized; adjusted throughput differs from face-value throughput — the discipline applied to the operator's own self-measurement)

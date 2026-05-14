@@ -21,6 +21,10 @@ concepts_taught:
   - four-kinds-of-evidence
   - 90-10-verification-ratio
   - tests-pass-as-misleading-claim
+  - verification-ladder
+  - tdd-with-ai
+  - failing-test-first-prompt
+  - red-green-refactor-fresh-subagents
   - behavioral-verification-for-ui
 
 complexity: medium

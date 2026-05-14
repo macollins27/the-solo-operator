@@ -1,0 +1,42 @@
+chapter:
+  number: 52
+  part: 7
+  slug: mcp-and-tool-ergonomics
+  title: "Operating in the Wild: MCP and tool ergonomics"
+
+learning_objective: >
+  The student can design or audit an MCP tool contract so an agent can
+  choose it correctly, call it safely, interpret its result, and verify
+  its output.
+
+prerequisites:
+  chapters_completed:
+    - 51
+  concepts_required:
+    - mcp-tool-contract-design
+    - lethal-trifecta
+    - workflow-eval
+
+concepts_taught:
+  - tools-as-contracts
+  - mcp-tool-naming-and-parameters
+  - workflow-shaped-tool-granularity
+  - token-efficient-tool-output
+  - tool-safety-contracts
+  - eval-driven-tool-improvement
+
+complexity: high
+
+recall_chapters:
+  - 22
+  - 35
+  - 45
+  - 48
+
+drill:
+  artifact: parts/07-operating-in-the-wild/09-mcp-and-tool-ergonomics/verify.sh
+  produces:
+    - student/drills/52-mcp-tool-ergonomics/01-tool-contract.md
+    - student/drills/52-mcp-tool-ergonomics/02-ergonomics-improvement.txt
+    - student/drills/52-mcp-tool-ergonomics/03-tool-eval.txt
+

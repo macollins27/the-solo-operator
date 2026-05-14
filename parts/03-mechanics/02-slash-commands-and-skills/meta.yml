@@ -36,4 +36,4 @@ drill:
   produces:
     - student/.claude/skills/finish-chapter/SKILL.md
     - student/drills/20-skills/01-invocation-log.txt
-    - student/drills/20-skills/02-second-skill.txt
+    - student/drills/20-skills/02-review-skill.txt

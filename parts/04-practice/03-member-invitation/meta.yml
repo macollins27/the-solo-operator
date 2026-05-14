@@ -36,4 +36,4 @@ drill:
     - student/specs/member-invitation.md
     - student/drills/27-member-invitation/01-spec-path.txt
     - student/drills/27-member-invitation/02-member-list.png
-    - student/drills/27-member-invitation/03-no-math-random.txt
+    - student/drills/27-member-invitation/03-security-grep.txt

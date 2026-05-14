@@ -6,17 +6,18 @@ The student can list the built-in slash commands (`/help`, `/clear`, `/exit`, `/
 
 ## Prerequisites
 
-- Completed: Chapter 19 — CLAUDE.md
+- Completed: Chapter 19 — AGENTS.md and CLAUDE.md
 - Concepts: what-is-claudemd, operator-as-manager
 
 ## Core concept
 
 A **slash command** is a named action you invoke in a Claude Code session by typing `/<name>`. Some are built-in. The interesting ones — the ones whose discipline you control — are **skills**: workflows YOU author, named, reusable, with the protocol encoded in a markdown file.
 
-A skill is a folder containing a `SKILL.md` file. The folder lives at one of two paths:
+A skill is a folder containing a `SKILL.md` file. The folder is loaded from one of three sources:
 
 - `.claude/skills/<skill-name>/SKILL.md` — project-level (lives in your fork)
 - `~/.claude/skills/<skill-name>/SKILL.md` — user-global (applies across every project)
+- Plugin-distributed: a Claude Code plugin you install can ship skills that load alongside the two paths above
 
 `SKILL.md` has YAML frontmatter (name + description) and a body (the protocol the AI follows when the skill runs).
 

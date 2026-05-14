@@ -21,7 +21,7 @@ Why bother? Three reasons matter for an operator.
 
 **Three — scriptability.** A sequence of commands can be saved as a file and run again later. That file is called a **shell script**. Anything you do twice, you can save as a script and never type again. Operators end up with collections of scripts that automate everything they used to do by hand.
 
-The terminal speaks to a program called a **shell**. The shell reads what you type, runs it, shows you the result, and waits for the next command. On macOS the default shell is **zsh**. On Windows the default is **PowerShell**. On Linux it's usually **bash**. They look different but they all do the same job — read text commands, run them, show results.
+The terminal speaks to a program called a **shell**. The shell reads what you type, runs it, shows you the result, and waits for the next command. On macOS the default shell is **zsh**. On Windows the default is usually **PowerShell** (some setups use CMD, Git Bash, or Windows Terminal — they all run shell commands, just with slightly different syntax). On Linux it's usually **bash**. They look different but they all do the same job — read text commands, run them, show results.
 
 When you open a terminal you see a **prompt** — some text ending in a symbol like `%` or `$` or `>`. The prompt tells you where you are (your current folder, often called the working directory) and is waiting for input. After every command, the prompt comes back, ready for the next one.
 
@@ -67,7 +67,7 @@ The terminal isn't intimidating — it's a faster, more precise way to ask your 
 
 **Mistake 1 — "The terminal is for programmers."** The terminal is for anyone who wants to do work faster and more reliably. Operators live in it because text is leverage. You don't need to be a programmer to use it; you need about 8 commands to handle 80% of daily computer work.
 
-**Mistake 2 — Memorizing instead of looking up.** Every command has a help page. `ls --help` shows what `ls` does and every flag it accepts. `man ls` (on Mac/Linux) shows the full manual. Don't memorize options; know that the help is one keystroke away.
+**Mistake 2 — Memorizing instead of looking up.** Every command has a help page. `man ls` shows the full manual on macOS and Linux (press `q` to quit). On Linux, `ls --help` also works for a shorter summary, but on macOS's BSD `ls` that flag isn't supported — use `man` there. Don't memorize options; know that the help is one keystroke away.
 
 **Mistake 3 — Treating mistakes as scary.** You will type wrong commands. The terminal will say `command not found` or `No such file or directory`. These messages are information, not failure. Read them. They name exactly what went wrong. Fix the typo and re-run.
 

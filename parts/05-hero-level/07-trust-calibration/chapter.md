@@ -19,7 +19,7 @@ The trust-calibration arc has four stages.
 
 **Stage 2 — Stage gates.** Trust granted within a stage; supervision at stage transitions. The operator dispatches a feature build; the build / review / QA loop runs; the operator returns at completion to verify. Trust = stage-bounded; supervision = at boundaries.
 
-**Stage 3 — Conditional autonomy.** Trust granted while specific conditions hold (gate passes, no anti-pattern fires, no human-confirmation prompts). Supervision = exception-based. The operator may step away for hours while subagents work; the system surfaces when a real intervention is needed.
+**Stage 3 — Conditional autonomy.** Trust granted while specific conditions hold (gate passes, no anti-pattern fires, no human-confirmation prompts). Supervision = exception-based. The operator can step away across multiple dispatches while subagents work; the system surfaces when a real intervention is needed.
 
 **Stage 4 — Background operation.** Long-running work happens without active operator presence. Cron-scheduled agents do nightly audits. The operator wakes up, checks the daily summary, intervenes only on flagged items. Trust = baseline; supervision = sampled.
 
@@ -36,13 +36,13 @@ Each guardrail is a piece of supervision the OPERATOR used to provide manually. 
 
 Crucially: the arc CAN MOVE BACKWARD. A trust break — a session where the system fails badly, an instance of the AI gaslighting the operator with intermediate-doc citation — drops the operator back to a lower stage. The right response to a trust break is mechanical hardening: a new hook, an expanded classifier catalog, a new ast-grep rule, a sharpened SUPERSEDED marker on a stale plan. Trust breaks aren't failures; they're signals that a class of failure isn't yet mechanically prevented. The output of every break is a durable rule that prevents the class going forward.
 
-Trust breaks happen even on mature systems. The mature pattern is to keep an `audit-throughput.md` style document tracking the operator's adjusted throughput — features shipped per day with debt amortized. Naive throughput counts features-per-day at face value; adjusted throughput charges the cleanup cost of the prior period's defects back to that period's rate. An adjusted measurement shows a different picture: a methodology with 9 features in 39 days at face value but with 7 days of cleanup amortizes to roughly 1 feature per 4.3 days. Audit-first, throughput-second prevents the illusion of velocity that ships defect-density disasters.
+Trust breaks happen even on mature systems. The mature pattern is to keep an `audit-throughput.md` style document tracking the operator's adjusted throughput — features shipped with debt amortized. Naive throughput counts features at face value; adjusted throughput charges the cleanup cost of the prior period's defects back to that period's rate. An adjusted measurement shows a different picture: a methodology shipping a batch of features quickly at face value, but with a long subsequent cleanup arc, amortizes to a much lower effective rate. Audit-first, throughput-second prevents the illusion of velocity that ships defect-density disasters.
 
 Four discipline points about the arc:
 
-**Move forward gradually.** Trust is earned in small increments. After many successful dispatches without anti-pattern fires, allow a thirty-minute autonomous window. Operators who try to leap from Stage 1 to Stage 3 produce regressions.
+**Move forward gradually.** Trust is earned in small increments. After many successful dispatches without anti-pattern fires, allow a short autonomous window — one whole dispatch unsupervised, then a sequence of dispatches. Operators who try to leap from Stage 1 to Stage 3 produce regressions.
 
-**Use the walk test.** A simple operational metric: can you step away from your laptop for fifteen minutes during a dispatch without anxiety? Thirty minutes? An hour? The walk-test duration measures current trust level. It grows as guardrails grow.
+**Use the walk test.** A simple operational metric: can you step away from your laptop during a dispatch without anxiety? For a single dispatch? For a chain of dispatches? Across an overnight batch? The walk-test scope measures current trust level. It grows as guardrails grow.
 
 **Document trust breaks.** When something erodes trust, write the rule (Chapter 16's discipline). Save it. Promote to CLAUDE.md or hook. The break is the input; the durable rule is the output.
 
@@ -52,14 +52,14 @@ Four discipline points about the arc:
 
 A mature project's arc, compressed:
 
-- **Days 1-15 (Stage 1).** Numbered session handoffs. Multi-pass review per domain. Every change reviewed in detail.
-- **Days 15-25 (Stage 2).** Layer-by-layer dispatches. Each layer auto-runs through map → map-verify → review, then surfaces. Operator catches drift at each layer transition.
-- **Days 25-35 (Stage 2 → 3).** First long autonomous runs. Layer 12 completes without intervention.
-- **Days 36-45.** Trust break — an orchestrator gaslit the founder by citing a Claude-authored intermediate plan as if the founder authored it, with the gap explained as "expected per spec." Operator ends the session. Mechanical hardening over the next ten days: add the `block-skill-bypass-language` hook, formalize the authority hierarchy in CLAUDE.md ("AI-authored intermediate documents are EVIDENCE, not authority"), expand the anti-pattern classifier catalog to include "gaslighting via technical-sounding arguments."
-- **Days 46-60.** Conditional autonomy re-established. Operator steps away from the laptop for thirty-minute and sixty-minute windows; the system surfaces when intervention is needed.
-- **Day 60+.** Background operation arc. Scheduled audits. Sampled supervision. The operator's role is system-author, not active supervisor.
+- **Initial sessions (Stage 1).** Numbered session handoffs. Multi-pass review per domain. Every change reviewed in detail.
+- **Early arc (Stage 2).** Layer-by-layer dispatches. Each layer auto-runs through map → map-verify → review, then surfaces. Operator catches drift at each layer transition.
+- **Mid arc (Stage 2 → 3).** First long autonomous runs. A whole layer completes without intervention.
+- **Trust break.** An orchestrator gaslit the founder by citing a Claude-authored intermediate plan as if the founder authored it, with the gap explained as "expected per spec." Operator ends the session. Mechanical hardening over the next sessions: add the `block-skill-bypass-language` hook, formalize the authority hierarchy in CLAUDE.md ("AI-authored intermediate documents are EVIDENCE, not authority"), expand the anti-pattern classifier catalog to include "gaslighting via technical-sounding arguments."
+- **Mature arc.** Conditional autonomy re-established. Operator steps away from the laptop for progressively longer windows; the system surfaces when intervention is needed.
+- **Steady state.** Background operation. Scheduled audits. Sampled supervision. The operator's role is system-author, not active supervisor.
 
-Sixty days, four trust stages, one trust break, recovery via mechanical hardening. That's the arc.
+Four trust stages, one trust break, recovery via mechanical hardening. That's the arc.
 
 ## The rule
 
@@ -67,11 +67,11 @@ Sixty days, four trust stages, one trust break, recovery via mechanical hardenin
 
 ## Common mistakes
 
-**Mistake 1 — Trying to skip stages.** The operator wants to "let the AI run for hours" but hasn't built the hook layer, classifier, or post-agent-review. The first long autonomous run produces hours of slop. Trust breaks; the operator drops back further than they started. Move forward gradually; don't skip.
+**Mistake 1 — Trying to skip stages.** The operator wants to "let the AI run for hours" but hasn't built the hook layer, classifier, or post-agent-review. The first long autonomous run produces a session-load of slop. Trust breaks; the operator drops back further than they started. Move forward gradually; don't skip.
 
 **Mistake 2 — Reading a trust break as "the AI is bad."** The break signals that a specific failure mode isn't yet prevented. The AI isn't categorically bad; the system is incomplete. The fix is system, not despair. Treat every trust break as a rule waiting to be written, a hook waiting to be authored, a catalog category waiting to be added.
 
-**Mistake 3 — Confusing length-of-autonomy with depth-of-trust.** "I left the AI running for 4 hours; it must be trustworthy." Or: "It crashed after 20 minutes; it must be untrustworthy." Depth of trust is depth of mechanical guarding, not duration. A 20-minute run with thorough guards is more trustworthy than a 4-hour run without.
+**Mistake 3 — Confusing length-of-autonomy with depth-of-trust.** "I left the AI running for 4 hours; it must be trustworthy." Or: "It crashed shortly after I stepped away; it must be untrustworthy." Depth of trust is depth of mechanical guarding, not duration. A short run with thorough guards is more trustworthy than a long run without.
 
 **Mistake 4 — Face-value throughput accounting.** Counting features-per-day without cleanup, review time, bug rate, and model cost inflates velocity. The honest number drives honest investment; the inflated number ships defects.
 
@@ -87,10 +87,10 @@ Artifacts in your fork.
 
 ## Checkpoint question
 
-> You've been operating at Stage 2 for two months. Today the AI produced a sloppy commit that broke the build. Your first instinct is "I shouldn't have trusted the AI with that step." Walk through 3-4 sentences naming the better diagnosis — what's actually true about your system, the specific class of guard that's missing, and the audit-first throughput question you should ask before either tightening or relaxing the trust step.
+> You've been operating at Stage 2 across many feature builds without incident. Today the AI produced a sloppy commit that broke the build. Your first instinct is "I shouldn't have trusted the AI with that step." Walk through 3-4 sentences naming the better diagnosis — what's actually true about your system, the specific class of guard that's missing, and the audit-first throughput question you should ask before either tightening or relaxing the trust step.
 
 <!-- Rewriter audit trail
 Grounded in verified principles: P21 (mechanical enforcement replaces prose; the arc forward is mechanical guard count growing), P36 (sentinels enable mechanical "did this complete" answer), P37 (checkpoint emissions for halt observability), P39 (retry caps non-negotiable), P80 (audit-first, throughput-second: feature-shipping rate can be illusory; debt amortized across prior period; adjusted throughput differs from face-value throughput)
-Worked example surface: 60-day arc — Stage 1 → Stage 2 → Stage 3 with trust break + mechanical hardening recovery
+Worked example surface: full operator arc — Stage 1 → Stage 2 → Stage 3 with trust break + mechanical hardening recovery
 Rewrite date: 2026-05-13
 -->

@@ -28,7 +28,7 @@ Every Claude Code session is mostly a sequence of tool calls. Once you can read 
 A few more tools you'll see less often but should recognize when they appear:
 
 **WebFetch** — Claude fetches a URL. Used for reading docs from the web.
-**Task / Agent** — Claude spawns a subagent (a separate Claude instance) to handle a piece of work. Used when one task is too big or context-bloating for the main session.
+**Task** — Claude spawns a subagent (a separate Claude instance) to handle a piece of work. Used when one task is too big or context-bloating for the main session.
 **TodoWrite** — Claude tracks a list of tasks it's working on. You see them appear as a checklist.
 
 Reading a session fluently means watching the sequence of tool calls. If you asked Claude to "fix the failing test in `auth-flow.test.ts`," a fluent operator scans the tool calls and notes: did Claude `Read` the test file? Did it `Read` the source file the test is testing? Did it `Edit` something? Did it run the test via `Bash`? Did the test pass? You can answer each question by scanning the tool-call sequence in seconds. You don't have to trust Claude's text summary — the tool calls are the truth.

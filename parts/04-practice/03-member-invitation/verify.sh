@@ -38,15 +38,15 @@ if [ ! -s "${DRILL_DIR}/02-member-list.png" ]; then
   exit 1
 fi
 
-if [ ! -s "${DRILL_DIR}/03-no-math-random.txt" ]; then
-  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-no-math-random.txt with grep result for Math.random"
+if [ ! -s "${DRILL_DIR}/03-security-grep.txt" ]; then
+  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-security-grep.txt with grep results for security audit"
   exit 1
 fi
 
-# The grep result should NOT show matches in security-relevant code
+# The grep result should document the security audit (Math.random + check-then-update patterns)
 # Permissive: file should contain the grep command + outcome
-if ! grep -qiE 'grep|Math.random|no match|0 results|none' "${DRILL_DIR}/03-no-math-random.txt"; then
-  echo "FAIL: Drill 3 — expected the grep command and its result documented."
+if ! grep -qiE 'grep|Math.random|no match|0 results|none|select|update|token' "${DRILL_DIR}/03-security-grep.txt"; then
+  echo "FAIL: Drill 3 — expected the grep commands and their results documented."
   exit 1
 fi
 

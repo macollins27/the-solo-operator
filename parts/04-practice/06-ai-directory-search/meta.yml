@@ -21,7 +21,7 @@ concepts_taught:
   - server-side-prompt-construction
   - wrap-user-input-in-tags-against-injection
   - authorization-in-sql-not-in-prompt
-  - structured-output-with-json-schema
+  - structured-output-via-tool-use
   - rate-limit-ai-calls
   - bounded-output-cap
 

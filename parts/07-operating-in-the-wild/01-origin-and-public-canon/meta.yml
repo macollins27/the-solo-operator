@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: medium
 
-recall_chapters:
-  - 19
-  - 23
-  - 32
-  - 43
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/01-origin-and-public-canon/verify.sh

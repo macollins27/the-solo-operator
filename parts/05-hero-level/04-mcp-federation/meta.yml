@@ -25,13 +25,12 @@ concepts_taught:
   - servers-stay-small-and-independent
   - mcp-tool-contract-design
   - mcp-granularity
-  - mcp-minimalism
-  - lethal-trifecta
   - auto-rebuild-on-file-changes
 
 complexity: high
 
 recall_chapters:
+  - 22   # mcp-minimalism + lethal-trifecta canonical home
   - 40   # skill-iteration applies to MCP servers too
   - 43   # building your own system — MCP servers grow over time
 

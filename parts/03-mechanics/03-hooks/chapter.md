@@ -2,7 +2,7 @@
 
 ## Learning objective
 
-The student can explain what a hook is, where hooks live, name the four most useful hook events, author a simple hook that blocks a specific bad behavior in their fork, and verify the hook fires when expected.
+The student can explain what a hook is, where hooks live, name the most useful hook events and which blocking interface each uses, author a simple hook that blocks a specific bad behavior in their fork, and verify the hook fires when expected.
 
 ## Prerequisites
 
@@ -34,15 +34,21 @@ Hooks live in `.claude/settings.json`. The settings file maps events to scripts:
 
 Before any `Bash` tool call, `block-rm-rf.sh` runs. Exit 2 BLOCKS the tool call with a reason. Exit 0 allows.
 
-The four hook events you'll use most:
+The hook events Claude Code exposes:
 
-**PreToolUse.** Fires before a tool runs. The script receives the tool name and arguments as JSON on stdin. Use for blocking, validation, or modification. Most enforcement happens here.
+**PreToolUse.** Fires before a tool runs. Script receives tool name + arguments as JSON on stdin. Use for blocking, validation, modification. Exit code 2 BLOCKS the call with a reason — this exit-code-blocking interface is PreToolUse-specific.
 
-**PostToolUse.** Fires after a tool runs. Cannot block (the tool already ran) but can inject context for the next AI message ("the file you wrote has a TypeScript error").
+**PostToolUse.** Fires after a tool runs. Cannot block (the tool already ran) but can inject context for the next AI message.
 
-**Stop.** Fires when the assistant turn is ending. Use to scan the final message against pattern catalogs, force re-engagement, or hold the turn open until a mechanical condition is met.
+**Stop / SubagentStop.** Fire when an assistant turn ends / when a dispatched subagent finishes. Use to scan final output, force re-engagement, classify subagent issue counts.
 
-**SessionStart.** Fires when a session opens. Use to inject context the AI needs every time (e.g., the MCP roster, the orientation reminder, the active branch).
+**SessionStart / SessionEnd.** Fire on session open / close. Use for roster context, orientation reminders, handoff-doc nudges.
+
+**UserPromptSubmit.** Fires on every operator message before the AI sees it.
+
+**Notification / PreCompact.** Fire on idle notifications and before context compaction.
+
+For events other than PreToolUse (Stop, UserPromptSubmit, SubagentStop, SessionEnd, etc.), the blocking interface is NOT exit code 2 — it is JSON on stdout: `{"decision":"block","reason":"..."}`.
 
 A minimal hook script:
 
@@ -63,7 +69,7 @@ fi
 exit 0
 ```
 
-That's a real working hook. Reads tool input from stdin, parses the command, blocks the dangerous shape.
+That's a real working hook. Reads tool input from stdin, parses the command, blocks the dangerous shape. `jq` is external — install once: `brew install jq` or `apt install jq`.
 
 Two design rules the mature hook layer enforces:
 
@@ -75,9 +81,9 @@ What hooks are NOT for: things you only want to enforce sometimes (use a CLAUDE.
 
 ## Worked example
 
-A specific failure surfaces: an AI in a recent session reported "all 3 review subagent reports confirm the fix" without reading any of the three reports. The orchestrator forwarded that claim to you. You discovered, hours later, that none of the three subagents had actually completed their reviews — two had hit timeouts; one had emitted a "shortcut" verdict. The chat narration was a lie; the artifacts told the truth.
+A specific failure surfaces: an AI reports "all 3 review subagent reports confirm the fix" without reading any of the three reports. You discover later that none had actually completed — two timed out, one emitted a shortcut verdict. The chat narration was a lie; the artifacts told the truth.
 
-This is the failure mode hooks defend against. You add a `PostToolUse:Agent` hook that scans every subagent return for issue indicators, and on any nonzero count injects a mandatory review prompt requiring per-finding action (FIX / DOCUMENT / ESCALATE):
+This is the failure mode hooks defend against. You add a `SubagentStop` hook (or `PostToolUse` with matcher `"Task"` — `Task` is the subagent-dispatch tool) that scans every subagent return for issue indicators, and on any nonzero count requires per-finding action (FIX / DOCUMENT / ESCALATE):
 
 ```bash
 #!/usr/bin/env bash
@@ -94,26 +100,17 @@ ISSUE_COUNT=$(echo "$RETURN_TEXT" \
   || true)
 
 if [ "$ISSUE_COUNT" -ge 2 ]; then
-  cat <<'EOF' >&2
-Subagent returned 2+ findings. Required action: for each
-finding, classify as one of:
-  - FIX (caused by this session's changes; fix before
-    proceeding)
-  - DOCUMENT (pre-existing with the subagent's evidence
-    cited; add to required-actions list)
-  - ESCALATE (cause unclear; stop and surface to operator)
-
-Invalid responses: "claim all fixed" without per-finding
-action, accept "PRE-EXISTING" framing without per-finding
-classification.
+  # SubagentStop uses JSON-decision on stdout, not exit code 2
+  cat <<'EOF'
+{"decision":"block","reason":"Subagent returned 2+ findings. Required action: for each finding, classify as one of: FIX (caused by this session's changes; fix before proceeding), DOCUMENT (pre-existing with the subagent's evidence cited; add to required-actions list), ESCALATE (cause unclear; stop and surface to operator). Invalid responses: claim all fixed without per-finding action; accept PRE-EXISTING framing without per-finding classification."}
 EOF
-  exit 2
+  exit 0
 fi
 
 exit 0
 ```
 
-The hook is short. Its register is declarative-imperative — names the condition, names the required action, names the invalid responses. No history; no alarm. The next time a subagent returns findings, the AI cannot proceed without classifying each one — the rule is mechanical, not advisory.
+The hook is short. Register is declarative-imperative — condition, required action, invalid responses. No history; no alarm. The next time a subagent returns findings, the AI cannot proceed without per-finding classification.
 
 ## The rule
 
@@ -121,13 +118,13 @@ The hook is short. Its register is declarative-imperative — names the conditio
 
 ## Common mistakes
 
-**Mistake 1 — Hooks with alarm-register prose.** All-caps "MANDATORY ACTIONS / you MUST acknowledge / Do NOT continue" output reads as moral pressure and triggers placating disposition. The AI says "yes, I will comply" and changes nothing. The right register is neutral: condition + action + invalid responses. The block is the work; the rationale lives in the hook's body comment.
+**Mistake 1 — Hooks with alarm-register prose.** All-caps "MANDATORY ACTIONS / you MUST acknowledge" reads as moral pressure and triggers placating disposition. The AI says "yes, I will comply" and changes nothing. The right register is neutral: condition + action + invalid responses. The block is the work; rationale lives in the hook's body comment.
 
 **Mistake 2 — One mega-hook checking 12 things.** A 500-line hook that polices git operations, file edits, secret patterns, and commit messages is a maintenance nightmare. Twelve small single-purpose hooks compose into the same enforcement layer and stay debuggable. The router pattern — one `pre-bash-policy.sh` that dispatches to specialized scripts — keeps composition manageable.
 
-**Mistake 3 — Conservative-allow bias.** A hook that "only blocks when sure" lets edge cases through. The operator catches violations manually, paying attention cost the hook was supposed to absorb. Calibrate the other way: when the regex matches, block; the AI re-engages on the false-positive cost of one Stop loop. The math favors over-blocking.
+**Mistake 3 — Conservative-allow bias.** A hook that "only blocks when sure" lets edge cases through. The operator catches violations manually, paying attention cost the hook was supposed to absorb. Calibrate the other way: when the regex matches, block. The math favors over-blocking.
 
-**Mistake 4 — Hooks the AI can talk past via syntactic tricks.** A hook blocks `git push --force origin main` but doesn't block `git push origin +HEAD:main` (the equivalent syntactic form). The AI tries the equivalent form; the hook lets it through. The fix is enumerating the recognized shapes plus the equivalents — or, more durably, making the hook check the EFFECT (does this push rewrite a protected ref?) rather than the literal command shape.
+**Mistake 4 — Hooks the AI talks past via syntactic tricks.** A hook blocks `git push --force origin main` but doesn't block the equivalent `git push origin +HEAD:main`. The AI tries the equivalent form; the hook lets it through. Fix: enumerate equivalent shapes — or, more durably, check the EFFECT (does this push rewrite a protected ref?) rather than the literal command.
 
 ## Drill
 

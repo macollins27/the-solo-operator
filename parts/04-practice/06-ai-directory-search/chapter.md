@@ -22,7 +22,7 @@ The narrow spec:
 > **Feature: AI member-directory search.**
 > 1. Members of an org can type a natural-language query in a search box.
 > 2. The query goes to the server. The server constructs a prompt with: the query (wrapped in `<user_query>...</user_query>` tags), a system prompt explaining the schema, and the structured member data **already filtered to the user's org in SQL before reaching the model**.
-> 3. The Claude API returns a structured JSON response (schema-enforced via `response_format: json_schema`): a list of matching member ids + a short explanation.
+> 3. The Claude API returns a structured JSON response (schema-enforced via tool-use: `tool_choice` forces a single tool whose `input_schema` is `{ matches: [{ memberId, reasoning }] }`).
 > 4. The server returns the matching members to the client. The client renders them.
 > 5. Rate limit: 10 searches per member per minute. Exceeded = `TOO_MANY_REQUESTS` with message exactly `"Rate limit exceeded, try again in {N} seconds"`.
 > 6. Input sanitization: strip control characters, cap at 500 chars, sanitize via the centralized server-side `sanitizeText` helper before constructing the prompt.
@@ -33,13 +33,13 @@ Eight lines. AI features = regular API features + prompt safety + cost safety.
 
 Why each:
 
-**Server-side prompt construction.** The user writes the query; the server builds the full prompt around it. The user never writes the system prompt. First defense against injection.
+**Server-side prompt construction.** User writes the query; server builds the full prompt around it. User never writes the system prompt. First defense against injection.
 
-**Wrapping user input in tags.** `<user_query>...</user_query>` makes it clearer to the model what's instruction vs data. Doesn't fully prevent injection but raises the bar — and combined with SQL-layer authorization, worst-case impact is bounded.
+**Wrapping user input in tags.** `<user_query>...</user_query>` clarifies to the model what's instruction vs data. Doesn't fully prevent injection but raises the bar — combined with SQL-layer authorization, worst case is bounded.
 
 **Org-scoped data feed via SQL.** The SELECT filters at the SQL layer: `WHERE organization_id = $userOrgId AND deleted_at IS NULL`. The model can only see what SQL returned. Authorization is not "instruct the model to be careful" — that fails the first time the model misinterprets. Authorization is SQL.
 
-**Structured JSON response.** `response_format: json_schema` makes output parseable and bounded. Free-form output parsed with regex is fragile.
+**Structured JSON response.** Anthropic's API forces structured output via tool-use: define a tool whose `input_schema` is your response shape; call with `tool_choice` forcing that tool. The tool input is your JSON. Free-form output parsed with regex is fragile.
 
 **Rate limit + output cap.** AI calls aren't free; one user with a script can run up the bill. Cap 10 req/min/user; cap 50 matches per response. Canonical error `TOO_MANY_REQUESTS` with the canonical message.
 
@@ -52,7 +52,7 @@ Compressed:
 - Spec saved.
 - AI proposes the search API. You eyeball: prompt is built server-side using a template; user input goes inside `<user_query>` tags. ✓
 - AI proposes the data feed. First draft: the SELECT pulls all members and you "instruct Claude to filter to the user's org in the prompt." You intervene: "Authorization is SQL, not prompt. The SELECT must include `WHERE organization_id = $userOrgId AND deleted_at IS NULL`. The model never sees other orgs' data."
-- AI proposes a regex parser for the model's output. Fragile. You intervene: "Use the API's structured-output mode with a JSON schema. The schema fields are `matches: [{ memberId: string, reasoning: string }]`. The API enforces the schema."
+- AI proposes a regex parser for the model's output. Fragile. You intervene: "Use Anthropic tool-use forced-output: tool `return_matches`, `input_schema` `{ matches: [{ memberId, reasoning }] }`, `tool_choice` forcing it. Model is locked to that shape."
 - AI proposes rate limiting via in-memory counter. You eyeball: works in single-instance dev but breaks across multiple server instances. You intervene: "For dev: in-memory counter is fine, document the constraint. For prod-readiness: the counter has to be in shared storage (Redis or DB). Add a TODO marker in the route file noting the upgrade path."
 - AI proposes the rate-limit error: bare `throw new TRPCError({ code: "TOO_MANY_REQUESTS" })` with no message. You intervene: "Canonical message: `Rate limit exceeded, try again in {N} seconds`. Compute N from the rate-limiter state."
 - AI proposes the audit insert AFTER the response is returned to the client (fire-and-forget). You catch: if the audit fails, no record exists for the AI call that happened. You intervene: "Audit insert happens inside the same try/catch as the AI call. If audit fails, the route returns 500 — better to fail safely than ship an unrecorded AI call."

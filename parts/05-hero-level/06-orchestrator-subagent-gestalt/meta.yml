@@ -15,8 +15,8 @@ prerequisites:
   chapters_completed:
     - 36
   concepts_required:
-    - fork-subagent-inherits-context
-    - fresh-subagent-zero-context
+    - task-tool-dispatches-subagents
+    - long-context-vs-minimal-context-dispatch
     - structured-exit-signals
 
 concepts_taught:

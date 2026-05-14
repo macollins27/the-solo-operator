@@ -5,10 +5,10 @@ chapter:
   title: "Building YOUR system over time"
 
 learning_objective: >
-  The student can describe the first 30 days as a solo operator on
+  The student can describe the early arc as a solo operator on
   their own project, name the rule-cadence and consolidation cadence
   that produce a working system, and identify the moat-building loop
-  that compounds over months.
+  that compounds across the operating arc.
 
 prerequisites:
   chapters_completed:
@@ -18,7 +18,7 @@ prerequisites:
     - bite-frequency-determines-promotion
 
 concepts_taught:
-  - first-30-days-cadence
+  - early-arc-cadence
   - dont-pre-engineer
   - moat-building-loop
   - quarterly-consolidation-cadence
@@ -27,6 +27,8 @@ concepts_taught:
   - portable-agent-operating-system
 
 complexity: medium
+
+recall_chapters: []
 
 drill:
   artifact: parts/06-meta-skill/05-building-your-system/verify.sh

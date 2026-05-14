@@ -2,7 +2,7 @@
 
 ## Learning objective
 
-The student can decide, given a recurring failure mode, whether to encode the response as a CLAUDE.md rule, a hook, an ast-grep rule, or a SKILL.md amendment — and predict the maintenance cost of each over the longer term.
+The student can decide, given a recurring failure mode, whether to encode the response as a CLAUDE.md rule, a hook, an ast-grep rule, or a SKILL.md amendment — and predict the maintenance cost of each across the lifetime of the project.
 
 ## Prerequisites
 
@@ -27,8 +27,8 @@ The decision rule is empirical, not theoretical. Mechanical promotion is justifi
 
 | Bite count | Action | Cost |
 |---|---|---|
-| 1 | Feedback file | ~60 seconds; passive document |
-| 2 (different surface, same family) | Promote to CLAUDE.md | ~60 seconds; entry in standing rules |
+| 1 | Feedback file | trivial; passive document |
+| 2 (different surface, same family) | Promote to CLAUDE.md | trivial; entry in standing rules |
 | 3+ (recurring despite CLAUDE.md) | Promote to mechanical layer | ast-grep, hook, or SKILL.md amendment |
 | 4+ (recurring despite mechanical layer) | Re-author the mechanical layer | The first hook was wrong; diagnose again |
 | 5+ language-level pattern | Add to anti-pattern classifier catalog | Catalog entry picks up the family automatically |
@@ -50,7 +50,7 @@ That last row is load-bearing. When a defect class shows up in three or more ind
 
 Trade-offs to weigh per layer:
 
-**Speed of authoring.** Feedback file: ~60 seconds. CLAUDE.md rule: ~60 seconds. SKILL.md amendment: 5-20 minutes. ast-grep rule: 10-30 minutes. Hook: 20-60 minutes.
+**Speed of authoring.** Feedback file and CLAUDE.md rule are both trivial — a few sentences typed in line. SKILL.md amendments are a small effort: a focused edit within an existing protocol. ast-grep rules are medium: pattern crafted, tested against the codebase. Hooks are the largest: script authored, wired into `settings.json`, observed firing on a real event before trusted. Roughly: hooks cost an order of magnitude more authoring attention than rules; SKILL amendments sit in the middle.
 
 **Speed of enforcement.** Hook: instant (mechanical). ast-grep + post-edit hook: fast (on every Edit/Write). SKILL.md: applies on skill invocation. CLAUDE.md: applies if the AI reads and follows it (sometimes drifts). Feedback file: only if you reference it.
 
@@ -78,7 +78,7 @@ The cost ramp matches the bite frequency. Three small efforts beat one mega-effo
 
 ## Common mistakes
 
-**Mistake 1 — Pre-promoting.** A theoretical failure mode becomes a hook before any bite has happened. The hook never fires. Months later it false-positives on something legitimate, costing an hour to debug. Wait for the bite; the bite tells you the pattern is real.
+**Mistake 1 — Pre-promoting.** A theoretical failure mode becomes a hook before any bite has happened. The hook never fires. Later, it false-positives on something legitimate, costing a debugging session. Wait for the bite; the bite tells you the pattern is real.
 
 **Mistake 2 — Never promoting.** You author 40 feedback files; CLAUDE.md is still 30 lines. The same patterns bite you in slightly different forms because the AI never sees a consolidated rule. Promotion is the moat; without it, the corpus is just a journal.
 

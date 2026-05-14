@@ -51,7 +51,7 @@ The student forks the course repo. Their fork's `student/` directory is theirs t
 
 5. **No improvisation of the protocol.** When in doubt about how to teach the next thing, re-read `pedagogy/SKILL.md`. The SKILL covers stuck students; you improvising does not.
 
-6. **No references to specific real-world commercial products** as teaching examples. Use the canonical project (MembershipKit) or constructed scenarios only. The course must work for any student building any kind of software.
+6. **No commercial products as MembershipKit's feature stack as if they're the only choice** — frame them as concrete-but-swappable defaults. Part 7 may discuss the public agent landscape with named products.
 
 7. **No jargon without inline definition the first time it appears.** The student is a beginner. Every term defined when first used.
 

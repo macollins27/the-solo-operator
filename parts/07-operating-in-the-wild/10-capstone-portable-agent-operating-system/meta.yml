@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 19
-  - 44
-  - 48
-  - 51
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/10-capstone-portable-agent-operating-system/verify.sh

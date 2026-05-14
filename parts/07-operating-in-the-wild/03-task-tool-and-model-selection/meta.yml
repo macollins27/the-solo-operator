@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: medium
 
-recall_chapters:
-  - 12
-  - 23
-  - 44
-  - 45
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/03-task-tool-and-model-selection/verify.sh

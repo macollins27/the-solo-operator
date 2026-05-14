@@ -39,14 +39,18 @@ if [ ! -s "${DRILL_DIR}/02-audit-browser.png" ]; then
   echo "FAIL: Drill 2 — expected screenshot ${DRILL_DIR}/02-audit-browser.png"
   exit 1
 fi
-if [ ! -s "${DRILL_DIR}/03-tamper-test.txt" ]; then
-  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-tamper-test.txt"
+if [ ! -s "${DRILL_DIR}/03-tamper-and-redact.txt" ]; then
+  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-tamper-and-redact.txt"
   exit 1
 fi
 
-# Tamper test should mention permission denied or similar
-if ! grep -qiE 'permission|denied|not authoriz|cannot|insufficient' "${DRILL_DIR}/03-tamper-test.txt"; then
-  echo "FAIL: Drill 3 — tamper test should show permission-denied for UPDATE on audit_log."
+# Tamper-and-redact file should mention permission-denied (tamper half) and redaction (redact half)
+if ! grep -qiE 'permission|denied|not authoriz|cannot|insufficient' "${DRILL_DIR}/03-tamper-and-redact.txt"; then
+  echo "FAIL: Drill 3 — tamper-and-redact file should show permission-denied for UPDATE on audit_log."
+  exit 1
+fi
+if ! grep -qiE 'redact|\[REDACTED\]|hash|sha|sensitive' "${DRILL_DIR}/03-tamper-and-redact.txt"; then
+  echo "FAIL: Drill 3 — tamper-and-redact file should show the redacted/hashed value from the audit row."
   exit 1
 fi
 

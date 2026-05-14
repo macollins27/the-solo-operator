@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 23
-  - 37
-  - 47
-  - 49
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/07-parallel-work-and-orchestration/verify.sh

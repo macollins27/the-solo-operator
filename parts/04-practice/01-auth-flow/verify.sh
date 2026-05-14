@@ -32,18 +32,18 @@ if [ ! -s "${DRILL_DIR}/02-signed-in.png" ]; then
   exit 1
 fi
 
-# Drill 3 — intervention captured
-if [ ! -s "${DRILL_DIR}/03-intervention.txt" ]; then
-  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-intervention.txt"
-  echo "      Document one anti-pattern intervention from the build session."
+# Drill 3 — security defaults observed
+if [ ! -s "${DRILL_DIR}/03-security-defaults.txt" ]; then
+  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-security-defaults.txt"
+  echo "      Document the two security-default observations (neutral signup response + reverse-guard redirect)."
   exit 1
 fi
 
-# Intervention file should mention an anti-pattern number or name
-if ! grep -qiE '#[0-9]+|pattern|wind-down|defensive|hedg|bandaid|menu|estimate' "${DRILL_DIR}/03-intervention.txt"; then
-  echo "FAIL: Drill 3 — intervention file should name which anti-pattern you caught."
+# Security-defaults file should mention auth-relevant security content
+if ! grep -qiE 'password|session|enumer|csrf|brute|hash|crypto|token|rate.?limit|neutral|reverse.?guard|redirect' "${DRILL_DIR}/03-security-defaults.txt"; then
+  echo "FAIL: Drill 3 — security-defaults file should reference the observed defaults (neutral signup response, reverse-guard redirect, session/password/enumeration discipline)."
   exit 1
 fi
 
-echo "Chapter 25 verified — auth flow shipped, with intervention documented."
+echo "Chapter 25 verified — auth flow shipped, with security defaults documented."
 exit 0

@@ -7,7 +7,7 @@ The student can read and explain mature `AGENTS.md` / `CLAUDE.md` architecture, 
 ## Prerequisites
 
 - Completed: Chapter 31 — Practice: The audit log
-- Concepts: what-is-agentsmd, what-is-claudemd, five-rank-authority-hierarchy, corpus-as-moat
+- Concepts: what-is-agentsmd, what-is-claudemd, four-rank-authority-hierarchy, corpus-as-moat
 
 ## Core concept
 

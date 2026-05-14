@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 22
-  - 35
-  - 45
-  - 48
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/09-mcp-and-tool-ergonomics/verify.sh

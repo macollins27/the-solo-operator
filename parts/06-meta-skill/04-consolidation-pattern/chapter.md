@@ -35,7 +35,7 @@ The discipline that makes consolidation safe:
 
 **Document the mapping in a drop log.** A consolidation pass produces a synthesis-drop log naming exactly which files were consolidated and where their rules now live. The log is the audit trail.
 
-**Don't rush.** A pass that takes 30-90 minutes saves dozens of hours over the next quarter. Don't try to do it in 10 minutes; you'll miss subtle relationships between rules.
+**Don't rush.** A focused consolidation pass pays for itself many times over in the operating arc that follows. Don't try to do it in one rushed sweep; you'll miss subtle relationships between rules.
 
 **Run on a known cadence.** Quarterly works for most operators. Or trigger when the corpus crosses a count threshold (50 files, say). Don't wait until you have 200 files and the corpus is unreadable.
 

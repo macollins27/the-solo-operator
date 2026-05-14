@@ -21,11 +21,11 @@ The context window is **finite**. A token is roughly one short word or a few cha
 
 For short tasks, this feels huge. But context fills with everything: instructions, messages, file reads, and command output.
 
-When context fills, the agent may **compact** older conversation into a summary. Compaction is helpful but lossy: details get dropped.
+When context fills, the agent may **compact** older conversation into a summary. Compaction is helpful but lossy: details get dropped. You can also trigger compaction yourself at any point with the `/compact` slash command — useful when you can feel the session is getting long but you're not ready to `/exit`.
 
 Managing that visible region is **context engineering**: choosing what enters working memory, what stays on disk, what gets summarized, and what gets isolated elsewhere.
 
-Four operations matter:
+Four operations matter (the framing here follows Anthropic's engineering writing on context engineering):
 
 **Offload.** Move state out of chat and into files, specs, databases, MCP servers, or decision logs.
 
@@ -50,7 +50,7 @@ A few discipline points operators use:
 - Use instruction files for load-bearing project rules instead of repeating them every session.
 - Save important state to files (session-state docs, decisions logs) so a fresh session can pick up where the last one left off by re-reading them.
 
-The failure vocabulary:
+The failure vocabulary (a taxonomy adapted from Drew Breunig's writing on how context goes wrong):
 
 - **Context poisoning:** a wrong assumption enters the thread and becomes treated like memory.
 - **Context distraction:** irrelevant files or logs pull attention away from the actual task.
@@ -72,7 +72,7 @@ Turn 2: "What was the second sentence you just wrote?"
 
 (Claude answers from memory — no new tool calls. The conversation now includes both your messages and Claude's reply.)
 
-Turn 3: "Read CHAPTER_SCHEMA.md and compare it to AGENTS.md. Where do they overlap?"
+Turn 3: "Read CHAPTER_SCHEMA.md and compare it to CLAUDE.md. Where do they overlap?"
 
 (Claude reads two more files. They are now in context.)
 

@@ -15,7 +15,7 @@ This is a **practice** chapter. The lesson is APPLYING the discipline you've lea
 
 Auth is the right first practice surface because two specific failure modes — both empirically observed — concentrate there. Both are OWASP-class.
 
-**Failure 1 — Account enumeration via signup error.** A signup form displays "User already exists." when an email is registered. An attacker iterates a list; presence/absence of the error reveals which addresses have accounts. This is OWASP WSTG-IDNT-04 / ASVS 2.2.6. The fix is structural: signup response is neutral. The system sends an email; the UI shows "If that email is available, we've sent a confirmation link."
+**Failure 1 — Account enumeration via signup error.** A signup form displays "User already exists." when an email is registered. An attacker iterates a list; presence/absence of the error reveals which addresses have accounts. This is OWASP WSTG-IDNT-04 / ASVS 4.0.3 §2.2.6. The fix is structural: signup response is neutral. The system sends an email; the UI shows "If that email is available, we've sent a confirmation link."
 
 **Failure 2 — Already-signed-in users reaching `/auth/sign-in`.** Auth middleware allows all `/auth/*` unconditionally. An authenticated user reaching `/auth/sign-in` submits new credentials, gets a new session cookie that may have different org context. Session-token confusion ships. The fix is the reverse-guard: authenticated users on `/auth/sign-in` or `/auth/sign-up` redirect to dashboard.
 
@@ -42,7 +42,7 @@ A possible session flow:
 
 **Turn 1.** You: "I want to build the auth flow per spec at `student/specs/auth-flow.md`. Before you touch a file, list the assumptions you're about to make and the choices not in the spec."
 
-AI: "Assumptions: Better Auth default schema; auth handler at `/api/auth/[...all]/route.ts`; passwords stored via bcrypt at default cost. Choices not in spec: forgot password (your spec doesn't mention it). OK to proceed with these assumptions?"
+AI: "Assumptions: Better Auth default schema; auth handler at `/api/auth/[...all]/route.ts`; passwords hashed via Better Auth's default scrypt parameters. Choices not in spec: forgot password (your spec doesn't mention it). OK to proceed with these assumptions?"
 
 You: "Forgot password is out of scope; I'll handle later. Other assumptions: approved. Proceed."
 

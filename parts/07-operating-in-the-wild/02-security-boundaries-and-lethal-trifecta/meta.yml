@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 21
-  - 22
-  - 34
-  - 35
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/02-security-boundaries-and-lethal-trifecta/verify.sh

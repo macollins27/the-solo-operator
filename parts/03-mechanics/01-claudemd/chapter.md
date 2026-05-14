@@ -7,7 +7,7 @@ The student can write a portable `AGENTS.md`, layer a Claude-specific `CLAUDE.md
 ## Prerequisites
 
 - Completed: Chapter 18 — The Anti-Pattern Vocabulary
-- Concepts: spec-as-authority, five-rank-authority-hierarchy, operator-as-manager
+- Concepts: spec-as-authority, four-rank-authority-hierarchy, operator-as-manager
 
 ## Core concept
 
@@ -15,7 +15,7 @@ An **instruction file** is a markdown file an AI coding agent reads before it wo
 
 `AGENTS.md` is the vendor-neutral instruction file. Use it for rules that should follow the repo across Claude Code, Codex, Cursor, Aider, Copilot, Gemini CLI, or any future agent that supports the standard. `CLAUDE.md` is the Claude Code-specific overlay. Use it for Claude-only commands, slash-command habits, Claude hooks, Claude MCP names, and Claude-specific recovery language. The portable base goes in `AGENTS.md`; the tool-specific layer goes in `CLAUDE.md`.
 
-Claude Code reads `CLAUDE.md` at session start. It can exist at project root, per-directory, and user-global scope. The project-root file is what you'll author first.
+Claude Code reads `CLAUDE.md` at session start. It can exist at three scopes: project root (`./CLAUDE.md`), per-directory (a nested `CLAUDE.md` inside a subfolder, loaded when work touches that subtree), and user-global (`~/.claude/CLAUDE.md`, loaded in every project you open). The project-root file is what you'll author first.
 
 The prose authority layer has a known compliance ceiling. Behavioral rules in prose hold roughly seventy to eighty percent of the time. Use instruction files for standing context, authority hierarchy, and rules that do not yet warrant mechanical enforcement. Rules whose violation must be impossible belong in hooks.
 

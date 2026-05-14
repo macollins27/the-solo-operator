@@ -104,7 +104,7 @@ Every technical term in this course, defined in plain English. Use this when a c
 
 **Read (Claude tool)** — The Claude Code tool that reads a file's contents into the conversation. Costs tokens equal to the file's text length. Chapter 7.
 
-**Real-time** — Updates that appear in a browser without page refresh, typically via WebSocket. Chapter 29.
+**Real-time** — Updates that appear in a browser without page refresh. Common transports: WebSocket (bidirectional), Server-Sent Events / SSE (server → client only, over HTTP), and long-polling (HTTP request held open until data arrives). Chapter 29.
 
 **Recursive (in this course)** — The course teaches you Claude Code by being taught BY Claude Code. The medium and the subject are the same.
 
@@ -150,7 +150,7 @@ Every technical term in this course, defined in plain English. Use this when a c
 
 **TypeScript** — A typed superset of JavaScript. Used by MembershipKit. The strict mode catches many bugs at compile time.
 
-**UUIDv7** — A version of UUID that includes a timestamp at the start, making them naturally sortable by creation order. Used for primary keys in MembershipKit.
+**UUIDv7** — A version of UUID that includes a timestamp at the start, making them naturally sortable by creation order. Used for primary keys in MembershipKit. Standardized in RFC 9562 (May 2024); library support is uneven — Node's built-in `crypto.randomUUID()` returns v4, not v7, so you need the `uuid` npm package or a Postgres extension like `uuid_generate_v7()`.
 
 **Verify.sh** — A small bash script per chapter that mechanically checks the student's drill is complete. Chapter schema in `CHAPTER_SCHEMA.md`.
 

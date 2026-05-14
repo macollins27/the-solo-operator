@@ -31,7 +31,7 @@ At hero level, `.claude/hooks/` contains 25-30 small scripts. They cluster into 
 **Layer 3 — Behavioral classification.** Hooks that classify the AI's natural-language output:
 
 - `detect-time-budget-rationalization.sh` — Stop hook with 33+ regex patterns ("this should take ~4 hours," "(~10 minutes)," "since this morning," "out of scope for this pass," "as a first pass," "the rest is execution"). Cap of three triggers per session.
-- `anti-pattern-classifier.sh` — Stop hook invoking `claude -p` with JSON-schema-enforced output, scanning against the 20-category catalog. Context-aware disambiguation reads the user's preceding message.
+- `anti-pattern-classifier.sh` — Stop hook invoking `claude -p --output-format json` against the 20-category catalog. The hook's prompt instructs the inner Claude to return a single JSON object; the hook validates the structure with `jq` before acting. Context-aware disambiguation reads the user's preceding message.
 
 The three layers share two critical properties:
 
@@ -85,7 +85,7 @@ Artifacts in your fork.
 
 **Drill 2 — Add a Layer 2 hook with historical-marker awareness.** Author a hook that blocks Edit/Write to `student/canonical-project/` if the new_string contains `parseFloat` UNLESS the same line contains the marker `legacy` or `previously`. The hook reads JSON from stdin; checks new_string; allows-with-marker, blocks-without. Save its path to `student/drills/34-hook-layer/02-new-hook.txt`.
 
-**Drill 3 — Recognize alarm vs declarative-imperative register.** Open the hook from Chapter 21 (`block-todo-commits.sh`). Read its error message. Is it alarm or declarative-imperative? If alarm, rewrite to declarative-imperative (condition + action + invalid responses). Save the before/after to `student/drills/34-hook-layer/03-register.txt`.
+**Drill 3 — Recognize alarm vs declarative-imperative register.** Open the hook from Chapter 21 (`block-todo-commits.sh`). Read its error message. Is it alarm or declarative-imperative? If alarm, rewrite to declarative-imperative (condition + action + invalid responses). Save the before/after to `student/drills/34-hook-layer/03-alarm-register.txt`.
 
 ## Checkpoint question
 

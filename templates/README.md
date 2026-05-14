@@ -14,7 +14,7 @@ They are intentionally plain markdown. The student should copy the shape, then a
 - `security-boundaries.md` — security rules for agent data, filesystem, network, MCP, and plugins.
 - `workflow-eval.md` — eval format for deciding whether a workflow is reusable or automatable.
 - `learnings.md` — scratch layer for observations before promotion into rules, skills, hooks, or tools.
-- `subagent-dispatch.md` — four-part dispatch contract for fresh or fork subagents.
+- `subagent-dispatch.md` — four-part dispatch contract for Task subagent dispatches (long-context or minimal-context).
 - `worktree-plan.md` — isolation plan for parallel write agents.
 - `pr-description.md` — structured PR summary for AI-authored or AI-assisted changes.
 - `governance-audit-log.md` — audit entry shape for agent-authored, AI-reviewed, or AI-committed work.

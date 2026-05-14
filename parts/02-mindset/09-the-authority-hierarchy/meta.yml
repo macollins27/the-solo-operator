@@ -17,12 +17,11 @@ prerequisites:
     - output-as-defendant
 
 concepts_taught:
-  - five-rank-authority-hierarchy
-  - typed-instructions-as-rank-1
-  - authored-specs-as-rank-2
+  - four-rank-authority-hierarchy
+  - authored-specs-as-rank-1
+  - prototype-as-rank-2-visual-contract
   - shipped-artifact-as-rank-3-reality
-  - generated-docs-as-rank-4
-  - ai-intermediate-as-rank-5
+  - ai-intermediate-as-rank-4-evidence-only
   - promote-decisions-explicitly
 
 complexity: medium

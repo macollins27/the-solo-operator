@@ -18,10 +18,10 @@ You do not need any prior computer experience. If you can use a web browser and 
 
 **Accounts you'll need (both free to create):**
 
-- **A Claude account with a paid plan.** Claude Code requires a Pro, Max, Team, or Enterprise subscription — the free Claude.ai tier does NOT work for Claude Code. Sign up at `https://claude.com/`. The cheapest plan that includes Claude Code is Pro.
+- **A Claude account with a paid plan.** Claude Code requires a Pro, Max, Team, or Enterprise subscription — the free Claude.ai tier does NOT work for Claude Code. Sign up at `https://claude.com/`. The cheapest plan that includes Claude Code is Pro. (Alternatively, if you already have an Anthropic API key with billing enabled, Claude Code can authenticate via that instead of a subscription.)
 - **A GitHub account** at `https://github.com/`. Free. Used to fork this course repo to your own copy.
 
-**About 30 minutes** for the one-time setup. After that you can take the course at any pace.
+**A single sitting** for the one-time setup — eight short steps below, each with a verification command. After that you can take the course at any pace.
 
 ---
 
@@ -279,7 +279,7 @@ Your tutor (Claude) reads where you left off, opens the active chapter, and walk
 
 You can stop at any time. The next time you run `claude` and type "teach me," you pick up exactly where you left off.
 
-There are 44 chapters across 6 parts (plus a Part 0 orientation). You don't have to finish them all. Each chapter you complete makes you a better operator than you were before.
+There are 54 chapters across 8 parts (Parts 0–7, with Part 0 being orientation). You don't have to finish them all. Each chapter you complete makes you a better operator than you were before.
 
 ---
 

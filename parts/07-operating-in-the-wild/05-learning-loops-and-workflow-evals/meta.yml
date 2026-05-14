@@ -14,7 +14,7 @@ prerequisites:
     - 47
   concepts_required:
     - mature-instruction-architecture
-    - skill-iteration-protocol
+    - nine-step-iteration-protocol
     - plan-mode-without-deferral
 
 concepts_taught:
@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 16
-  - 32
-  - 40
-  - 47
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/05-learning-loops-and-workflow-evals/verify.sh

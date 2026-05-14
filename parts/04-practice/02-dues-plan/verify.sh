@@ -35,14 +35,14 @@ if [ ! -s "${DRILL_DIR}/02-subscription.png" ]; then
   exit 1
 fi
 
-if [ ! -s "${DRILL_DIR}/03-money-discipline.txt" ]; then
-  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-money-discipline.txt"
-  echo "      Document a money-discipline moment from your session."
+if [ ! -s "${DRILL_DIR}/03-discipline-log.txt" ]; then
+  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/03-discipline-log.txt"
+  echo "      Document a money-discipline or cross-org moment from your session."
   exit 1
 fi
 
-if ! grep -qiE 'cent|float|parseFloat|toFixed|integer|money' "${DRILL_DIR}/03-money-discipline.txt"; then
-  echo "FAIL: Drill 3 — money-discipline log should mention cents/float/integer/money explicitly."
+if ! grep -qiE 'cent|float|parseFloat|toFixed|integer|money|org|forbidden|not.?found|idor' "${DRILL_DIR}/03-discipline-log.txt"; then
+  echo "FAIL: Drill 3 — discipline log should mention cents/float/integer/money or cross-org/IDOR explicitly."
   exit 1
 fi
 

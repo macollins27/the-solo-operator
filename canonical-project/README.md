@@ -36,7 +36,9 @@ The product is small enough that a single non-engineer can understand the whole 
 | `Notification` | An activity-feed entry: "Sarah paid $25 on May 1", "Event 'Spring Cleanup' was created". |
 | `AuditLog` | Every state-changing action recorded with actor, action, target, before/after, timestamp. |
 
-## Tech stack
+## Tech stack (target)
+
+This is the TARGET stack — what MembershipKit looks like when it's done. Code lands here chapter by chapter as the course progresses; not every layer is shipping yet (see "Status of this directory" below for the current state).
 
 | Layer | Tool | Why |
 |---|---|---|
@@ -51,11 +53,11 @@ The product is small enough that a single non-engineer can understand the whole 
 | AI | Anthropic Claude API | Member directory search, event summaries, dues triage |
 | Tests | Vitest + Playwright | Unit + integration + end-to-end browser tests |
 
-Stack choices are deliberate. Every tool is widely used, well-documented, free or has a free tier large enough for course use, and runs cleanly on a Mac or Windows laptop with no commercial license.
+Stack choices are deliberate-but-swappable defaults. Every tool is widely used, well-documented, free or has a free tier large enough for course use, and runs cleanly on a Mac or Windows laptop with no commercial license. If you prefer a different equivalent (e.g., a different ORM, a different payments provider, a different real-time transport), the course's patterns transfer.
 
 ## Build path across the course
 
-The chapters are organized into six parts. Here's what gets built where.
+The chapters are organized into eight parts (Parts 0–7). Here's what gets built where.
 
 **Part 0 — Why You're Here.** No code. Orientation only.
 
@@ -83,7 +85,7 @@ When you're stuck, you compare. When you're done with a chapter's drill, you com
 
 ## Status of this directory
 
-This directory is the reference implementation in progress. As the course is authored, code lands here chapter by chapter — same way you'll build your own fork. The reference is always one step ahead of the student so you can compare without spoilers.
+This directory is the reference implementation **in progress**. As the course is authored, code lands here chapter by chapter — same way you'll build your own fork. The reference is always one step ahead of the student so you can compare without spoilers. A given layer in the target-stack table above may not be present in the repo until its chapter is reached.
 
 ## License
 

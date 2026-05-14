@@ -84,7 +84,7 @@ Artifacts go in `student/drills/46-task-tool-model-selection/`.
 
 ## Checkpoint question
 
-> A teammate wants to launch five cloud agents overnight with the prompt "clean up the codebase and improve tests." Answer in 4-5 sentences. Name what's wrong with the task shape, which surface you would use first instead, what model tier belongs where, and what acceptance criteria would make one safe ticket.
+> A teammate wants to launch five cloud agents in parallel, unattended, with the prompt "clean up the codebase and improve tests." Answer in 4-5 sentences. Name what's wrong with the task shape, which surface you would use first instead, what model tier belongs where, and what acceptance criteria would make one safe ticket.
 
 <!-- Rewriter audit trail
 Universalization pass: adds mode selection across autocomplete, chat, local agent, subagent, worktree agent, background agent, automation; adds three-tier model routing and AI-ready ticket shape.

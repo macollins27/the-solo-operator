@@ -17,9 +17,9 @@ check_nonempty() {
 }
 
 check_nonempty "${DRILL_DIR}/01-fresh-result.txt" \
-  "Drill 1 — capture the fresh subagent's return summary."
+  "Drill 1 — capture the minimal-context Task dispatch's return summary."
 check_nonempty "${DRILL_DIR}/02-fork-result.txt" \
-  "Drill 2 — capture the fork subagent's return summary."
+  "Drill 2 — capture the long-context Task dispatch's return summary."
 check_nonempty "${DRILL_DIR}/03-context-growth.txt" \
   "Drill 3 — note how much each subagent's output added to context (Claude's estimate)."
 

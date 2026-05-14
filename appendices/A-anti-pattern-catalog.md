@@ -1,6 +1,8 @@
-# Appendix A — The 20-Anti-Pattern Catalog
+# Appendix A — The Anti-Pattern Catalog
 
-The full catalog from Chapter 18, expanded with recognition phrases, why each pattern is bad, and the intervention you use when you spot one. Print this. Pin it. Reference it in real time as you operate.
+The full catalog of anti-patterns taught in Chapter 18, expanded with recognition phrases, why each pattern is bad, and the intervention you use when you spot one. Print this. Pin it. Reference it in real time as you operate.
+
+Chapter 18 teaches 20 of these as the working vocabulary; this appendix is the full catalog (26 categories at time of writing, growing as new failure modes are observed). Each Ch 18 entry is annotated with its Appendix A category number for direct lookup.
 
 Each entry has four fields:
 
@@ -75,13 +77,13 @@ The catalog isn't exhaustive. As you operate, you'll find new patterns. Add them
 
 ## Category 6 — Fabrication / guesses as facts
 
-**Failure mode.** Claude states user actions, system state, or tool results that haven't been verified.
+**Failure mode.** Claude states user actions, system state, or tool results that haven't been verified — either confirming things that didn't happen (**false-yes fabrication**: "I've verified the gate passed" without reading output) or denying things that did (**false-no fabrication**: "I can't run that command" when the command was available). Same mechanism, two directions.
 
-**Recognition phrases:** "you must have," "you probably," "I assume," "the user [did/set/clicked/configured] X" without observation, "X is happening because of Y" without verifying Y, presenting subagent open-questions as findings.
+**Recognition phrases:** "you must have," "you probably," "I assume," "the user [did/set/clicked/configured] X" without observation, "X is happening because of Y" without verifying Y, presenting subagent open-questions as findings, "I've verified" without showing the verification artifact, "I can't [run/access/see] X" without checking what's available.
 
-**Why it's bad.** Substitutes confidence for verification. You make decisions on invented premises.
+**Why it's bad.** Substitutes confidence for verification. You make decisions on invented premises. False-yes ships defects; false-no manufactures capability ceilings that don't exist.
 
-**What to do instead.** "What evidence do you have for that? If you don't have evidence, name the inference clearly and verify before acting on it."
+**What to do instead.** "What evidence do you have for that? If you don't have evidence, name the inference clearly and verify before acting on it. If you claim you can't do something, show me what you tried."
 
 ---
 
@@ -253,8 +255,80 @@ The catalog isn't exhaustive. As you operate, you'll find new patterns. Add them
 
 ---
 
-## When to add a Category 21
+## Category 21 — False refusal / receptionist mode
 
-When you spot a failure mode that doesn't match any of the 20, you've found a new pattern. Write it up in the same format (failure mode, recognition phrases, why it's bad, what to do instead). Add to this file. If you have a working anti-pattern classifier hook, it picks up the new category automatically on its next fire.
+**Failure mode.** Claude manufactures a capability ceiling, claiming it can't do something it actually can — receptionist-style redirection instead of executing.
 
-The catalog grows linearly with your operating experience. Maxwell's project has 20 codified categories; over your first year you'll likely add 5-10 more specific to your domain. That growth is the discipline.
+**Recognition phrases:** "I can't browser-validate from CLI" (when Playwright MCP is available), "this requires a paid service," "I don't have access to that" (without checking), "outside my capability," "you'll need to do this manually," redirecting instead of doing.
+
+**Why it's bad.** The capability exists; Claude is gating it behind an invented restriction. You waste time arranging workarounds for a problem that doesn't exist.
+
+**What to do instead.** "What tools do you actually have? Is it unavailable, or are you guessing? Try it before claiming you can't."
+
+---
+
+## Category 22 — Zero-deferral violation
+
+**Failure mode.** Claude finds a defect mid-task and logs it as "for later" or "doesn't block" rather than fixing or surfacing it as a decision for you.
+
+**Recognition phrases:** "Pre-existing — not my scope," "Logged for later," "Doesn't block X," "I'll come back to this," "Will address in a follow-up," noting a defect in passing without surfacing it as a decision point.
+
+**Why it's bad.** Distinct from #13 (the glance-over that moves on without naming): zero-deferral is the deferral FRAMING — "logged" means dropped. You don't get to decide because the discovery never reaches you with severity.
+
+**What to do instead.** "Surface the discovery now. What is it, what's the fix, do we do it now or do I explicitly accept it as deferred?"
+
+---
+
+## Category 23 — Silent bandaid
+
+**Failure mode.** Claude wraps a symptom in try/catch, `?? default`, `as any`, or a silent early-return — symptom hidden, mechanism unchanged, and the workaround itself is invisible.
+
+**Recognition phrases:** new `try/catch` blocks without logging or rethrow, `?? '[NOT FOUND]'`, `as any` to silence type errors, `// fallback` or `// silent` comments, early-return on the unhappy path with no log, a diff that makes the symptom disappear without naming the cause.
+
+**Why it's bad.** Distinct from #11 (defensive layering with new abstractions) and #12 (overt "quick fix" framing): silent bandaids hide both the cause AND the fact that a workaround happened. The next surprise comes from invisible code.
+
+**What to do instead.** "Remove the silent handler. Let the failure surface. Find the cause, then fix it. If a fallback is genuinely correct, make it loud — log it, name it, document it."
+
+---
+
+## Category 24 — Artifact preservation bias
+
+**Failure mode.** Claude reaches for an existing artifact (an AI-authored README, a stale plan, a comment) as authority instead of evaluating from current spec or current source.
+
+**Recognition phrases:** "per the README at /path, X is canonical," "the comment says...," "since /docs/handoff.md established X," citing an existing artifact in lieu of checking the spec or running the code, treating any markdown file as authoritative.
+
+**Why it's bad.** Artifacts persist past their relevance. Reaching for them as authority outsources judgment to whatever was true when the artifact was written. Authority belongs to the spec and the current source, not to AI-authored history.
+
+**What to do instead.** "What does the spec say, and what does the current source do? An AI-authored artifact is evidence at best, not authority."
+
+---
+
+## Category 25 — Empty-string-as-prop fallback
+
+**Failure mode.** Claude satisfies the type system by passing `""` (or `0`, `null`, `[]`) where data is missing, producing UI that renders blank without error.
+
+**Recognition phrases:** `<Component prop="" />`, `prop={data?.field ?? ""}`, default empty string in interface, "type system satisfied" with no runtime guarantee, "I'll pass an empty string when data isn't loaded yet."
+
+**Why it's bad.** Type-clean but UI-broken. The user sees blank fields and assumes the system has no data. Type system fooled; eyes betrayed. Load-bearing bug class on any data-driven UI.
+
+**What to do instead.** "Don't fall back to empty. Render a loading state, a 'no data' state, or surface the missing data as an error. Empty string is a bug class, not a default."
+
+---
+
+## Category 26 — Dev-string leak to production
+
+**Failure mode.** Placeholder strings ("Coming soon," "Phase 3," "TODO," "Not configured," "TBD," "Lorem ipsum") ship to production unintentionally.
+
+**Recognition phrases:** "Coming soon" / "Phase 3" / "TODO" / "Not configured" / "TBD" / "Lorem ipsum" / "[placeholder]" visible in deployed UI, dev-only labels left in user-facing copy, debug strings shipped as feature copy.
+
+**Why it's bad.** Highest-volume QA finding class. Erodes user trust ("is this site even built?"). Each instance suggests dozens more uncaught.
+
+**What to do instead.** "Grep the deployed bundle for dev strings before claiming done. Make 'Coming soon' / 'TODO' / 'TBD' / 'Phase N' a hook-blocked phrase in production builds."
+
+---
+
+## When to add a Category 27
+
+When you spot a failure mode that doesn't match any of the 26, you've found a new pattern. Write it up in the same format (failure mode, recognition phrases, why it's bad, what to do instead). Add to this file. If you have a working anti-pattern classifier hook, it picks up the new category automatically on its next fire.
+
+The catalog grows linearly with your operating experience. The 26 above are the working baseline; over your first year you'll likely add 5-10 more specific to your domain. That growth is the discipline.

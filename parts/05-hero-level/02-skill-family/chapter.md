@@ -6,7 +6,7 @@ The student can describe how 20-30 skills compose into a pipeline at hero level,
 
 ## Prerequisites
 
-- Completed: Chapter 32 — Hero level: the mature CLAUDE.md
+- Completed: Chapter 32 — Hero level: mature instruction architecture
 - Concepts: what-is-a-skill, anything-done-twice-is-a-skill-candidate
 
 ## Core concept
@@ -29,6 +29,8 @@ A typical workflow uses skills from all four roles in sequence:
 specify → contract → build-source → review-source → pnpm gate → qa-audit → fix-source
  (write)  (write)    (write)        (review)        (mechanical) (review)   (recover)
 ```
+
+`gate` is a script you compose once you've reached this maturity level — typically `pnpm lint && pnpm exec tsc --noEmit && pnpm test`. If you don't have one yet, run `pnpm lint && pnpm exec tsc --noEmit` as the equivalent.
 
 Each skill is small (~200-500 lines of SKILL.md). Each skill calls specific tools. The pipeline emerges from composition, not from any single skill being huge.
 

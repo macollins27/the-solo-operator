@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: high
 
-recall_chapters:
-  - 12
-  - 19
-  - 45
-  - 50
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/08-governance-auditability-and-cost-controls/verify.sh

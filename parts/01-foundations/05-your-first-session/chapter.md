@@ -86,7 +86,7 @@ Ask the same question again. Claude will redo the work — it doesn't remember t
 
 **Mistake 2 — Approving permissions without reading.** A permission prompt is showing you exactly what Claude wants to do. "Run `rm -rf /tmp/foo`" and "Run `rm -rf /`" are one character apart and one is fine while the other is catastrophic. The whole point of the prompt is to make you look. Look.
 
-**Mistake 3 — Treating exit and `Ctrl + C` as the same.** `/exit` cleanly closes the session and writes any pending state. `Ctrl + C` kills the session mid-action — Claude might be in the middle of a tool call. Use `/exit`. Reserve `Ctrl + C` for when Claude is doing something you need to stop right now.
+**Mistake 3 — Treating exit and `Ctrl + C` as the same.** `/exit` cleanly closes the session and writes any pending state. A single `Ctrl + C` interrupts whatever Claude is currently doing (the tool call in flight) without ending the session — useful when you want to stop a bad path mid-action and redirect. A double `Ctrl + C` (press it twice in quick succession) actually exits the session. Use `/exit` for clean shutdowns; reserve single `Ctrl + C` for "stop what you're doing, I want to redirect," and double `Ctrl + C` for "get me out now."
 
 ## Drill
 

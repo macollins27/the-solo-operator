@@ -57,7 +57,7 @@ Open your course repo in your terminal (you'll learn the terminal properly next 
 
 **Drill 1 — Visit the pantry.** Open Finder (Mac) or File Explorer (Windows). Navigate to your course repo folder. Take a screenshot of the folder's contents and save it to `student/drills/01-what-a-computer-does/01-repo-folder.png`. This is the pantry section of your computer that holds this course.
 
-**Drill 2 — Inventory the pantry.** Look inside the `canonical-project/` folder of the course repo. Pick any 5 files you see. Create a plain text file at `student/drills/01-what-a-computer-does/02-my-files.txt` and write the 5 filenames inside, one per line. These are recipes in the pantry, currently not being cooked.
+**Drill 2 — Inventory the pantry.** Look inside the `canonical-project/` folder of the course repo. Pick any 5 files you see. Create a plain text file at `student/drills/01-what-a-computer-does/02-my-files.txt` and write the 5 filenames inside, one per line. These are recipes in the pantry, currently not being cooked. (Note: this `canonical-project/` at the repo root is the reference implementation. From Chapter 8 onward, you'll work in your own copy at `student/canonical-project/` — the same pantry, your own shelf.)
 
 **Drill 3 — Observe a cook at work.** Open Activity Monitor (Mac, find it via Spotlight) or Task Manager (Windows, press `Ctrl + Shift + Esc`). Pick any running process — your web browser is a good one. Write its name to `student/drills/01-what-a-computer-does/03-one-process.txt` on a single line. That process is a recipe currently on the counter.
 

@@ -8,7 +8,7 @@ learning_objective: >
   The student can decide, given a recurring failure mode, whether to
   encode the response as a CLAUDE.md rule, a hook, an ast-grep rule,
   or a SKILL.md amendment — and predict the maintenance cost of each
-  over a 6-month horizon.
+  across the lifetime of the project.
 
 prerequisites:
   chapters_completed:

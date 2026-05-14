@@ -5,10 +5,10 @@ chapter:
   title: "Subagents and parallel work"
 
 learning_objective: >
-  The student can describe fork subagents, fresh subagents, and
-  worktrees; predict when each is appropriate; dispatch one of each
-  subagent type; and explain why parallel write work needs isolated
-  file states.
+  The student can describe how the Task tool dispatches subagents,
+  distinguish long-context vs minimal-context dispatch prompts and
+  worktrees; predict when each is appropriate; dispatch a subagent;
+  and explain why parallel write work needs isolated file states.
 
 prerequisites:
   chapters_completed:
@@ -18,10 +18,9 @@ prerequisites:
     - context-window-finite
 
 concepts_taught:
-  - fork-subagent-inherits-context
-  - fresh-subagent-zero-context
-  - when-to-fork-vs-fresh
+  - task-tool-dispatches-subagents
   - subagent-output-stays-out-of-context
+  - long-context-vs-minimal-context-dispatch
   - worktree-as-parallel-write-isolation
   - context-isolation-vs-file-isolation
   - three-tier-model-routing
@@ -32,8 +31,8 @@ concepts_taught:
 complexity: high
 
 recall_chapters:
-  - 32   # hero-level — orchestrator-and-subagent gestalt
   - 35   # multi-agent pipeline
+  - 37   # hero-level — orchestrator-and-subagent gestalt
 
 drill:
   artifact: parts/03-mechanics/05-subagents-and-parallel/verify.sh

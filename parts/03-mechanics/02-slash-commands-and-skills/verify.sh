@@ -38,14 +38,14 @@ if [ ! -s "${DRILL_DIR}/01-invocation-log.txt" ]; then
   exit 1
 fi
 
-# Drill 3 — second skill
-if [ ! -s "${DRILL_DIR}/02-second-skill.txt" ]; then
-  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/02-second-skill.txt"
-  echo "      Path to your second authored skill."
+# Drill 3 — review-my-commit skill path
+if [ ! -s "${DRILL_DIR}/02-review-skill.txt" ]; then
+  echo "FAIL: Drill 3 — expected non-empty ${DRILL_DIR}/02-review-skill.txt"
+  echo "      Path to your review-my-commit skill."
   exit 1
 fi
 
-SECOND_SKILL_PATH=$(head -1 "${DRILL_DIR}/02-second-skill.txt" | tr -d '\r\n')
+SECOND_SKILL_PATH=$(head -1 "${DRILL_DIR}/02-review-skill.txt" | tr -d '\r\n')
 # Strip leading 'Path:' or similar; check that whatever's named actually exists
 SKILL_FILE=$(echo "${SECOND_SKILL_PATH}" | grep -oE '\.claude/skills/[^[:space:]]+SKILL\.md' || true)
 if [ -n "${SKILL_FILE}" ]; then

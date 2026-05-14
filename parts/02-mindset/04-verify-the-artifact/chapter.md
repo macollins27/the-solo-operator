@@ -81,17 +81,15 @@ The recognition phrase to remember: "PASS confirmed" said in 2 minutes for a job
 
 ## Common mistakes
 
-**Mistake 1 — Trusting hook annotations or session-state markers.** A hook wrote "GATE PASSED" to a status file. The hook signal is not authoritative — only the actual command's stdout is. A session-state narrative is not authoritative — `git merge-tree HEAD origin/main` is. Read the primary artifact.
+**Mistake 1 — Trusting status markers or handoff documents instead of the primary artifact.** A hook wrote "GATE PASSED" to a status file. A handoff doc says "Phase 1 complete, source-code bugs fixed in prior session." Neither is authoritative — only the actual command stdout, `git diff`, and `git log` are. Cite-by-commit beats cite-by-prose; read the primary artifact.
 
 **Mistake 2 — Trusting "tests pass" without reading the output.** Can mean: all passed; some passed and failures hidden; tests skipped; command errored before tests ran. Read the output.
 
 **Mistake 3 — Trusting a subagent when it's anomalously fast.** A verification step at 2 minutes vs prior 10 has probably cut the protocol. Wall-clock anomaly IS the signal. Read the verdict's method section.
 
-**Mistake 4 — Trusting handoff documents on faith.** "Phase 1 complete, source-code bugs fixed in prior session." Verify against `git log` — did a commit actually fix the cited bugs? Cite-by-commit beats cite-by-prose.
+**Mistake 4 — Believing UI work without seeing the UI.** Typecheck green. Unit tests green. Page renders blank, or works for desktop and breaks at mobile. Mandatory walkthrough for UI changes: dev server starts → navigate to route → screenshot + console-messages check → "done." Use Playwright MCP (`mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_console_messages`, `mcp__playwright__browser_take_screenshot`).
 
-**Mistake 5 — Believing UI work without seeing the UI.** Typecheck green. Unit tests green. Page renders blank, or works for desktop and breaks at mobile. Mandatory walkthrough for UI changes: dev server starts → navigate to route → screenshot + console-messages check → "done."
-
-**Mistake 6 — Asking for tests after implementation and calling it TDD.** The agent writes the code, then writes tests shaped around that code. If deleting the production code does not make the test fail, the test is fake. Use the explicit failing-test-first prompt, and use fresh subagents when test independence matters.
+**Mistake 5 — Asking for tests after implementation and calling it TDD.** The agent writes the code, then writes tests shaped around that code. If deleting the production code does not make the test fail, the test is fake. Use the explicit failing-test-first prompt, and use fresh subagents when test independence matters.
 
 ## Drill
 
@@ -99,9 +97,9 @@ Artifacts go in `student/drills/12-verify-the-artifact/`.
 
 **Drill 1 — Run a session, then verify it.** Open Claude Code. Ask Claude to add a new file at `student/canonical-project/lib/greetings.ts` exporting a function `greet(name: string): string` that returns `Hello, ${name}!`. After Claude reports done, run `git diff` and `cat` the file. Capture both outputs to `student/drills/12-verify-the-artifact/01-evidence.txt`. Confirm the file exists, contains the expected content, and that `git diff` only shows the new file (no unexpected changes elsewhere).
 
-**Drill 2 — Catch a claim that doesn't match evidence.** This time, ask Claude to "run the type-checker on `student/canonical-project/` and tell me if it passes." Listen carefully to its claim. Then independently run `cd student/canonical-project && pnpm typecheck` yourself and compare. Also write one failing-test-first prompt for the greeting behavior using the exact phrase "Do NOT write implementation yet." If the claim matches reality, write "matched" + brief observation. If it doesn't match, capture the discrepancy. Save your finding and the prompt to `student/drills/12-verify-the-artifact/02-claim-vs-reality.txt`.
+**Drill 2 — Catch a claim that doesn't match evidence.** This time, ask Claude to "run the type-checker on `student/canonical-project/` and tell me if it passes." Listen carefully to its claim. Then independently run `cd student/canonical-project && pnpm exec tsc --noEmit` yourself and compare. (A freshly-scaffolded fork won't have a `typecheck` npm script yet, so call `tsc` directly.) Also write one failing-test-first prompt for the greeting behavior using the exact phrase "Do NOT write implementation yet." If the claim matches reality, write "matched" + brief observation. If it doesn't match, capture the discrepancy. Save your finding and the prompt to `student/drills/12-verify-the-artifact/02-claim-vs-reality.txt`.
 
-**Drill 3 — Behavioral verification.** Ask Claude to modify the home page (`student/canonical-project/app/page.tsx`) to display the text "MembershipKit". After Claude finishes, start the dev server (`pnpm dev` in another terminal), open `http://localhost:3000`, and confirm visually that the text is there. Take a screenshot and save it to `student/drills/12-verify-the-artifact/03-browser-screenshot.png`. (The point is: code-level verification isn't enough; you actually have to see it in the browser to verify a UI change.)
+**Drill 3 — Behavioral verification.** Ask Claude to modify the home page (`student/canonical-project/app/page.tsx`) to display the text "MembershipKit". After Claude finishes, start the dev server (`pnpm dev` in another terminal), open `http://localhost:3000`, and confirm visually that the text is there. Take a screenshot and save it to `student/drills/12-verify-the-artifact/03-browser-screenshot.png`. (If Playwright MCP is registered, use the `mcp__playwright__browser_*` tools — `browser_navigate`, `browser_take_screenshot`, `browser_console_messages` — to drive this through Claude. The point is: code-level verification isn't enough; you actually have to see it in the browser to verify a UI change.)
 
 > When something breaks mid-session (build fails, dev server crashes, a hook fires), **see Appendix C** for the recovery recipes — twenty specific "when X happens, do Y" patterns.
 

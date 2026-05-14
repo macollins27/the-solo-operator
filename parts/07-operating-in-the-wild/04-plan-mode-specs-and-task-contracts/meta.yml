@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: medium
 
-recall_chapters:
-  - 11
-  - 12
-  - 23
-  - 46
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/04-plan-mode-specs-and-task-contracts/verify.sh

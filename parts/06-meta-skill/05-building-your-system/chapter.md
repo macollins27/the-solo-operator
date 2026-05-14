@@ -71,7 +71,7 @@ Eventually, you have a portable operating system that works across agents. That'
 
 **Mistake 2 — Quitting early.** The first week feels chaotic. You're authoring feedback files but they're not yet rules. Sessions still require corrections. You think "this isn't working." But the corpus needs accumulation; compounding hasn't kicked in yet. Stay with it.
 
-**Mistake 3 — Skipping consolidation forever.** "I'll consolidate when I have time." You never have time. The corpus grows. The active surface degrades. After a year you can't find anything. The fix: schedule consolidation as non-negotiable; the 30-90 minutes pays for itself in operating velocity for the next quarter.
+**Mistake 3 — Skipping consolidation forever.** "I'll consolidate when I have time." You never have time. The corpus grows. The active surface degrades. Eventually you can't find anything. The fix: schedule consolidation as non-negotiable; the focused pass pays for itself in operating velocity across the arc that follows.
 
 **Mistake 4 — Counting features-per-day at face value.** Throughput measured naively looks great. Each shipped feature carries latent defects. Cleanup later costs days that aren't charged back to the feature rate. The honest measurement amortizes cleanup back to the prior period — and produces a feature-per-day rate that reflects real velocity, not apparent velocity.
 

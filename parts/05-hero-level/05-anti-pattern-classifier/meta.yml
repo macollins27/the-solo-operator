@@ -19,7 +19,7 @@ prerequisites:
 
 concepts_taught:
   - stop-hook-architecture
-  - claude-p-with-json-schema
+  - claude-p-with-structured-output
   - editable-catalog-pattern
   - context-aware-disambiguation
   - false-positives-cheap-false-negatives-expensive

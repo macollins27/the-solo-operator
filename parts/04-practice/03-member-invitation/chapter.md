@@ -31,13 +31,13 @@ Eight lines. The security rules are baked in.
 
 Why each detail matters:
 
-**UUIDv7 for the row id, `crypto.randomUUID()` for the TOKEN.** The id is for sequential B-tree inserts — predictable is fine. The token is the security primitive — predictable is fatal. Different generators for different roles.
+**UUIDv7 for the row id, `crypto.randomUUID()` (v4) for the TOKEN.** Different generators for different roles. The id wants time-ordered values for sequential B-tree inserts — Node's `crypto.randomUUID()` returns v4, so use the `uuid` npm package (`uuidv7()`) or Postgres `uuid_generate_v7()` for the row id. The token wants unpredictability — `crypto.randomUUID()` (v4) is correct; time-ordering does not matter.
 
-**The atomic UPDATE WHERE used_at IS NULL.** A naive two-step flow (SELECT check, then UPDATE mark) races. Two clicks at the same instant both pass the SELECT, both UPDATE. Double-claim ships. The single-statement form is atomic; zero rows returned = the token was unknown, expired, or already used — you can't tell which from the rowcount, which is the property you want.
+**The atomic UPDATE WHERE used_at IS NULL.** A naive two-step flow (SELECT check, then UPDATE mark) races: two simultaneous clicks both pass the SELECT, both UPDATE, double-claim ships. The single-statement form is atomic; zero rows returned = token was unknown, expired, or already used — you can't tell which, which is the property you want.
 
 **Generic error message.** "Invalid or expired" for ALL failure modes. Don't tell the attacker which case applies; they can't iterate. Information-asymmetry discipline.
 
-**Server-side HTML stripping at the tRPC boundary.** Even when the only consumer is React JSX, you sanitize at storage. React JSX auto-escaping is a rendering-layer defense, not a storage-layer defense. The moment a second consumer ships (an email template, a CSV export, a mobile client), unescaped HTML in the database becomes stored XSS. Sanitize at the API boundary via `Zod .transform(sanitizeText)`; centralize the sanitizer; never trust per-output-channel escaping as the only defense.
+**Server-side HTML stripping at the tRPC boundary.** Sanitize at storage even when the only consumer is React JSX. JSX auto-escaping is a rendering-layer defense, not storage. The moment a second consumer ships (email template, CSV export, mobile client), unescaped HTML in the database becomes stored XSS. Sanitize at the API boundary via `Zod .transform(sanitizeText)`; centralize the sanitizer; never trust per-output-channel escaping as the only defense.
 
 ## Worked example
 

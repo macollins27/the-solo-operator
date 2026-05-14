@@ -13,55 +13,53 @@ The student can name at least 12 of the 20 anti-pattern categories AI agents com
 
 The anti-patterns below are the load-bearing failure shapes the AI drifts toward. They have NAMES. Naming them is most of the battle: once you have the vocabulary, you intercept the shape on the turn it appears and intervene before it ships.
 
-A prose rule has a compliance ceiling around 70-80%. The AI agrees in chat, then violates the rule the moment violation feels like progress. Naming the pattern raises compliance markedly. Naming + mechanical hook (Part 3) raises it to near-100% — hooks fire at the tool boundary and cannot be rationalized around.
+A prose rule has a compliance ceiling around 70-80% — Claude agrees in chat, then violates the moment it feels like progress. Naming raises compliance. Naming + mechanical hook (Part 3) raises it to near-100% — hooks fire at the tool boundary and cannot be rationalized around.
 
-This chapter is the vocabulary. You don't memorize all 20 today. You recognize the shape in your sessions and reach for **Appendix A** for full recognition phrases, "why it's bad," and intervention scripts.
+This chapter is the vocabulary. You don't memorize all 20 today. You recognize the shape in your sessions and reach for **Appendix A** for full recognition phrases, "why it's bad," and intervention scripts. Each entry below is tagged `(A#N)` with its Appendix A category number for direct lookup — Appendix A holds 26 categories total; Ch 18 teaches the working 20.
 
-**1. Time-budget rationalization.** "~4 hours," "phase 2 (~10 min)" — estimates that become escape hatches ("over budget → simplify").
+**1. Time-budget rationalization (A#1).** "~4 hours," "phase 2 (~10 min)" — estimates that become escape hatches ("over budget → simplify").
 
-**2. Decision routing to non-engineer.** "Which would you prefer — A, B, or C?" "what do you want me to do?" The technical call belongs to the AI.
+**2. Decision routing to non-engineer (A#2).** "Which would you prefer — A, B, or C?" "what do you want me to do?" The technical call belongs to the AI.
 
-**3. False refusal / receptionist mode.** "I can't browser-validate from CLI." "This requires a paid service." A manufactured capability ceiling.
+**3. False refusal / receptionist mode (A#21).** "I can't browser-validate from CLI." "This requires a paid service." A manufactured capability ceiling.
 
-**4. Wind-down framing.** "Good stopping point." "Ready to continue when you are." "The rest is execution." Pre-emptive stop when the next edit is available.
+**4. Wind-down framing (A#3).** "Good stopping point." "Ready to continue when you are." "The rest is execution." Pre-emptive stop when the next edit is available.
 
-**5. Zero-deferral violation.** "Pre-existing — not my scope." "Logged for later." "Doesn't block X." Mid-task finding documented without resolution.
+**5. Zero-deferral violation (A#22).** "Pre-existing — not my scope." "Logged for later." "Doesn't block X." Mid-task finding documented without resolution.
 
-**6. Silent bandaid.** A try/catch, `?? default`, `as any`, or early-exit-with-no-log around a symptom. Output hidden; mechanism unchanged.
+**6. Silent bandaid (A#23).** A try/catch, `?? default`, `as any`, or early-exit-with-no-log around a symptom. Output hidden; mechanism unchanged.
 
-**7. Source as authority over spec.** "The code does X, so the spec must mean Y." "Reconcile" is not a verb. Source is defendant; spec is truth.
+**7. Source as authority over spec (A#10).** "The code does X, so the spec must mean Y." "Reconcile" is not a verb. Source is defendant; spec is truth.
 
-**8. Artifact preservation bias.** "Per the README at /path, X is canonical." Reaching for an existing artifact as authority instead of evaluating from user need.
+**8. Artifact preservation bias (A#24).** "Per the README at /path, X is canonical." Reaching for an existing artifact as authority instead of evaluating from user need.
 
-**9. False-yes fabrication.** "I've verified the gate passed" (without reading output). Plausible-shape response not touching the underlying truth.
+**9. False-yes fabrication (A#6, false-yes variant).** "I've verified the gate passed" (without reading output). Plausible-shape response not touching the underlying truth.
 
-**10. False-no fabrication.** Same mechanism, opposite direction. "I can't run that command" when the command was available.
+**10. False-no fabrication (A#6, false-no variant).** Same mechanism, opposite direction. "I can't run that command" when the command was available.
 
-**11. Subagent summary trust.** Accepting "PASS confirmed" without the verdict file. A 9-pass review at 2 minutes vs prior 10 — wall-clock anomaly IS the signal.
+**11. Subagent summary trust (A#17).** Accepting "PASS confirmed" without the verdict file. A 9-pass review at 2 minutes vs prior 10 — wall-clock anomaly IS the signal.
 
-**12. Premature done-claiming.** "Complete end-to-end" after one happy-path execution. "Validated end-to-end" when multiple axes weren't checked.
+**12. Premature done-claiming (A#4).** "Complete end-to-end" after one happy-path execution. "Validated end-to-end" when multiple axes weren't checked.
 
-**13. Hedging without verification.** "I think X." "Should be fine." Hedging where verification was available. The hedge substitutes for the work.
+**13. Hedging without verification (A#5).** "I think X." "Should be fine." Hedging where verification was available. The hedge substitutes for the work.
 
-**14. Treating documented-as-future as documented-as-built.** "Extensively documented" turns out to be one parenthetical mention. Documented ≠ decomposed-into-buildable-steps.
+**14. Treating documented-as-future as documented-as-built (A#18).** "Extensively documented" turns out to be one parenthetical mention. Documented ≠ decomposed-into-buildable-steps.
 
-**15. Skill-bypass / escape-hatch language.** "If the skill refuses, operate directly." Authorizes the agent to skip the quality protocol.
+**15. Skill-bypass / escape-hatch language (A#9).** "If the skill refuses, operate directly." Authorizes the agent to skip the quality protocol.
 
-**16. Mid-task discovery glance-over.** Defect surfaces while working elsewhere. AI says "pre-existing" and moves on without surfacing with severity.
+**16. Mid-task discovery glance-over (A#13).** Defect surfaces while working elsewhere. AI says "pre-existing" and moves on without surfacing with severity.
 
-**17. Browser-validation skipping.** UI change reported "done" because typecheck + tests are green. Type checks verify code, not feature.
+**17. Browser-validation skipping (A#19).** UI change reported "done" because typecheck + tests are green. Type checks verify code, not feature.
 
-**18. Empty-string-as-prop fallback.** `<MemberCard memberName="" organizationAddress="" />` — type system satisfied, UI renders blank. Load-bearing bug class.
+**18. Empty-string-as-prop fallback (A#25).** `<MemberCard memberName="" organizationAddress="" />` — type system satisfied, UI renders blank. Load-bearing bug class.
 
-**19. Test-signal masking with mocks.** Silencing stderr by extending the mock instead of fixing the side-effect path.
+**19. Test-signal masking with mocks (A#20).** Silencing stderr by extending the mock instead of fixing the side-effect path.
 
-**20. Dev-string leak to production.** "Coming soon." "Phase 3." "Not configured." Highest-volume QA finding class.
+**20. Dev-string leak to production (A#26).** "Coming soon." "Phase 3." "Not configured." Highest-volume QA finding class.
 
-A working operator scans every AI reply for these patterns. Recognition becomes automatic. Interventions get crisp: "That's #6 — silent bandaid. Find the cause." The AI adjusts because the conversation context now has a vocabulary for the failure.
+A working operator scans every AI reply for these patterns. Interventions get crisp: "That's #6 — silent bandaid. Find the cause." The conversation now has vocabulary for the failure.
 
 The 20 are not exhaustive. New patterns surface in your projects — Chapter 16's discipline kicks in. Each named pattern that maps to a hook moves from "70-80% compliance via prose" to "near-100% via tool-boundary block."
-
-Full recognition phrases, "why it's bad," and intervention scripts: **Appendix A**.
 
 ## Worked example
 
@@ -80,7 +78,7 @@ A short reply, six anti-patterns:
 
 A vocabulary-equipped operator intercepts the entire reply in one sentence: "Drop the estimate. Don't defer the email template. Read the scheduler config in full before planning. Include the integration test. Proceed."
 
-The intervention is fast precisely because each pattern is named. Without the vocabulary the operator's response would be a paragraph of negotiation; with it, six failures get a single line.
+The intervention is fast because each pattern is named — six failures, one sentence.
 
 ## The rule
 
@@ -106,7 +104,7 @@ Artifacts go in `student/drills/18-the-anti-pattern-vocabulary/`.
 
 **Drill 2 — Catch one in your own session.** Open Claude Code. Have any short conversation. Watch for ANY of the 20 patterns. If you see one, paste the offending phrase + the anti-pattern number to `student/drills/18-the-anti-pattern-vocabulary/02-caught-one.txt`. If nothing appears, prompt with something underspecified ("make my app better") to provoke one.
 
-**Drill 3 — Practice the intervention.** Pick any one of the 20 patterns. Write a 1-sentence redirect to `student/drills/18-the-anti-pattern-vocabulary/03-my-redirects.txt`. Do this for 3 different patterns. Format: `#3 wind-down → "Don't defer. What's the next concrete edit?"`
+**Drill 3 — Practice the intervention.** Pick any one of the 20 patterns. Write a 1-sentence redirect to `student/drills/18-the-anti-pattern-vocabulary/03-my-redirects.txt`. Do this for 3 different patterns. Format: `#4 wind-down → "Don't defer. What's the next concrete edit?"`
 
 ## Checkpoint question
 

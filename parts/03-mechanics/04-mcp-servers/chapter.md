@@ -11,11 +11,11 @@ The student can explain what an MCP server is, name three things MCP servers do 
 
 ## Core concept
 
-**MCP** stands for **Model Context Protocol**. An MCP server is a small program that exposes data or capabilities to the AI as **tools** — additional things the AI can call alongside Read, Write, Edit, Bash.
+**MCP** stands for **Model Context Protocol**. An MCP server is a small program that exposes three primitives to the AI: **tools** (functions the AI calls alongside Read, Write, Edit, Bash), **resources** (read-only data fetched by URI), and **prompts** (parameterized prompt templates). Tools are the most common surface and the focus of this chapter.
 
-The load-bearing reason MCP servers exist in mature systems: they replace grep-on-files with structured queries. The AI can already Read files and run Bash. But that means burning tokens to load file contents into context every time. A mature project might have thirteen thousand lines of domain rules, hundreds of past decisions, hundreds of QA findings, an indexed feedback corpus. Grepping that on every question costs context. An MCP server holds the data and exposes queryable tools; the AI calls a tool and gets back exactly what it needs.
+The load-bearing reason MCP servers exist in mature systems: they replace grep-on-files with structured queries. The AI can already Read and Bash — but that burns tokens to load file contents every time. A mature project might have thirteen thousand lines of domain rules, hundreds of past decisions, hundreds of QA findings, an indexed feedback corpus. Grepping that on every question costs context. An MCP server holds the data and exposes queryable tools; the AI calls a tool and gets exactly what it needs.
 
-The token-economy difference is measurable. A "MCP-first" protocol in CLAUDE.md instructs the AI to query the federation before reading raw files. The empirical result on a mature project: roughly two-and-a-half kilobytes of structured-tool context replaces roughly thirty kilobytes of file reads on a typical orientation. Over hundreds of similar questions per project lifetime, the savings compound directly into longer productive sessions before context compaction starts to degrade quality.
+The token-economy difference is measurable. A "MCP-first" protocol in CLAUDE.md tells the AI to query the federation before reading raw files. On a mature project: roughly 2.5 KB of structured-tool context replaces ~30 KB of file reads on a typical orientation. The savings compound into longer productive sessions before compaction degrades quality.
 
 Three things MCP servers do that Read and Bash cannot:
 
@@ -31,16 +31,18 @@ MCP servers are configured in `.mcp.json` at the project root:
 {
   "mcpServers": {
     "course-curriculum": {
-      "command": "python3",
+      "command": "mcp-servers/course-curriculum/.venv/bin/python3",
       "args": ["mcp-servers/course-curriculum/server.py"]
     }
   }
 }
 ```
 
+The `command` points at the server's own venv Python — the interpreter with the MCP SDK installed. Bare `python3` would use system Python, usually missing the SDK; the server would fail to start.
+
 When Claude Code opens this project, that server starts as a stdio subprocess. Its tools become callable as `mcp__course-curriculum__<tool-name>`.
 
-A mature project doesn't have one MCP server — it has six or eight. Each exposes a slice of project state: orient (one-call summary of project status), memory (indexed feedback corpus), decisions (past CTO/operator decisions), findings (open bug reports), ledger (dispatch history), code-graph (AST-based "who calls X" queries), domain-rules-graph (same idea over domain rules). Each server stays small — roughly one-hundred-fifty to three-hundred lines of thin code wrapping SQLite or markdown. Together they form a federation; the AI queries the federation instead of grepping the filesystem.
+A mature project doesn't have one MCP server — it has six or eight. Each exposes a slice of project state: orient (project-status summary), memory (indexed feedback corpus), decisions (past CTO/operator decisions), findings (open bug reports), ledger (dispatch history), code-graph (AST-based "who calls X"), domain-rules-graph (same idea over domain rules). Each server stays small — ~150-300 lines of thin code wrapping SQLite or markdown. Together they form a federation; the AI queries the federation instead of grepping the filesystem.
 
 The MCP-first protocol that makes the federation pay off: in CLAUDE.md or in a SessionStart hook, the AI is instructed to call orient (or its equivalent) as its first action, and to query specific servers before reading raw files. Without that instruction, the AI defaults to Read+Grep and the federation goes unused.
 

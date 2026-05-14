@@ -36,7 +36,7 @@ The commit message matters. "Fixed bug" is useless. "Fix login redirect when use
 
 A small but load-bearing detail: until you `git add` something, Git doesn't know about it. The folder it ignores by default is called **untracked**. The folder it tracks but you haven't staged for the next commit is **modified**. The set of files staged for the next commit is the **staging area**. `git status` shows all three categories clearly. Read it carefully — operators read `git status` 50 times a day.
 
-The reverse of `git add` is `git restore --staged <file>` (unstage). The reverse of a committed change is more complicated and you don't need it yet. For now: take many small commits with descriptive messages. The smaller your commits, the easier it is to find and undo a bad one later.
+The reverse of `git add` is `git restore --staged <file>` (unstage). Note: `git restore` requires Git 2.23 or later (released August 2019). On older Git installs, the equivalent is `git reset HEAD <file>`. The reverse of a committed change is more complicated and you don't need it yet. For now: take many small commits with descriptive messages. The smaller your commits, the easier it is to find and undo a bad one later.
 
 ## Worked example
 
@@ -58,7 +58,7 @@ git log                               # see your first commit
 
 `git init` creates a hidden folder called `.git/` inside your folder. That folder is the entire repo — it holds every snapshot, every commit message, every change ever made. Don't touch it directly; let Git manage it. Move or copy `.git/` along with your project folder and you keep your full history. Delete it and you lose all history (the current files stay).
 
-Each commit gets a unique identifier called a **hash** — a long string of letters and numbers like `a3f8c2d4...`. You'll see the first 7 characters of recent commits in `git log` output. That hash is how you refer to a specific snapshot when you want to inspect or revert it.
+Each commit gets a unique identifier called a **hash** — a 40-character string of letters and numbers like `a3f8c2d4b1e9f5...`. In most `git log` output you'll see only the first 7–8 characters as a short form; that's enough to refer to a specific snapshot when you want to inspect or revert it.
 
 ## The rule
 

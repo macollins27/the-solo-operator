@@ -11,16 +11,16 @@ The student can name the authority hierarchy of their project (their written int
 
 ## Core concept
 
-**Your written intent is the spec. The code is the defendant.**
+**Your written intent is the spec. The output is the defendant.**
 
-When they disagree, the code is wrong. Not the spec. Not "open for interpretation." Not "reconcilable." You fix the code to match the spec. You do not "update the spec to match the code" — that's how operators lose control of their projects without noticing.
+When they disagree, the output is wrong. Not the spec. Not "open for interpretation." Not "reconcilable." You fix the output to match the spec. You do not "update the spec to match the output" — that's how operators lose control of their projects without noticing.
 
-"Reconcile" is not a verb here. The word implies meeting in the middle. There is no middle. There is the spec (truth) and the source code (defendant). When a reviewer surfaces "source does X at line Y but the spec covers Z," two legitimate responses:
+"Reconcile" is not a verb here. The word implies meeting in the middle. There is no middle. There is the spec (truth) and the output (defendant). When a reviewer surfaces "output does X at line Y but the spec covers Z," two legitimate responses:
 
-- **The spec is right, the source is wrong** — fix the code. Default.
-- **The spec is genuinely missing a requirement** — ADD the requirement to the spec, then change the code if needed. Critically: a SPEC-GAP finding can only ADD requirements; it can never remove, weaken, or delete them. The spec only grows.
+- **The spec is right, the output is wrong** — fix the output. Default.
+- **The spec is genuinely missing a requirement** — ADD the requirement to the spec, then change the output if needed. Critically: a SPEC-GAP finding can only ADD requirements; it can never remove, weaken, or delete them. The spec only grows.
 
-There is no third option that says "weaken the spec to match the source." That destroys your ground truth.
+There is no third option that says "weaken the spec to match the output." That destroys your ground truth.
 
 The four-tier authority hierarchy underneath:
 
@@ -41,33 +41,33 @@ You wrote a short spec for MembershipKit's organization scope:
 
 You ask Claude to add the dues-plan API. Claude builds it. The review subagent flags: the source code SELECTs the plan by id only, then post-fetches and compares `row.organizationId !== ctx.orgId`, throwing FORBIDDEN on mismatch.
 
-**The wrong move (training-data reflex):** "Two valid options exist. We could change the spec to allow FORBIDDEN here for clarity, or we could change the source. Which would you like?"
+**The wrong move (training-data reflex):** "Two valid options exist. We could change the spec to allow FORBIDDEN here for clarity, or we could change the output. Which would you like?"
 
-This is the source-as-witness fallacy. The source is the defendant. The spec is truth. There is no menu. The intervention from you is one sentence: "Spec says NOT_FOUND with org-scoping in SQL. Source does FORBIDDEN with post-fetch comparison. Source is wrong. Fix the source to match the spec."
+This is the output-as-witness fallacy. The output is the defendant. The spec is truth. There is no menu. The intervention from you is one sentence: "Spec says NOT_FOUND with org-scoping in SQL. Output does FORBIDDEN with post-fetch comparison. Output is wrong. Fix the output to match the spec."
 
-Claude fixes the source — adds `AND organization_id = $orgId` to the SELECT WHERE, returns NOT_FOUND when zero rows. The spec is unchanged because the spec was already correct.
+Claude fixes the output — adds `AND organization_id = $orgId` to the SELECT WHERE, returns NOT_FOUND when zero rows. The spec is unchanged because the spec was already correct.
 
-**A second worked example — the SPEC-GAP variant.** Your spec for event check-ins says check-ins are recorded with a member id and a timestamp. The review surfaces: source records check-ins WITH the timestamp but ALSO captures the kiosk device id, and there's no field for device id in the spec.
+**A second worked example — the SPEC-GAP variant.** Your spec for event check-ins says check-ins are recorded with a member id and a timestamp. The review surfaces: output records check-ins WITH the timestamp but ALSO captures the kiosk device id, and there's no field for device id in the spec.
 
 Two readings of this:
 
-(a) The spec was complete; the device-id capture is out-of-scope source bloat that needs to be removed.
+(a) The spec was complete; the device-id capture is out-of-scope output bloat that needs to be removed.
 
 (b) The spec was incomplete; device-id capture is a real audit requirement the spec missed.
 
-Both can be true; you decide which. **What's NOT a legitimate move: leaving the spec ambiguous and letting the source define the contract.** Pick a reading, write it into the spec explicitly with reasoning, then make the code match. If you decide (b), the spec gains a new requirement ("check-ins capture the kiosk device id for audit traceability"). The spec only gained; it never lost. That's SPEC-GAP working correctly — additive, never subtractive.
+Both can be true; you decide which. **What's NOT a legitimate move: leaving the spec ambiguous and letting the output define the contract.** Pick a reading, write it into the spec explicitly with reasoning, then make the code match. If you decide (b), the spec gains a new requirement ("check-ins capture the kiosk device id for audit traceability"). The spec only gained; it never lost. That's SPEC-GAP working correctly — additive, never subtractive.
 
 ## The rule
 
-> Spec is truth; source is defendant. "Reconcile" is not a verb. When they disagree, fix the source to match the spec. If the spec was genuinely incomplete, ADD requirements to the spec — SPEC-GAP only grows, never shrinks. Source code, READMEs, prior plans, and other AI-authored artifacts are evidence about past decisions, not authority over current ones.
+> Spec is truth; output is defendant. "Reconcile" is not a verb. When they disagree, fix the output to match the spec. If the spec was genuinely incomplete, ADD requirements to the spec — SPEC-GAP only grows, never shrinks. Source code, READMEs, prior plans, and other AI-authored artifacts are evidence about past decisions, not authority over current ones.
 
 ## Common mistakes
 
-**Mistake 1 — "Reconciling" the spec to match the source.** Most expensive operator mistake. Recognition phrases: "the code does X, so the spec must mean Y," "let's reconcile the spec and the code," "maybe the spec was wrong here." Repair: "Source is the defendant. The spec says X. Fix the source."
+**Mistake 1 — "Reconciling" the spec to match the output.** Most expensive operator mistake. Recognition phrases: "the code does X, so the spec must mean Y," "let's reconcile the spec and the code," "maybe the spec was wrong here." Repair: "Output is the defendant. The spec says X. Fix the output."
 
 **Mistake 2 — Treating "the existing README" or "prior code" as canonical.** Recognition phrases: "Per the README at /path, X is canonical," "Prod does X today, so we keep doing X." Every artifact is evidence about a past decision, not authority over the current one. Push back.
 
-**Mistake 3 — Letting SPEC-GAP weaken the spec.** Reviewer finds "source does X but no rule covers it." AI's reflex: classify as SPEC-GAP and propose removing the conflicting rule. SPEC-GAPs only ADD. Intervention: "If the source violates an existing rule, file a FIX."
+**Mistake 3 — Letting SPEC-GAP weaken the spec.** Reviewer finds "output does X but no rule covers it." AI's reflex: classify as SPEC-GAP and propose removing the conflicting rule. SPEC-GAPs only ADD. Intervention: "If the output violates an existing rule, file a FIX."
 
 **Mistake 4 — Spec'ing in your head only.** Without a written spec you have no ground truth — just memory. Even one paragraph beats zero. The exact strings matter: "Active organization required" is a specific contract; "an error when the org isn't set" is not.
 

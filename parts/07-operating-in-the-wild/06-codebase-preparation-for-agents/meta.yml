@@ -27,11 +27,7 @@ concepts_taught:
 
 complexity: medium
 
-recall_chapters:
-  - 12
-  - 19
-  - 46
-  - 48
+recall_chapters: []
 
 drill:
   artifact: parts/07-operating-in-the-wild/06-codebase-preparation-for-agents/verify.sh

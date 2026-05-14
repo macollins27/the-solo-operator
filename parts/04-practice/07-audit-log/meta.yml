@@ -35,4 +35,4 @@ drill:
     - student/specs/audit-log.md
     - student/drills/31-audit-log/01-spec-path.txt
     - student/drills/31-audit-log/02-audit-browser.png
-    - student/drills/31-audit-log/03-tamper-test.txt
+    - student/drills/31-audit-log/03-tamper-and-redact.txt

@@ -14,7 +14,7 @@ prerequisites:
     - 18
   concepts_required:
     - spec-as-authority
-    - five-rank-authority-hierarchy
+    - four-rank-authority-hierarchy
     - operator-as-manager
 
 concepts_taught:
@@ -31,7 +31,7 @@ concepts_taught:
 complexity: medium
 
 recall_chapters:
-  - 22   # hooks — when CLAUDE.md rules need mechanical backing
+  - 21   # hooks — when CLAUDE.md rules need mechanical backing
   - 32   # hero-level — mature CLAUDE.md walkthrough
 
 drill:

@@ -43,9 +43,9 @@ Agent-ready setup contract:
 Install: pnpm install
 Dev server: pnpm dev
 Typecheck: pnpm typecheck
-Unit tests: pnpm test
-Full gate: pnpm lint && pnpm typecheck && pnpm test
-Seed data: pnpm seed
+Unit tests: <project test command, once a runner is wired in>
+Full gate: <lint> && <typecheck> && <tests>, composed once each step is real
+Seed data: <project seed command>
 Dev URL: http://localhost:3000
 Admin: admin@example.test / password
 Member: member@example.test / password

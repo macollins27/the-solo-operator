@@ -40,7 +40,7 @@ Specific repos to study (look for `CLAUDE.md` at the root):
 
 ## Books — AI engineering specifically
 
-**Anthropic's published research papers.** `https://www.anthropic.com/research`. Of particular relevance: the Constitutional AI paper, the Claude 4 technical report, the various agent papers. Not required reading, but useful background once you've operated for a few weeks.
+**Anthropic's published research papers.** `https://www.anthropic.com/research`. Of particular relevance: the Constitutional AI paper, the Claude 4 model card / system card (Anthropic publishes model and system cards rather than a single "technical report"), and the various agent papers. Not required reading, but useful background once you've operated for a few weeks.
 
 **"Building LLM Applications for Production" articles** (Eugene Yan's blog, Chip Huyen's writing). Practical, code-adjacent, often updated. Read AFTER Chapter 30.
 

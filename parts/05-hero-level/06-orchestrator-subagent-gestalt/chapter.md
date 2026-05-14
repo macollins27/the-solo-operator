@@ -7,7 +7,7 @@ The student can describe the orchestrator-and-subagent pattern at hero level —
 ## Prerequisites
 
 - Completed: Chapter 36 — Hero level: the anti-pattern classifier
-- Concepts: fork-subagent-inherits-context, fresh-subagent-zero-context, structured-exit-signals
+- Concepts: task-tool-dispatches-subagents, long-context-vs-minimal-context-dispatch, structured-exit-signals
 
 ## Core concept
 
@@ -88,11 +88,11 @@ Artifacts in your fork.
 
 **Drill 2 — Dispatch in parallel.** In a Claude Code session, dispatch THREE fresh subagents in a single message (three Agent tool calls in parallel). Each does a small audit task (e.g., "summarize what Chapter X teaches"). Save the three structured returns to `student/drills/37-orchestrator-gestalt/02-parallel-returns.txt`.
 
-**Drill 3 — Write two dispatch prompt templates.** Author two reusable dispatch templates at `student/drills/37-orchestrator-gestalt/03-dispatch-templates.txt`: (a) a long structured template for a non-skilled subagent with objective, output format, tool/source guidance, task boundaries, forbidden list, and verification criteria; (b) a minimal trigger template for a skilled subagent (`/SKILL` invocation + one-line forbidden list). Include the forbidden phrases the `block-skill-bypass-language` hook would catch — and confirm your templates avoid them.
+**Drill 3 — Write two dispatch prompt templates.** Author two reusable dispatch templates at `student/drills/37-orchestrator-gestalt/03-dispatch-template.txt`: (a) a long structured template for a non-skilled subagent with objective, output format, tool/source guidance, task boundaries, forbidden list, and verification criteria; (b) a minimal trigger template for a skilled subagent (`/SKILL` invocation + one-line forbidden list). Include the forbidden phrases the `block-skill-bypass-language` hook would catch — and confirm your templates avoid them.
 
 ## Checkpoint question
 
-> You're orchestrating a feature build and notice your context is at 60% after only ninety minutes of work. You haven't even started the implementation phase. Walk through 3-4 sentences naming what's likely happening, where in the dispatch pattern context is leaking, what specifically to change at the next subagent boundary (skill-invoking vs non-skill-invoking dispatch style), and what the retry cap tells you if your "fix" attempts on this leak fail twice in a row.
+> You're orchestrating a feature build and notice your context is at 60% before implementation has even started — just a few dispatches in. Walk through 3-4 sentences naming what's likely happening, where in the dispatch pattern context is leaking, what specifically to change at the next subagent boundary (skill-invoking vs non-skill-invoking dispatch style), and what the retry cap tells you if your "fix" attempts on this leak fail twice in a row.
 
 <!-- Rewriter audit trail
 Grounded in verified principles: P29 (skill bypass language forbidden in dispatch prompts; ~80% → ~100% compliance step; hook with 19 patterns), P30 (destructive ops belong in orchestrator turn, not subagent prompts), P31 (subagent dispatch prompt length — extractor divergence WEAK; long prompt discipline for non-skilled subagents vs minimal trigger for skilled subagents; reconciliation hypothesis preserved), P36 (mandatory exit sentinels for staged workflows; STAGE-COMPLETE first line + JSON exit), P37 (mandatory checkpoint emissions before every tool call for halt observability), P38 (subagent halt signatures forensically distinct), P39 (retry caps non-negotiable; re-categorizing across retries forbidden; 3-attempt cap; SOUNDNESS-STOP on 4th), P40 (authority-document editing as cross-skill input channel, not string arguments)

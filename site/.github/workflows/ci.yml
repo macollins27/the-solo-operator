@@ -42,3 +42,19 @@ jobs:
       - name: Build
         working-directory: site
         run: pnpm build
+
+      - name: Install Playwright browsers
+        working-directory: site
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright smoke tests
+        working-directory: site
+        run: pnpm test
+
+      - name: Accessibility (pa11y)
+        working-directory: site
+        run: pnpm a11y
+
+      - name: Lighthouse CI
+        working-directory: site
+        run: pnpm lhci

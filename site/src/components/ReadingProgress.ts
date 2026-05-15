@@ -6,6 +6,9 @@ class ReadingProgress extends HTMLElement {
 
   connectedCallback() {
     this.setAttribute('role', 'progressbar');
+    if (!this.hasAttribute('aria-label')) {
+      this.setAttribute('aria-label', 'Reading progress');
+    }
     this.setAttribute('aria-valuemin', '0');
     this.setAttribute('aria-valuemax', '100');
     this.innerHTML = '<div class="reading-progress-bar"></div>';

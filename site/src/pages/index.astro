@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="When your agent misbehaves, say this."
+  description="A phrasebook for non-technical operators building real software with AI agents. Pick what your agent is doing, get the exact words to say back. Distilled from 1,073 working sessions."
+  pageType="home"
+>
+  <div class="container grid-bg">
+    <div class="titleblock">
+      <div class="cell">
+        <div class="kicker">Document</div>
+        <div class="val">The Solo Operator's Manual</div>
+      </div>
+      <div class="cell">
+        <div class="kicker">For</div>
+        <div class="val">Non-technical operators</div>
+      </div>
+      <div class="cell">
+        <div class="kicker">Revision</div>
+        <div class="val">2026-05-15</div>
+      </div>
+      <div class="cell">
+        <div class="kicker">Refreshed</div>
+        <div class="val">Monthly</div>
+      </div>
+      <div class="cell">
+        <div class="kicker">Status</div>
+        <div class="val">Living</div>
+      </div>
+    </div>
+
+    <p class="kicker">How to talk to your AI agent when it gets stubborn</p>
+    <h1 class="h-display cover">When your agent<br />misbehaves, say this.</h1>
+    <p class="subtle">A phrasebook for operators who don't write code.</p>
+
+    <p class="thesis">
+      If you don't write code but you ship software with AI agents, the work eventually comes down
+      to this: knowing what to say back when the agent stalls, lies, hands the decision back to you,
+      or quietly makes something up. This is the phrasebook for those moments.
+    </p>
+
+    <button
+      type="button"
+      class="cmd-trigger"
+      onclick="document.dispatchEvent(new CustomEvent('cmd-palette-open'))"
+      aria-label="Open command palette"
+    >
+      <span class="cmd-trigger-leader">&gt;</span>
+      <span class="cmd-trigger-text">Search the manual</span>
+      <span class="cmd-trigger-kbd"><kbd>&#8984;</kbd><kbd>K</kbd></span>
+    </button>
+
+    <section class="modes" aria-labelledby="modes-heading">
+      <h2 id="modes-heading" class="sr-only">Three ways to read this manual</h2>
+      <a href="/phrasebook" class="mode primary">
+        <span class="badge">PRIMARY</span>
+        <h3>The Phrasebook</h3>
+        <p class="lead">
+          Pick the closest thing your agent is doing. Get the exact words to say back, a short
+          explanation of why those words work, and the story of where this pattern came from. This
+          is the part you'll use every day.
+        </p>
+        <span class="cta">Browse the phrasebook &rarr;</span>
+      </a>
+      <a href="/start-here" class="mode">
+        <span class="badge">IF YOU'RE NEW</span>
+        <h3>Start Here</h3>
+        <p class="lead">
+          Five foundational moves before you need the phrasebook. Read these once and the rest will
+          make sense.
+        </p>
+        <span class="cta">Read the basics &rarr;</span>
+      </a>
+      <a href="/about" class="mode">
+        <span class="badge">ABOUT</span>
+        <h3>Where this came from</h3>
+        <p class="lead">
+          A non-technical operator. Real software, shipped. The hard moves, written down.
+        </p>
+        <span class="cta">Read the story &rarr;</span>
+      </a>
+    </section>
+
+    <section class="spec" aria-label="Corpus shape">
+      <div class="cell">
+        <div class="kicker">Sessions distilled</div><div class="val">1,073</div>
+      </div>
+      <div class="cell"><div class="kicker">Projects covered</div><div class="val">46</div></div>
+      <div class="cell">
+        <div class="kicker">Behaviors catalogued</div><div class="val">145</div>
+      </div>
+      <div class="cell"><div class="kicker">Principles named</div><div class="val">80</div></div>
+    </section>
+
+    <div class="rev-strip">
+      <span>FRONTISPIECE</span>
+      <span>NEXT MONTHLY REFRESH: 2026-06-01</span>
+    </div>
+  </div>
+</Base>

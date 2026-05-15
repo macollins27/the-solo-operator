@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { CATEGORIES, type CategoryKey } from '../lib/categories';
+
+type PhrasebookEntry = CollectionEntry<'phrasebook'>;
+
+const allEntries: PhrasebookEntry[] = await getCollection('phrasebook');
+const publishedIds = new Set(allEntries.map((e: PhrasebookEntry) => e.id));
+
+type Placeholder = { what: string; freq: string; coveredBy: string | null };
+
+const categoryOrder: ReadonlyArray<{
+  id: CategoryKey;
+  placeholders: ReadonlyArray<Placeholder>;
+}> = [
+  {
+    id: 'giving-up',
+    placeholders: [
+      {
+        what: "it tells you you'll need a paid service",
+        freq: '~38 sessions',
+        coveredBy: 'paid-service-claim',
+      },
+      {
+        what: "it says it can't do something you think it can",
+        freq: '103 sessions',
+        coveredBy: 'cant-do-something',
+      },
+      {
+        what: 'it suggests stopping at a good place',
+        freq: '61 sessions',
+        coveredBy: 'good-stopping-place',
+      },
+    ],
+  },
+  {
+    id: 'done-before-done',
+    placeholders: [
+      {
+        what: 'it says the change is complete but never tested it',
+        freq: '224 sessions',
+        coveredBy: 'complete-but-untested',
+      },
+      {
+        what: 'it paraphrases an error instead of pasting the actual text',
+        freq: '280 sessions',
+        coveredBy: 'paraphrased-error',
+      },
+      {
+        what: 'it estimates how long the work will take',
+        freq: '73 sessions',
+        coveredBy: 'time-estimate',
+      },
+      {
+        what: "it claims it ran something it didn't run",
+        freq: '~52 sessions',
+        coveredBy: 'claimed-ran-but-didnt',
+      },
+    ],
+  },
+  {
+    id: 'handing-back',
+    placeholders: [
+      {
+        what: 'it asks you which of three options to pick',
+        freq: '120 sessions',
+        coveredBy: 'three-options',
+      },
+      {
+        what: 'it frames a technical choice as your preference',
+        freq: '~67 sessions',
+        coveredBy: 'your-preference',
+      },
+      {
+        what: "it asks 'what would you like me to do?'",
+        freq: '~94 sessions',
+        coveredBy: 'what-would-you-like',
+      },
+    ],
+  },
+  {
+    id: 'making-up',
+    placeholders: [
+      {
+        what: 'it cites a document it wrote earlier as if you wrote it',
+        freq: '97 sessions',
+        coveredBy: 'cites-own-doc-as-authority',
+      },
+      {
+        what: "it claims a file says something it doesn't say",
+        freq: '73 sessions',
+        coveredBy: 'false-file-citation',
+      },
+      {
+        what: "it changes something you didn't ask it to change",
+        freq: '54 sessions',
+        coveredBy: 'unrequested-scope-change',
+      },
+    ],
+  },
+];
+---
+
+<Base
+  title="What is your agent doing right now?"
+  description="The phrasebook. Four plain-English categories of bad agent behavior. Pick what is happening and get the exact words to say back."
+  pageType="index"
+>
+  <div class="container">
+    <p class="kicker">The Phrasebook</p>
+    <h1 class="h-display chapter">What is your agent doing right now?</h1>
+    <p class="body-copy">
+      Four kinds of bad behavior cover almost everything. Pick the closest match and you will find
+      the words to say back.
+    </p>
+
+    {
+      categoryOrder.map((cat) => {
+        const published = allEntries.filter((e: PhrasebookEntry) => e.data.category === cat.id);
+        const stubs = cat.placeholders.filter(
+          (p: Placeholder) => !p.coveredBy || !publishedIds.has(p.coveredBy),
+        );
+        const totalCount = published.length + stubs.length;
+        return (
+          <section class="category" aria-labelledby={`cat-${cat.id}`}>
+            <header class="ch">
+              <span class="num">{CATEGORIES[cat.id].number}</span>
+              <h2 class="name" id={`cat-${cat.id}`}>
+                {CATEGORIES[cat.id].label}
+              </h2>
+              <span class="count">
+                {totalCount} {totalCount === 1 ? 'entry' : 'entries'}
+              </span>
+            </header>
+            {published.map((entry: PhrasebookEntry) => (
+              <a href={`/phrasebook/${entry.id}`} class="pb-row">
+                <span class="what">{entry.data.quote}</span>
+                <span class="freq">{entry.data.appears}</span>
+              </a>
+            ))}
+            {stubs.map((stub) => (
+              <div class="pb-row is-stub" aria-disabled="true">
+                <span class="what">
+                  {stub.what}
+                  <span class="sr-only">, forthcoming, not yet published</span>
+                </span>
+                <span class="freq">forthcoming</span>
+              </div>
+            ))}
+          </section>
+        );
+      })
+    }
+
+    <div class="rev-strip">
+      <span>
+        The phrasebook &middot; {allEntries.length} entries published &middot; counts refreshed 2026-05-14
+      </span>
+      <span>Next monthly refresh: 2026-06-01</span>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Page not found"
+  description="The page you were looking for is not part of this manual. Use the navigation to find what you need."
+  noIndex={true}
+>
+  <div class="container">
+    <p class="kicker">404 &middot; Page not found</p>
+    <h1 class="h-display chapter">That page isn't here.</h1>
+    <p class="body-copy">
+      Either the page never existed, or it has been retired. Try the navigation above &mdash; the
+      phrasebook, the start-here path, or the about page.
+    </p>
+    <p class="body-copy">
+      <a href="/">&larr; Back to the front</a>
+    </p>
+  </div>
+</Base>

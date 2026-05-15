@@ -1,0 +1,18 @@
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "timeout": 30000,
+    "wait": 500,
+    "ignore": [],
+    "chromeLaunchConfig": {
+      "args": ["--no-sandbox"]
+    }
+  },
+  "urls": [
+    "http://localhost:4321/",
+    "http://localhost:4321/phrasebook",
+    "http://localhost:4321/phrasebook/paid-service-claim",
+    "http://localhost:4321/start-here",
+    "http://localhost:4321/about"
+  ]
+}

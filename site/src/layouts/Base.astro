@@ -1,0 +1,151 @@
+---
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/ibm-plex-sans-condensed/500.css';
+import '@fontsource/ibm-plex-sans-condensed/600.css';
+import '@fontsource/ibm-plex-sans-condensed/700.css';
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+  description: string;
+  pageType?: 'home' | 'article' | 'index';
+  ogImage?: string;
+  noIndex?: boolean;
+  structuredData?: object;
+}
+
+const {
+  title,
+  description,
+  pageType = 'article',
+  ogImage = '/og-default.png',
+  noIndex = false,
+  structuredData,
+} = Astro.props;
+
+const SITE_NAME = "The Solo Operator's Manual";
+const SITE_URL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://solo-operator.example';
+const canonical = new URL(Astro.url.pathname, SITE_URL).toString();
+const fullTitle = pageType === 'home' ? title : `${title} · ${SITE_NAME}`;
+const ogImageUrl = new URL(ogImage, SITE_URL).toString();
+
+const navItems = [
+  { href: '/phrasebook', label: 'Phrasebook' },
+  { href: '/start-here', label: 'Start Here' },
+  { href: '/about', label: 'About' },
+];
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+
+const defaultSchema =
+  pageType === 'home'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE_NAME,
+        description,
+        url: SITE_URL,
+        inLanguage: 'en',
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'TechArticle',
+        headline: title,
+        description,
+        url: canonical,
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+        inLanguage: 'en',
+      };
+const schema = structuredData ?? defaultSchema;
+
+// Escape `</` to `<\/` so JSON-LD content can't break out of the inline
+// <script> block. See `_internal/reviews/2026-05-15-security-review.md` F-01.
+function safeJsonLd(obj: object): string {
+  return JSON.stringify(obj).replace(/<\//g, '<\\/');
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0d10" />
+    <meta name="color-scheme" content="dark" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+
+    <meta property="og:type" content={pageType === 'home' ? 'website' : 'article'} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />
+    {
+      /* Font preload deferred: @fontsource bundles fonts under hashed _astro/* paths
+        that change per build. See MASTER-PLAN T-601 follow-up for proper
+        preload via build-time manifest lookup. */
+    }
+
+    <script is:inline type="application/ld+json" set:html={safeJsonLd(schema)} />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <header class="topnav" transition:persist transition:name="topnav">
+      <nav class="container" aria-label="Primary">
+        <a href="/" class="brand">
+          {SITE_NAME}<small>Living document</small>
+        </a>
+        <div class="links">
+          {
+            navItems.map((item) => (
+              <a href={item.href} class={currentPath === item.href ? 'active' : ''}>
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <command-palette></command-palette>
+
+    <footer class="site-footer" transition:persist transition:name="site-footer">
+      <div class="container">
+        <span>{SITE_NAME} &middot; Revision 2026-05-15 &middot; Living document</span>
+        <span>
+          <a href="/about">Where this came from</a> &nbsp;&middot;&nbsp;
+          <a href="/sitemap-index.xml">Sitemap</a>
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      import '../components/CopyButton.ts';
+      import '../components/CommandPalette.ts';
+      import '../components/ReadingProgress.ts';
+    </script>
+  </body>
+</html>

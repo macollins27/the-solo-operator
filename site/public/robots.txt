@@ -1,0 +1,28 @@
+# The site's audience explicitly includes AI crawlers. Allowlist named
+# crawlers and allow * by default. See MASTER-PLAN T-502 amendment.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://solo-operator.example/sitemap-index.xml

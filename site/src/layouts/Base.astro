@@ -118,10 +118,10 @@ function safeJsonLd(obj: object): string {
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />
+
     {
-      /* Font preload deferred: @fontsource bundles fonts under hashed _astro/* paths
-        that change per build. See MASTER-PLAN T-601 follow-up for proper
-        preload via build-time manifest lookup. */
+      /* Font preload tags are injected at build time by src/integrations/font-preload.ts
+        (T-601). Hashed _astro/*.woff2 paths are discovered after the Vite build. */
     }
 
     <script is:inline type="application/ld+json" set:html={safeJsonLd(schema)} />

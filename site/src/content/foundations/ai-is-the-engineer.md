@@ -21,7 +21,7 @@ pubDate: 2026-05-15
 
 ## The wrong question
 
-If you ask yourself _how do I code this?_, you've already lost. You're not going to learn enough engineering to ship production software at the bar an AI agent can hit. The question doesn't scale. There's no time. And worse, asking it pulls you into the agent's seat — making technical decisions you can't defend, getting them wrong, then having to argue with the agent about a decision you didn't have the standing to make.
+If you ask yourself _how do I code this?_, you've already lost. You're not going to learn enough engineering to ship real software at the bar an AI agent can hit. The question doesn't scale. There's no time. And worse, asking it pulls you into the agent's seat — making technical decisions you can't defend, getting them wrong, then having to argue with the agent about a decision you didn't have the standing to make.
 
 The right question is: _how do I tell the engineer what good looks like, and verify they did it?_
 

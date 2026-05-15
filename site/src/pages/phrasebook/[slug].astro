@@ -24,6 +24,11 @@ const cat = CATEGORIES[d.category as CategoryKey];
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const entryUrl = new URL(Astro.url.pathname, Astro.site).toString();
 
+const recognizeText = `Listen for any of: ${d.hearing.join(' / ')}`;
+const verifyText =
+  d.afterPaste?.trim() ??
+  'Read the agent’s next reply. If it returns to concrete action — a command, a file, an error — you have ground truth. If it returns more abstraction, push again.';
+
 const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -68,6 +73,36 @@ const structuredData = {
           position: 4,
           name: d.title,
           item: entryUrl,
+        },
+      ],
+    },
+    {
+      '@type': 'HowTo',
+      name: `How to push back when your agent says "${d.quote}"`,
+      description: d.subtitle,
+      inLanguage: 'en',
+      totalTime: 'PT2M',
+      step: [
+        {
+          '@type': 'HowToStep',
+          position: 1,
+          name: "Recognize the agent's words",
+          text: recognizeText,
+          url: `${entryUrl}#block-hearing`,
+        },
+        {
+          '@type': 'HowToStep',
+          position: 2,
+          name: 'Paste the intervention',
+          text: d.pasteText.trim(),
+          url: `${entryUrl}#block-paste`,
+        },
+        {
+          '@type': 'HowToStep',
+          position: 3,
+          name: "Verify the agent's response",
+          text: verifyText,
+          url: `${entryUrl}#block-why`,
         },
       ],
     },

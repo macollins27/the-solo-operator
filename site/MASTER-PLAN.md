@@ -805,7 +805,8 @@ Each task follows the same shape: read the relevant principles, write the founda
 #### T-205 — Browser-validate command palette at 4 viewports
 
 - **Phase:** 2
-- **Status:** not-started
+- **Status:** done
+- **Result:** Cmd+K opens palette; typing "paid" filters to 1 hit (paid-service-claim entry); Esc closes (hidden attribute set, body overflow restored). DOM evaluate at 1440 confirms no horizontal scroll, h1 correct, Plex Sans Condensed loaded, bg #0a0d10. Screenshots at 375/768/1024 saved in \_internal/val-\*.png. Playwright smoke suite passes 32/32 across all four viewports.
 - **Prereqs:** T-204
 - **Instructions:**
   1. Open the palette at 375, 768, 1024, 1440. Screenshot each.

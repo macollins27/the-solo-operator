@@ -1,16 +1,18 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist",
+      "startServerCommand": "pnpm exec serve dist -l 4321 --no-clipboard --no-request-logging",
+      "startServerReadyPattern": "Accepting connections",
+      "startServerReadyTimeout": 30000,
       "url": [
-        "http://localhost/index.html",
-        "http://localhost/phrasebook.html",
-        "http://localhost/phrasebook/paid-service-claim.html",
-        "http://localhost/phrasebook/cant-do-something.html",
-        "http://localhost/start-here.html",
-        "http://localhost/start-here/ai-is-the-engineer.html",
-        "http://localhost/about.html",
-        "http://localhost/404.html"
+        "http://localhost:4321/",
+        "http://localhost:4321/phrasebook",
+        "http://localhost:4321/phrasebook/paid-service-claim",
+        "http://localhost:4321/phrasebook/cant-do-something",
+        "http://localhost:4321/start-here",
+        "http://localhost:4321/start-here/ai-is-the-engineer",
+        "http://localhost:4321/about",
+        "http://localhost:4321/404"
       ],
       "numberOfRuns": 1,
       "settings": {
@@ -21,7 +23,7 @@
     "assert": {
       "assertMatrix": [
         {
-          "matchingUrlPattern": "^(?!.*404\\.html).+$",
+          "matchingUrlPattern": "^(?!.*/404$).+$",
           "assertions": {
             "categories:performance": ["error", { "minScore": 0.95 }],
             "categories:accessibility": ["error", { "minScore": 1 }],
@@ -35,7 +37,7 @@
           }
         },
         {
-          "matchingUrlPattern": "404\\.html$",
+          "matchingUrlPattern": "/404$",
           "assertions": {
             "categories:performance": ["error", { "minScore": 0.95 }],
             "categories:accessibility": ["error", { "minScore": 1 }],

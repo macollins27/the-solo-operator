@@ -1491,6 +1491,34 @@ command-palette {
 }
 
 /* =========================================================
+   Scroll-driven section reveals (T-405)
+   On entry pages, each .block fades up subtly as it enters
+   the viewport. CSS-only via animation-timeline: view().
+   No-op fallback in browsers that don't support it.
+   Disabled entirely by the reduced-motion block below.
+   ========================================================= */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    article .block,
+    article .prose-block > * {
+      animation: section-reveal 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+    @keyframes section-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+/* =========================================================
    Reduced motion
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {

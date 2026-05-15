@@ -15,12 +15,22 @@ for (const route of ROUTES) {
       page,
     }) => {
       const errors: string[] = [];
+      const isPath404 = route.path === '/404';
       page.on('pageerror', (err) => errors.push(err.message));
       page.on('console', (msg) => {
-        if (msg.type() === 'error') errors.push(msg.text());
+        if (msg.type() !== 'error') return;
+        // /404 itself returns HTTP 404, which Chromium logs as a console error.
+        // Skip the self-404 noise on that route only.
+        if (isPath404 && /Failed to load resource.*404/i.test(msg.text())) return;
+        errors.push(msg.text());
+      });
+      page.on('response', (resp) => {
+        if (resp.status() >= 400 && resp.url() !== page.url()) {
+          errors.push(`${resp.status()} on subresource ${resp.url()}`);
+        }
       });
 
-      const response = await page.goto(route.path);
+      const response = await page.goto(route.path, { waitUntil: 'networkidle' });
       // 404 page is rendered statically and returns 404 by Astro convention; accept both.
       const status = response?.status() ?? 0;
       expect(status === 200 || status === 404).toBeTruthy();
@@ -28,7 +38,9 @@ for (const route of ROUTES) {
       const title = await page.title();
       expect(title.length).toBeGreaterThan(0);
 
-      const h1s = await page.locator('h1').all();
+      // Scope h1 lookup to <main> so view-transition snapshot pseudo-elements
+      // and prefetched-document fragments don't inflate the count.
+      const h1s = await page.locator('main h1').all();
       expect(h1s).toHaveLength(1);
       const h1Text = (await h1s[0].textContent()) ?? '';
       expect(h1Text).toMatch(route.expectedH1);

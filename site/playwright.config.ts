@@ -12,15 +12,37 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    { name: 'mobile-375', use: { ...devices['iPhone SE'], viewport: { width: 375, height: 812 } } },
-    { name: 'tablet-768', use: { ...devices['iPad Mini'], viewport: { width: 768, height: 1024 } } },
-    { name: 'desktop-1024', use: { viewport: { width: 1024, height: 768 } } },
-    { name: 'desktop-1440', use: { viewport: { width: 1440, height: 900 } } },
+    // All four viewports run on Chromium so a single browser install satisfies
+    // local and CI. iPhone/iPad device profiles default to WebKit and add an
+    // install/maintenance cost the smoke suite doesn't need.
+    {
+      name: 'mobile-375',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 812 } },
+    },
+    {
+      name: 'tablet-768',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 768, height: 1024 } },
+    },
+    {
+      name: 'desktop-1024',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1024, height: 768 } },
+    },
+    {
+      name: 'desktop-1440',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
   ],
+  // Smoke tests run against the production build so the sitemap, hashed
+  // assets, font-preload tags, and OG generator output match what ships.
+  // dev-only artifacts (missing sitemap-index.xml, source maps) would
+  // otherwise pollute the console-error gate.
+  // Smoke tests run against the production build served by `serve` (not
+  // astro preview, which 404s on XML routes because of trailingSlash:never +
+  // build:format:'file'). serve mirrors Cloudflare Pages static behavior.
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm build && pnpm exec serve dist -l 4321 --no-clipboard --no-request-logging',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
-    timeout: 60000,
+    timeout: 180000,
   },
 });

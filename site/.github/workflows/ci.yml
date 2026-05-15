@@ -51,6 +51,18 @@ jobs:
         working-directory: site
         run: pnpm test
 
+      - name: Serve built site (background)
+        working-directory: site
+        run: |
+          nohup pnpm exec serve dist -l 4321 --no-clipboard --no-request-logging > serve.log 2>&1 &
+          echo $! > serve.pid
+          for i in {1..40}; do
+            if curl -sf http://localhost:4321/ -o /dev/null; then
+              echo "serve ready after ${i} attempt(s)"; break
+            fi
+            sleep 0.5
+          done
+
       - name: Accessibility (pa11y)
         working-directory: site
         run: pnpm a11y
@@ -58,3 +70,8 @@ jobs:
       - name: Lighthouse CI
         working-directory: site
         run: pnpm lhci
+
+      - name: Stop background serve
+        if: always()
+        working-directory: site
+        run: if [ -f serve.pid ]; then kill "$(cat serve.pid)" || true; fi

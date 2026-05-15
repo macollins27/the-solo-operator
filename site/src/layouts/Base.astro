@@ -1,4 +1,9 @@
 ---
+// Zero-cookie posture (T-503): this site sets no cookies on any route.
+// No auth, no analytics, no third-party scripts, no service workers, no
+// consent banner. The CSP in public/_headers blocks third-party origins.
+// If a future change introduces cookies, update both this comment and the
+// security review in _internal/reviews/.
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';

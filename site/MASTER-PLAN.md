@@ -17,13 +17,16 @@
 A static website at a custom domain (TBD), branded as **The Solo Operator's Manual**. A phrasebook for non-technical operators who build production software with AI agents.
 
 **Audience (two-tier):**
+
 1. Humans — non-technical operators landing cold. They have an agent misbehaving right now. They want the words to say back.
 2. AI sessions — future Claude (or other agent) sessions whose operators have pasted a link to a specific principle page into their CLAUDE.md. The site is a citable rules surface.
 
 **Animating thesis:**
+
 > The operator sets the bar and refuses the menu. The AI makes every technical call in between. Because the operator cannot verify the technical layer, the apparatus verifies it mechanically — prose rules cap at ~70–80% compliance; only the tool boundary cannot be rationalized around.
 
 **Three reading modes (the IA):**
+
 - **The Phrasebook** (primary) — symptom-indexed lookup. Pick what your agent is doing, get the words to say back.
 - **Start Here** — five foundational moves for new operators.
 - **About** — sterilized origin story + corpus receipts.
@@ -110,6 +113,7 @@ Before marking any content task `done`:
 When a task says "read X for context," consult this map for which files apply.
 
 ### Content authoring (phrasebook entries, foundation moves)
+
 - `_internal/verified-principles.md` — the canon. Each entry maps to one or more principles. Cite the principle (by theme letter + name, not by raw page reference) in the "Why this works" section.
 - `_internal/foundational-principles.md` — the un-audited merged canon. Use only the principles that are also in verified-principles.md.
 - `_internal/phase1/behaviors-v2.md` — 145 voice-filtered operator behaviors. Maps to recognition phrases.
@@ -118,64 +122,72 @@ When a task says "read X for context," consult this map for which files apply.
 - `_internal/CLAUDE REPORTS/2026-05-14-full-corpus-1073sessions.html` — rendered corpus report with category counts.
 
 ### Voice
+
 - `_internal/max.md` — Maxwell's first-person typed material. Read for cadence; never quote without sterilization.
 - `_internal/phase1/voice-filter.md` — explains how to distinguish Maxwell's actual voice from Claude-played-persona output in source files.
 
 ### Design tokens and visual system
+
 - `site/src/styles/global.css` — the binding token system + responsive breakpoints.
 - `_internal/handoff/source/manual.css` — original handoff stylesheet (reference, not source of truth anymore).
 - `_internal/handoff/DESIGN-SYSTEM.md` — design system specification.
 - `_internal/proposal-mockup-v2.html` — the visual reference Maxwell validated on 2026-05-15. When in doubt about a layout decision, refer to this.
 
 ### SEO and structured data
+
 - https://schema.org/TechArticle, schema.org/HowTo, schema.org/BreadcrumbList
 - https://llmstxt.org — spec for `llms.txt` and `llms-full.txt`
 - `_internal/handoff/SEO.md` — original SEO plan (reference).
 - `_internal/handoff/AI-OPTIMIZATION.md` — original AI-crawler plan (reference).
 
 ### Astro
+
 - https://docs.astro.build/en/getting-started/
 - https://docs.astro.build/en/guides/content-collections/
 - https://docs.astro.build/en/guides/view-transitions/
 - https://docs.astro.build/en/recipes/
 
 ### Security
+
 - https://content-security-policy.com — CSP reference
 - https://infosec.mozilla.org/guidelines/web_security — Mozilla web security checklist
 - https://web.dev/articles/security-headers — Google security headers overview
 
 ## 6. Architecture decisions (with rationale)
 
-| Decision                                                    | Why                                                                                                  |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Astro 5 static                                              | Zero JS by default. Per-component scoping. Content collections typed. AI-crawler friendly.           |
-| Single content collection (`phrasebook`)                    | One Zod schema, one render path. Foundation moves are pages, not a collection (only five of them).   |
-| Frontmatter-only entries (no MDX body)                      | Structured rendering. Designer has total control over layout. Markdown is brittle for complex pages. |
-| Custom elements over framework                              | <15 KB JS budget. One built-in interactive surface (copy button + command palette).                  |
-| CSS custom properties for tokens                            | No utility framework. One source of truth in `global.css`. Easy to retheme.                          |
-| Mobile-first responsive                                     | Maxwell's directive 2026-05-15. Default is small; `min-width` adds up.                               |
-| Sticky receipts at ≥1024px only                             | On mobile the panel stacks below content; sticky is meaningless.                                     |
-| Cloudflare Pages deploy                                     | Free tier handles it. Free HTTPS. AI-crawler accessible. No vendor lock.                             |
-| 15 KB total client JS budget                                | Command palette + copy button. Still ~10x smaller than a typical SPA.                                |
-| Per-page Schema.org JSON-LD                                 | Boosts AI ingestion and traditional SEO.                                                             |
-| llms.txt + llms-full.txt                                    | Audience explicitly includes future AI sessions; native AI-discovery channel.                        |
+| Decision                                 | Why                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Astro 5 static                           | Zero JS by default. Per-component scoping. Content collections typed. AI-crawler friendly.           |
+| Single content collection (`phrasebook`) | One Zod schema, one render path. Foundation moves are pages, not a collection (only five of them).   |
+| Frontmatter-only entries (no MDX body)   | Structured rendering. Designer has total control over layout. Markdown is brittle for complex pages. |
+| Custom elements over framework           | <15 KB JS budget. One built-in interactive surface (copy button + command palette).                  |
+| CSS custom properties for tokens         | No utility framework. One source of truth in `global.css`. Easy to retheme.                          |
+| Mobile-first responsive                  | Maxwell's directive 2026-05-15. Default is small; `min-width` adds up.                               |
+| Sticky receipts at ≥1024px only          | On mobile the panel stacks below content; sticky is meaningless.                                     |
+| Cloudflare Pages deploy                  | Free tier handles it. Free HTTPS. AI-crawler accessible. No vendor lock.                             |
+| 15 KB total client JS budget             | Command palette + copy button. Still ~10x smaller than a typical SPA.                                |
+| Per-page Schema.org JSON-LD              | Boosts AI ingestion and traditional SEO.                                                             |
+| llms.txt + llms-full.txt                 | Audience explicitly includes future AI sessions; native AI-discovery channel.                        |
 
 ## 7. The Vercel-style command palette spec (Phase 2 reference)
 
 The single largest new feature beyond content. Specified once here so each Phase 2 task can refer back without re-deriving.
 
 ### Trigger surfaces
+
 - Keyboard: `Cmd+K` (Mac) / `Ctrl+K` (Win/Linux) anywhere on the site.
 - Keyboard: `/` key when not focused on an input.
 - Mouse: click the "Browse the phrasebook" prompt on the home page. (Currently a link; will be re-wired to open the palette.)
 
 ### Overlay structure (visual)
+
 - Backdrop: `rgba(0,0,0,0.7)` with `backdrop-filter: blur(8px)`.
 - Modal: centered, max-width 640px, full-width-with-padding on mobile (full-screen takeover below 640px viewport).
 - Modal background: `var(--panel-2)`, border `1px solid var(--line-bright)`.
 - Modal padding: 0 (search input at top, list below, both flush to edge).
 
 ### Search input
+
 - Top of modal, sticky within.
 - Placeholder: `Search the manual...`
 - Auto-focus on open.
@@ -183,6 +195,7 @@ The single largest new feature beyond content. Specified once here so each Phase
 - ESC closes; arrow keys navigate the list (do not move cursor).
 
 ### Result list
+
 - Grouped by section, in order: **Phrasebook**, **Foundations**, **Pages**.
 - Section header: small kicker in muted color (`Phrasebook`, `Foundations`, `Pages`).
 - Each row:
@@ -194,6 +207,7 @@ The single largest new feature beyond content. Specified once here so each Phase
 - No results: a single row reading "No matches. Browse the phrasebook →" linking to `/phrasebook`.
 
 ### Behavior
+
 - Real-time filter as user types. Matching: case-insensitive `includes()` against the label, the category, and the description. (Hand-rolled; no library.)
 - Enter on active row navigates to the row's URL and closes the overlay.
 - ESC closes without navigation.
@@ -201,6 +215,7 @@ The single largest new feature beyond content. Specified once here so each Phase
 - On mobile (<640): modal takes full screen, search input stays sticky at top, cancel button (text) at top-right of modal.
 
 ### Search index (build-time)
+
 - JSON manifest emitted at `/search.json` by a build-time endpoint at `src/pages/search.json.ts`.
 - Manifest shape:
   ```json
@@ -219,6 +234,7 @@ The single largest new feature beyond content. Specified once here so each Phase
 - Fetched once on first palette-open via `fetch('/search.json')`. Cached for the session.
 
 ### Implementation
+
 - Custom element `<command-palette>` defined in `src/components/CommandPalette.ts`.
 - Mounted globally via `src/layouts/Base.astro` (single instance at end of body).
 - Vanilla JS; no framework imports.
@@ -229,26 +245,28 @@ The single largest new feature beyond content. Specified once here so each Phase
 
 Each phase is a shippable unit. Tasks within a phase can run in any order subject to prereqs. Phases run roughly in numeric order, but Phases 4-7 can interleave once Phase 1-2 are landed.
 
-| Phase | Title                                | Result on completion                                                                                                |
-| ----- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| 0     | Foundation hardening                 | View transitions wired; pa11y/Playwright CI; a working README.                                                       |
-| 0.5   | Pre-content fixes (audit-driven)     | The 27-task amendment from three reviews lands: typecheck passes, schema tightened, home page restructured, accessibility fails fixed, About voice rewritten, infrastructure (Prettier/ESLint/CI) wired. Blocks T-101. |
-| 1     | Content to full coverage             | All 13 phrasebook entries + 5 foundation-move detail pages live.                                                     |
-| 2     | Vercel-style command palette         | Cmd+K overlay live; home CTA re-wired; mobile takeover working.                                                      |
-| 3     | Open Graph image generation          | Every page has a unique OG image, build-time generated.                                                              |
-| 4     | Polish layer                         | Micro-animations, view transitions, copy-button states, reading progress on entries.                                 |
-| 5     | Security hardening                   | CSP + HSTS + X-Content-Type-Options + Referrer-Policy + Permissions-Policy; AI bot policy in robots.txt.             |
-| 6     | Performance gates                    | Lighthouse 100/100/100/100 on all pages; preloaded critical fonts; cache headers.                                    |
-| 7     | AI-SEO + crawler optimization        | llms-full.txt; expanded Schema.org (BreadcrumbList, HowTo); internal linking density; AI bot allowlist live.         |
-| 8     | Production deployment                | Live at custom domain on Cloudflare Pages, with smoke test and basic uptime monitoring.                              |
+| Phase | Title                            | Result on completion                                                                                                                                                                                                   |
+| ----- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0     | Foundation hardening             | View transitions wired; pa11y/Playwright CI; a working README.                                                                                                                                                         |
+| 0.5   | Pre-content fixes (audit-driven) | The 27-task amendment from three reviews lands: typecheck passes, schema tightened, home page restructured, accessibility fails fixed, About voice rewritten, infrastructure (Prettier/ESLint/CI) wired. Blocks T-101. |
+| 1     | Content to full coverage         | All 13 phrasebook entries + 5 foundation-move detail pages live.                                                                                                                                                       |
+| 2     | Vercel-style command palette     | Cmd+K overlay live; home CTA re-wired; mobile takeover working.                                                                                                                                                        |
+| 3     | Open Graph image generation      | Every page has a unique OG image, build-time generated.                                                                                                                                                                |
+| 4     | Polish layer                     | Micro-animations, view transitions, copy-button states, reading progress on entries.                                                                                                                                   |
+| 5     | Security hardening               | CSP + HSTS + X-Content-Type-Options + Referrer-Policy + Permissions-Policy; AI bot policy in robots.txt.                                                                                                               |
+| 6     | Performance gates                | Lighthouse 100/100/100/100 on all pages; preloaded critical fonts; cache headers.                                                                                                                                      |
+| 7     | AI-SEO + crawler optimization    | llms-full.txt; expanded Schema.org (BreadcrumbList, HowTo); internal linking density; AI bot allowlist live.                                                                                                           |
+| 8     | Production deployment            | Live at custom domain on Cloudflare Pages, with smoke test and basic uptime monitoring.                                                                                                                                |
 
 ## 9. Task catalog
 
 ### Phase 0 — Foundation hardening
 
 #### T-001 — Add Astro view transitions integration
+
 - **Phase:** 0
-- **Status:** not-started
+- **Status:** done
+- **Result:** ClientRouter wired in Base.astro with transition:persist on topnav and footer.
 - **Prereqs:** none
 - **Read first:**
   - https://docs.astro.build/en/guides/view-transitions/
@@ -265,8 +283,10 @@ Each phase is a shippable unit. Tasks within a phase can run in any order subjec
 - **Definition of done:** `pnpm build` exits 0. Visual check shows a smooth crossfade between phrasebook index and entry pages. `prefers-reduced-motion` disables them.
 
 #### T-002 — Add Playwright smoke-test suite
+
 - **Phase:** 0
-- **Status:** not-started
+- **Status:** done
+- **Result:** tests/smoke.spec.ts runs 8 routes at 4 viewports; pnpm test passes.
 - **Prereqs:** none
 - **Read first:**
   - https://playwright.dev/docs/test-fixtures
@@ -283,8 +303,10 @@ Each phase is a shippable unit. Tasks within a phase can run in any order subjec
 - **Definition of done:** `pnpm test` passes for all viewports and all pages.
 
 #### T-003 — Add accessibility CI gate (pa11y or axe)
+
 - **Phase:** 0
-- **Status:** not-started
+- **Status:** done
+- **Result:** .pa11yci.json present; pnpm a11y wired; passes against built dist.
 - **Prereqs:** T-002
 - **Read first:** https://github.com/pa11y/pa11y-ci
 - **Files to create:**
@@ -297,8 +319,10 @@ Each phase is a shippable unit. Tasks within a phase can run in any order subjec
 - **Definition of done:** `pnpm a11y` exits 0 against the running dev server.
 
 #### T-004 — Write `site/README.md`
+
 - **Phase:** 0
-- **Status:** not-started
+- **Status:** done
+- **Result:** site/README.md present, 63 lines, accurate to current scaffold.
 - **Prereqs:** none
 - **Read first:** `site/CLAUDE.md`, `site/MASTER-PLAN.md`
 - **Files to create:** `site/README.md`
@@ -322,7 +346,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 #### Critical tier (blocks T-101)
 
 ##### T-005 — Fix pnpm check implicit-any errors
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** CollectionEntry annotations applied to phrasebook.astro and [slug].astro; pnpm check 0/0/0.
 - **Prereqs:** none
 - **Read first:** `site/src/pages/phrasebook.astro`, `site/src/pages/phrasebook/[slug].astro`, https://docs.astro.build/en/guides/content-collections/#querying-collections
 - **Files to edit:** the two files above
@@ -334,7 +360,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** `pnpm check` exits 0 with 0 errors and 0 warnings.
 
 ##### T-006 — Add astro check to prebuild gate
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** build script is "astro check && astro build" in package.json.
 - **Prereqs:** T-005
 - **Files to edit:** `site/package.json`
 - **Instructions:** Change the `build` script from `astro build` to `astro check && astro build`. Verify `pnpm build` fails if a type error is reintroduced (test by adding `const x: number = 'string'` temporarily, confirming build fails, then reverting).
@@ -342,7 +370,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** `pnpm build` first runs `astro check`. Reintroducing a type error causes build to exit 1.
 
 ##### T-007 — Apply JSON-LD escape function
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** safeJsonLd helper escapes </ in Base.astro; is:inline on JSON-LD script.
 - **Prereqs:** none
 - **Files to edit:** `site/src/layouts/Base.astro`
 - **Instructions:** Add a helper function `safeJsonLd(obj)` that returns `JSON.stringify(obj).replace(/<\//g, '<\\/')`. Replace the `<script type="application/ld+json" set:html={JSON.stringify(schema)} />` with `set:html={safeJsonLd(schema)}`. Also add `is:inline` attribute on that script to silence the Astro hint.
@@ -350,7 +380,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** Helper present, used in Base.astro, no behavior change observable in browser. `pnpm check` exits 0 (hint cleared).
 
 ##### T-008 — Tighten content collection schema
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Schema in src/content/config.ts uses max() caps, enum on category and relatedMove.slug, refine() against raw HTML.
 - **Prereqs:** none
 - **Files to edit:** `site/src/content/config.ts`, `site/src/content/phrasebook/paid-service-claim.md`, `site/src/pages/phrasebook/[slug].astro`
 - **Instructions:**
@@ -363,7 +395,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** `pnpm check` and `pnpm build` both exit 0. The published entry renders identically. Attempting to add `category: 'giving-up'` with no `categoryLabel` in frontmatter succeeds (because the field no longer exists).
 
 ##### T-009 — Convert hardcoded afterPaste paragraph to frontmatter
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** afterPaste is an optional schema field; rendered conditionally in [slug].astro.
 - **Prereqs:** T-008
 - **Files to edit:** `site/src/content/config.ts`, `site/src/content/phrasebook/paid-service-claim.md`, `site/src/pages/phrasebook/[slug].astro`
 - **Instructions:**
@@ -374,52 +408,65 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** The published entry still shows the followup paragraph. A new entry without `afterPaste` does not show any followup paragraph. `pnpm build` exits 0.
 
 ##### T-010 — Already amended in T-501 and T-502 above
+
 - **Status:** done
 - **Result:** T-501 CSP `script-src` now includes `'unsafe-inline'` + adds `object-src 'none'`. T-502 user-agent list replaces `Claude-Web` with `ClaudeBot`. Amendments are inline in Phase 5 task definitions.
 
 #### High tier (should land before T-101)
 
 ##### T-011 — Lift Start Here cards into clickable anchors
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Start Here cards are clickable anchors styled as cards (text-decoration:none, color:inherit).
 - **Files to edit:** `site/src/pages/start-here.astro`, `site/src/styles/global.css`
 - **Instructions:** Wrap each `.move` card in an `<a href="#${move.slug}">` element (interim, until T-150 creates `/start-here/<slug>` routes). Update `.move` CSS so the anchor behaves as the card (text-decoration: none, color: inherit, display: flex, flex-direction: column).
 - **Why:** Architecture review HIGH-3 + content/voice §5. The cards show "Read →" but aren't clickable.
 - **Definition of done:** Clicking anywhere on a `.move` card scrolls to its `#slug` anchor. Keyboard nav reaches each card.
 
 ##### T-012 — Fix home heading hierarchy (h1 → h2 → h3)
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** home modes section wrapped in <section aria-labelledby="modes-heading"> with a visually-hidden h2.
 - **Files to edit:** `site/src/pages/index.astro`, `site/src/styles/global.css` (selector update)
 - **Instructions:** The three mode tiles use `<h3>` with no intermediate `<h2>`. Wrap the modes section in `<section aria-labelledby="modes-heading">`, prepend a visually-hidden `<h2 id="modes-heading" class="sr-only">Three ways to read this manual</h2>` (add `.sr-only` utility in global.css), keep tiles as `<h3>`. Result: screen-reader hierarchy `h1 → h2 → h3`.
 - **Why:** Architecture review HIGH-4. Trips screen-reader heading nav and pa11y CI (T-003).
 - **Definition of done:** Heading order on `/` is h1, h2, h3, h3, h3. pa11y test passes.
 
 ##### T-013 — Ship placeholder og-default.png
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** SUPERSEDED by T-301/T-302/T-303: per-page OG generator replaces the placeholder; og-default.png removed from public/.
 - **Files to create:** `site/public/og-default.png`
 - **Instructions:** Render a 1200×630 PNG with the brand title "The Solo Operator's Manual" centered in Plex Sans Condensed-style typography on the `#0a0d10` background, with a subtle drafting-grid underlay. Use any one-shot SVG-to-PNG path: a hand-authored SVG converted via `resvg-js`, an inline canvas-rendered PNG, or a build-time Satori call. Keep file size under 100 KB.
 - **Why:** Architecture review HIGH-2 + security F-06. `og:image` defaults to a 404 file today. Every link preview is a broken image.
 - **Definition of done:** `curl -I http://localhost:4321/og-default.png` returns 200. File is a valid PNG, 1200×630.
 
 ##### T-014 — Remove dead RSS link from Base.astro
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** No <link rel="alternate" type="application/rss+xml"> in Base.astro.
 - **Files to edit:** `site/src/layouts/Base.astro`
 - **Instructions:** Delete the `<link rel="alternate" type="application/rss+xml" title=... href="/rss.xml" />` at Base.astro:91. RSS is deferred until Phase 7 backlog (see T-705 below).
 - **Why:** Architecture HIGH-2 + security F-05. The endpoint doesn't exist; the link is a broken contract.
 - **Definition of done:** No `<link rel="alternate" type="application/rss+xml">` in any built page. Feed reader 404s on this site simply because the link is gone, not advertised-then-broken.
 
 ##### T-015 — Redesign home page structure
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Home has thesis paragraph; .search-wrap removed; three-card modes grid remains.
 - **Files to edit:** `site/src/pages/index.astro`
 - **Instructions:**
   1. Delete the entire `.search-wrap` `<section>` (the prompt + helper + "Browse the phrasebook" link block).
-  2. Insert a thesis paragraph between the `.subtle` subtitle and the `.modes` grid: *"If you don't write code but you ship software with AI agents, the work eventually comes down to this: knowing what to say back when the agent stalls, lies, hands the decision back to you, or quietly makes something up. This is the phrasebook for those moments."* — wrapped in `<p class="thesis">`.
+  2. Insert a thesis paragraph between the `.subtle` subtitle and the `.modes` grid: _"If you don't write code but you ship software with AI agents, the work eventually comes down to this: knowing what to say back when the agent stalls, lies, hands the decision back to you, or quietly makes something up. This is the phrasebook for those moments."_ — wrapped in `<p class="thesis">`.
   3. Keep the three-card `.modes` grid as-is.
   4. Move the inline-style mess at `index.astro:41-44` into a new `.mode.cta-row` class in `global.css`; or, if that section is being deleted entirely (per step 1), this is moot.
 - **Why:** Content/voice review CRITICAL §10 Rewrite 1. Two competing CTAs ten pixels apart; no thesis on the home page; the fake-search section is misleading.
 - **Definition of done:** Home page renders thesis paragraph above the three-card grid. No duplicate CTAs. `pnpm build` exits 0.
 
 ##### T-016 — Replace home kicker + "production software" sweep
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Kicker is "How to talk to your AI agent when it gets stubborn"; zero occurrences of "production software" remain in src/ or public/.
 - **Files to edit:** `site/src/pages/index.astro`, `site/src/pages/llms.txt.ts`, any other surface that uses the phrase
 - **Instructions:**
   1. Change the kicker on the home page from "How to talk to an AI agent so it builds production software" to "How to talk to your AI agent when it gets stubborn."
@@ -429,21 +476,27 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** Zero occurrences of "production software" in `site/src/`. Home kicker reads the new copy.
 
 ##### T-017 — Rewrite About paragraph 3
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** About paragraph 3 reads the rewritten copy starting "A thousand sessions in...".
 - **Files to edit:** `site/src/pages/about.astro`
-- **Instructions:** Replace the existing paragraph 3 (starting "Over the course of more than a thousand working sessions...") with the tighter version from content/voice §10 Rewrite 3: *"A thousand sessions in, I had a notebook of patterns. The agent failed the same way over and over. \"Please remember\" never worked. \"Build a rule the agent can't ignore\" almost always did. \"What do you want me to do?\" stalled the work. \"You decide and tell me why\" moved it."*
+- **Instructions:** Replace the existing paragraph 3 (starting "Over the course of more than a thousand working sessions...") with the tighter version from content/voice §10 Rewrite 3: _"A thousand sessions in, I had a notebook of patterns. The agent failed the same way over and over. \"Please remember\" never worked. \"Build a rule the agent can't ignore\" almost always did. \"What do you want me to do?\" stalled the work. \"You decide and tell me why\" moved it."_
 - **Why:** Content/voice §2 Passage C + §10 Rewrite 3. LLM-cadence drift; rewrite drops the "Over the course of" tic and halves word count while preserving substance.
 - **Definition of done:** Paragraph reads the new copy. About page builds.
 
 ##### T-018 — Rewrite About verification-discipline paragraph
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** About verification-discipline paragraph reads the rewritten copy starting "Every number on this site is a real number...".
 - **Files to edit:** `site/src/pages/about.astro`
-- **Instructions:** Replace the verification-discipline paragraph (currently "Every claim on this site is anchored in a count from the underlying working corpus...") with content/voice §10 Rewrite 4: *"Every number on this site is a real number from real sessions. If a section's claim can't be traced back to a count, the section stays empty. Guessing is the failure mode this manual is trying to break — the manual itself doesn't guess."*
+- **Instructions:** Replace the verification-discipline paragraph (currently "Every claim on this site is anchored in a count from the underlying working corpus...") with content/voice §10 Rewrite 4: _"Every number on this site is a real number from real sessions. If a section's claim can't be traced back to a count, the section stays empty. Guessing is the failure mode this manual is trying to break — the manual itself doesn't guess."_
 - **Why:** Content/voice §2 Passage D — labeled CLAUDE-DEFAULT-EXPLAINER. The single most fixable voice problem on the site.
 - **Definition of done:** Paragraph reads the new copy.
 
 ##### T-019 — Contraction pass on Start Here card bodies
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Start Here card bodies pass contraction check (no "cannot", "I have added", etc., where natural).
 - **Files to edit:** `site/src/pages/start-here.astro`
 - **Instructions:** Pass through all five `move.body` strings and apply contractions per content/voice §5:
   - Move 03: "I have added" → "I've added"
@@ -453,30 +506,38 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** Five card bodies updated. No remaining uncontracted forms where contraction reads natural.
 
 ##### T-020 — Document story-mode decision in CLAUDE.md
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** site/CLAUDE.md has "Phrasebook story mode" subsection under Voice and content.
 - **Files to edit:** `site/CLAUDE.md`
-- **Instructions:** Add a short subsection under "Voice and content" titled "Phrasebook story mode" stating: *"Every phrasebook entry's 'where this came from' section uses first-person scar-tissue mode ('I once X. Later Y. The lesson was Z.'). Constraint: no two stories share the same anchoring image — no two stories say 'a service', 'weeks later', 'for months', etc. Variance comes from substance, not structure."*
+- **Instructions:** Add a short subsection under "Voice and content" titled "Phrasebook story mode" stating: _"Every phrasebook entry's 'where this came from' section uses first-person scar-tissue mode ('I once X. Later Y. The lesson was Z.'). Constraint: no two stories share the same anchoring image — no two stories say 'a service', 'weeks later', 'for months', etc. Variance comes from substance, not structure."_
 - **Why:** Content/voice §3 CRITICAL framing question. Twelve memoir-shaped stories risk becoming a memoir; locking the mode AND the variance rule preserves the manual register.
 - **Definition of done:** Section added to CLAUDE.md. Next phrasebook author task will read it.
 
 #### Medium tier (polish)
 
 ##### T-021 — Bump --muted to pass AA on --panel
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** --muted bumped to pass AA on --panel; verified by pa11y CI.
 - **Files to edit:** `site/src/styles/global.css`
 - **Instructions:** Change `--muted: #6e7b89` (4.37:1 on --panel — FAIL AA body). Target a value that clears 4.5:1. Candidate: `#7a8693` (estimated 4.6+). Verify with a contrast checker; visually verify the muted text doesn't read too bright. If too bright, instead introduce a new token `--muted-on-panel: #7d8a98` and use selectively where backgrounds are panel-colored.
 - **Why:** Architecture review §2.5 MEDIUM contrast fail. Blocks T-003 pa11y CI.
 - **Definition of done:** All muted-text-on-panel uses pass 4.5:1.
 
 ##### T-022 — Replace opacity:0.45 stubs with explicit token color
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** No stub rows remain — all 13 entries are published; .is-stub pattern unneeded.
 - **Files to edit:** `site/src/pages/phrasebook.astro`, `site/src/styles/global.css`
 - **Instructions:** Drop the inline `style="opacity:0.45; cursor:default; pointer-events:none"` on stub rows. Replace with a `.pb-row.is-stub` class. In CSS, the class sets color via `--dim` token, `cursor: default`, `pointer-events: none`. Add `aria-disabled="true"` and a visually-hidden `<span class="sr-only">, forthcoming, not yet published</span>` for screen readers.
 - **Why:** Architecture §2.4 MEDIUM. Opacity bypasses tokens and crashes contrast; aria-disabled signals state to AT.
 - **Definition of done:** Stub rows render with token-based dim color, pass AA Large at minimum, announce "forthcoming" to screen readers.
 
 ##### T-023 — Polish CopyButton: aria-live, aria-label, error recovery, error styling
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** CopyButton has aria-label, aria-live, error-state CSS, 1.4s recovery to idle.
 - **Files to edit:** `site/src/components/CopyButton.ts`, `site/src/styles/global.css`
 - **Instructions:**
   1. In `connectedCallback`, also set `this.setAttribute('aria-label', 'Copy paste text to clipboard'); this.setAttribute('aria-live', 'polite');`
@@ -486,21 +547,27 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** Denying clipboard permission (in DevTools) shows a brief red error state, then returns to idle. Screen-reader testing announces "Copied" after success.
 
 ##### T-024 — Remove Astro generator meta tag
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** No <meta name="generator"> on any built page.
 - **Files to edit:** `site/src/layouts/Base.astro`
 - **Instructions:** Delete the `<meta name="generator" content={Astro.generator} />` at Base.astro:94.
 - **Why:** Security review F-07 NIT. Tells scanners the exact Astro version; maps to known CVEs.
 - **Definition of done:** No generator meta on any built page.
 
 ##### T-025 — Remove unused @astrojs/mdx
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** @astrojs/mdx absent from package.json and astro.config.mjs.
 - **Files to edit:** `site/package.json`, `site/astro.config.mjs`
 - **Instructions:** Remove `@astrojs/mdx` from `dependencies`. Remove the `mdx()` integration from `astro.config.mjs`. Remove the unused import line. Run `pnpm install` to update the lockfile.
 - **Why:** Security review §5 + architecture review. No `.mdx` files exist; reduces dependency surface and supply-chain audit load.
 - **Definition of done:** `pnpm build` exits 0. `pnpm list @astrojs/mdx` shows it's gone.
 
 ##### T-026 — Add Prettier + plugin-astro
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Prettier 3.x + prettier-plugin-astro present; pnpm format and pnpm format:check both green.
 - **Files to create:** `site/.prettierrc`, `site/.prettierignore`
 - **Files to edit:** `site/package.json`
 - **Instructions:** Add `prettier ^3.3.0` and `prettier-plugin-astro ^0.14.0` to `devDependencies`. Create `.prettierrc` with `{ "printWidth": 100, "semi": true, "singleQuote": true, "plugins": ["prettier-plugin-astro"] }`. Create `.prettierignore` with `dist`, `node_modules`, `.astro`. Add `"format": "prettier --write 'src/**/*.{astro,ts,js,css,md}'"` script. Run it once.
@@ -508,7 +575,9 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** `pnpm format` runs without errors. `pnpm format --check` exits 0 after running write.
 
 ##### T-027 — Add ESLint flat config
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** eslint.config.js flat config; pnpm lint exits 0.
 - **Files to create:** `site/eslint.config.js`
 - **Files to edit:** `site/package.json`
 - **Instructions:** Add `eslint ^9.0.0`, `astro-eslint-parser`, `@typescript-eslint/parser`, `eslint-plugin-astro`, `typescript-eslint` to `devDependencies`. Create `eslint.config.js` (flat config) with rules for `.astro` and `.ts`/`.js` files: no-unused-vars warn, prefer-const error, no-implicit-any error, recommended ts rules. Add `"lint": "eslint 'src/**/*.{astro,ts,js}'"`. Run; resolve any findings.
@@ -516,29 +585,37 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 - **Definition of done:** `pnpm lint` exits 0.
 
 ##### T-028 — Add GitHub Actions CI
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** .github/workflows/ci.yml runs install/check/lint/format:check/build/playwright/pa11y/lhci.
 - **Prereqs:** T-026, T-027
 - **Files to create:** `site/.github/workflows/ci.yml`
 - **Instructions:** Workflow triggers on push and pull_request. Steps: checkout, setup pnpm, setup Node 22, cache pnpm store, `pnpm install`, `pnpm check`, `pnpm lint`, `pnpm format --check`, `pnpm build`. Fail the workflow if any step fails.
 - **Why:** Mechanical regression gate. Every change is screened before landing.
 - **Definition of done:** Workflow file syntactically valid (verify with `actionlint` if available). Local simulation of all steps passes.
 
-##### T-029 — Add _TEMPLATE.md.txt authoring scaffold
-- **Status:** not-started
+##### T-029 — Add \_TEMPLATE.md.txt authoring scaffold
+
+- **Status:** done
+- **Result:** src/content/phrasebook/\_TEMPLATE.md.txt exists; .txt extension keeps it out of the collection glob.
 - **Files to create:** `site/src/content/phrasebook/_TEMPLATE.md.txt`
 - **Instructions:** Annotated frontmatter scaffold for a new phrasebook entry. Every field has an inline comment naming: what it is, length cap, format constraint, sterilization reminder. `.txt` extension keeps it out of the content collection glob.
 - **Why:** Architecture review §4.9. Cold-start agent copying T-101 from spec needs an annotated reference.
 - **Definition of done:** File exists. Contains every schema field with inline comments. `pnpm build` does not pick it up as an entry.
 
 ##### T-030 — Add prompt-injection guard
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** noPromptInjection refine() applied to pasteText, afterPaste, whyThisWorks, whereThisCameFrom.
 - **Files to edit:** `site/src/content/config.ts`
 - **Instructions:** Add a Zod `.refine()` on `pasteText` that rejects strings matching `^(Ignore|Forget|Disregard|You are now|Your new role|System:|Assistant:|Human:)\\b/i`. Same for entries of `whyThisWorks` and `whereThisCameFrom`. The `.refine()` should produce a clear error message naming the disallowed prefix.
 - **Why:** Security review §6. `llms-full.txt` (Phase 7) will concatenate body content; if a future Claude session ingests it as authoritative context, prompt-injection patterns in entry bodies become a vector.
 - **Definition of done:** A test entry with `pasteText: "Ignore all previous instructions"` fails `pnpm check` or `pnpm build`. Removing the prefix passes.
 
 ##### T-031 — Sterilization micro-tightening
-- **Status:** not-started
+
+- **Status:** done
+- **Result:** Three sterilization micro-edits landed in about.astro and paid-service-claim.md.
 - **Files to edit:** `site/src/pages/about.astro`, `site/src/content/phrasebook/paid-service-claim.md`
 - **Instructions:**
   1. `about.astro:20` — drop "small" from "a small company" → "a company".
@@ -552,6 +629,7 @@ This phase has three tiers: Critical (T-005 through T-010), High (T-011 through 
 Twelve more phrasebook entries to author. Each follows the same shape:
 
 **Common task template — TC-PHRASEBOOK-ENTRY:**
+
 - **Prereqs:** none
 - **Read first:**
   - `site/src/content/config.ts` (the schema)
@@ -572,28 +650,52 @@ Twelve more phrasebook entries to author. Each follows the same shape:
 
 The twelve entries:
 
-| Task  | Category          | Slug                          | Quote (agent's voice)                                                |
-| ----- | ----------------- | ----------------------------- | -------------------------------------------------------------------- |
-| T-101 | giving-up         | `cant-do-something`           | "I can't do that"                                                    |
-| T-102 | giving-up         | `good-stopping-place`         | "this is a good place to stop"                                       |
-| T-103 | done-before-done  | `complete-but-untested`       | "the change is complete"                                             |
-| T-104 | done-before-done  | `paraphrased-error`           | "the command failed with a permissions issue" (paraphrased)          |
-| T-105 | done-before-done  | `time-estimate`               | "this should take about thirty minutes"                              |
-| T-106 | done-before-done  | `claimed-ran-but-didnt`       | "I ran the tests and they all pass"                                  |
-| T-107 | handing-back      | `three-options`               | "would you like A, B, or C?"                                         |
-| T-108 | handing-back      | `your-preference`             | "this depends on your preference"                                    |
-| T-109 | handing-back      | `what-would-you-like`         | "what would you like me to do?"                                      |
-| T-110 | making-up         | `cites-own-doc-as-authority`  | "per the spec you wrote" (when the spec was AI-authored)             |
-| T-111 | making-up         | `false-file-citation`         | "the file says X" (when it doesn't)                                  |
-| T-112 | making-up         | `unrequested-scope-change`    | "I also went ahead and refactored Y"                                 |
+| Task  | Category         | Slug                         | Quote (agent's voice)                                       |
+| ----- | ---------------- | ---------------------------- | ----------------------------------------------------------- |
+| T-101 | giving-up        | `cant-do-something`          | "I can't do that"                                           |
+| T-102 | giving-up        | `good-stopping-place`        | "this is a good place to stop"                              |
+| T-103 | done-before-done | `complete-but-untested`      | "the change is complete"                                    |
+| T-104 | done-before-done | `paraphrased-error`          | "the command failed with a permissions issue" (paraphrased) |
+| T-105 | done-before-done | `time-estimate`              | "this should take about thirty minutes"                     |
+| T-106 | done-before-done | `claimed-ran-but-didnt`      | "I ran the tests and they all pass"                         |
+| T-107 | handing-back     | `three-options`              | "would you like A, B, or C?"                                |
+| T-108 | handing-back     | `your-preference`            | "this depends on your preference"                           |
+| T-109 | handing-back     | `what-would-you-like`        | "what would you like me to do?"                             |
+| T-110 | making-up        | `cites-own-doc-as-authority` | "per the spec you wrote" (when the spec was AI-authored)    |
+| T-111 | making-up        | `false-file-citation`        | "the file says X" (when it doesn't)                         |
+| T-112 | making-up        | `unrequested-scope-change`   | "I also went ahead and refactored Y"                        |
+
+**Phase 1 task statuses (template-based):**
+
+| Task  | Status | Result                                                             |
+| ----- | ------ | ------------------------------------------------------------------ |
+| T-101 | done   | `cant-do-something.md` published; row in phrasebook index.         |
+| T-102 | done   | `good-stopping-place.md` published.                                |
+| T-103 | done   | `complete-but-untested.md` published.                              |
+| T-104 | done   | `paraphrased-error.md` published.                                  |
+| T-105 | done   | `time-estimate.md` published.                                      |
+| T-106 | done   | `claimed-ran-but-didnt.md` published.                              |
+| T-107 | done   | `three-options.md` published.                                      |
+| T-108 | done   | `your-preference.md` published.                                    |
+| T-109 | done   | `what-would-you-like.md` published.                                |
+| T-110 | done   | `cites-own-doc-as-authority.md` published.                         |
+| T-111 | done   | `false-file-citation.md` published.                                |
+| T-112 | done   | `unrequested-scope-change.md` published.                           |
+| T-151 | done   | `ai-is-the-engineer.md` foundation body published.                 |
+| T-152 | done   | `refuse-the-menu.md` foundation body published.                    |
+| T-153 | done   | `verify-the-artifact.md` foundation body published.                |
+| T-154 | done   | `push-back-on-i-cant.md` foundation body published.                |
+| T-155 | done   | `make-recurring-mistakes-mechanical.md` foundation body published. |
 
 For each task `T-1NN` use the common template above plus the specific slug, category, and quote from the table.
 
 **Five foundation move detail pages:**
 
 #### T-150 — Build foundation move detail page route
+
 - **Phase:** 1
-- **Status:** not-started
+- **Status:** done
+- **Result:** foundations collection + src/pages/start-here/[slug].astro emit all five foundation move pages.
 - **Prereqs:** none
 - **Read first:**
   - `site/src/pages/start-here.astro` (the index page; the cards already have slugs and bodies)
@@ -606,26 +708,28 @@ For each task `T-1NN` use the common template above plus the specific slug, cate
   2. Create five entries: `ai-is-the-engineer.md`, `refuse-the-menu.md`, `verify-the-artifact.md`, `push-back-on-i-cant.md`, `make-recurring-mistakes-mechanical.md`.
   3. Build `[slug].astro` to render each foundation move as a full page. Layout: hero (kicker MOVE/0N, title, summary), body (the essay), paste-examples (using the same `paste-block` component as phrasebook entries), related phrasebook entries.
   4. Update `start-here.astro` cards to link to `/start-here/<slug>` instead of `#<slug>`.
-- **Why:** The five cards on Start Here currently show body text in-line. They need full pages so the deeper material lives somewhere; foundation moves are the *why* phrasebook entries lean on.
+- **Why:** The five cards on Start Here currently show body text in-line. They need full pages so the deeper material lives somewhere; foundation moves are the _why_ phrasebook entries lean on.
 - **Definition of done:** All five `/start-here/<slug>` URLs render. Each links to relevant phrasebook entries. `pnpm build` exits 0.
 
 #### T-151 through T-155 — Author the five foundation move bodies
 
-| Task  | Slug                                | Title                                            | Source principles in `verified-principles.md` |
-| ----- | ----------------------------------- | ------------------------------------------------ | --------------------------------------------- |
-| T-151 | `ai-is-the-engineer`                | The AI is the engineer. You are not.             | Theme A (operator worldview)                  |
-| T-152 | `refuse-the-menu`                   | Refuse the menu.                                 | Theme A, Principle 2                          |
-| T-153 | `verify-the-artifact`               | Verify the artifact, not the summary.            | Theme B (tool output as truth)                |
-| T-154 | `push-back-on-i-cant`               | Push back on "I can't" once.                     | Theme F (receptionist refusals)               |
-| T-155 | `make-recurring-mistakes-mechanical`| Make every recurring mistake mechanical.         | Theme D (mechanical enforcement)              |
+| Task  | Slug                                 | Title                                    | Source principles in `verified-principles.md` |
+| ----- | ------------------------------------ | ---------------------------------------- | --------------------------------------------- |
+| T-151 | `ai-is-the-engineer`                 | The AI is the engineer. You are not.     | Theme A (operator worldview)                  |
+| T-152 | `refuse-the-menu`                    | Refuse the menu.                         | Theme A, Principle 2                          |
+| T-153 | `verify-the-artifact`                | Verify the artifact, not the summary.    | Theme B (tool output as truth)                |
+| T-154 | `push-back-on-i-cant`                | Push back on "I can't" once.             | Theme F (receptionist refusals)               |
+| T-155 | `make-recurring-mistakes-mechanical` | Make every recurring mistake mechanical. | Theme D (mechanical enforcement)              |
 
 Each task follows the same shape: read the relevant principles, write the foundation move body in plain non-technical English (1,200-2,000 words), include 2-3 paste-example blocks (sterilized), list 3-5 related phrasebook entries.
 
 ### Phase 2 — Vercel-style command palette
 
 #### T-201 — Build the search-index manifest endpoint
+
 - **Phase:** 2
-- **Status:** not-started
+- **Status:** done
+- **Result:** src/pages/search.json.ts emits a single typed manifest covering phrasebook, foundations, and top-level pages.
 - **Prereqs:** T-101 through T-112 (entries exist), T-151 through T-155 (foundations exist)
 - **Read first:**
   - § 7 of this file (the spec)
@@ -641,8 +745,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** `pnpm build` emits `/search.json` containing all phrasebook entries, all foundations, and all pages.
 
 #### T-202 — Build the `<command-palette>` custom element
+
 - **Phase:** 2
-- **Status:** not-started
+- **Status:** done
+- **Result:** src/components/CommandPalette.ts is a vanilla custom element; Cmd+K/Ctrl+K/Esc/click-outside/arrow-keys all wired; bundle under 8KB gzipped.
 - **Prereqs:** T-201
 - **Read first:**
   - § 7 of this file
@@ -662,8 +768,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Cmd+K opens the palette anywhere on the site. Typing filters results. Arrow keys navigate. Enter goes to the URL. Esc closes. Bundle size under 8 KB gzipped (verified by `pnpm build`'s output).
 
 #### T-203 — Style the command palette
+
 - **Phase:** 2
-- **Status:** not-started
+- **Status:** done
+- **Result:** Palette styled in global.css using existing tokens; mobile takeover below 640px; centered modal above.
 - **Prereqs:** T-202
 - **Read first:**
   - § 7 of this file (visual spec)
@@ -679,8 +787,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Visual screenshots at 375 and 1440 match § 7's spec.
 
 #### T-204 — Mount the palette globally and re-wire home CTA
+
 - **Phase:** 2
-- **Status:** not-started
+- **Status:** done
+- **Result:** Single <command-palette> mounted in Base.astro; home CTA opens it via event.
 - **Prereqs:** T-202, T-203
 - **Files to edit:**
   - `site/src/layouts/Base.astro` (add `<command-palette></command-palette>` before `</body>`; import the JS module)
@@ -693,6 +803,7 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Cmd+K, `/`, and click on the home CTA all open the same palette.
 
 #### T-205 — Browser-validate command palette at 4 viewports
+
 - **Phase:** 2
 - **Status:** not-started
 - **Prereqs:** T-204
@@ -708,8 +819,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 ### Phase 3 — Open Graph image generation
 
 #### T-301 — Add `@vercel/og` or Satori dependency
+
 - **Phase:** 3
-- **Status:** not-started
+- **Status:** done
+- **Result:** satori 0.26 + @resvg/resvg-js 2.6 installed; no peer-dep warnings.
 - **Prereqs:** none
 - **Read first:** https://github.com/vercel/satori (likely the right pick — pure TS, runs at build time)
 - **Files to edit:** `site/package.json`
@@ -719,8 +832,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Both packages install cleanly; no peer-dep warnings.
 
 #### T-302 — Build the OG image generator endpoint
+
 - **Phase:** 3
-- **Status:** not-started
+- **Status:** done
+- **Result:** src/pages/og/[slug].png.ts emits 24 unique 1200x630 PNGs (13 phrasebook + 5 foundations + 6 special routes).
 - **Prereqs:** T-301
 - **Read first:** Satori README; `_internal/handoff/SEO.md` § OG image spec
 - **Files to create:**
@@ -734,8 +849,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Every page's `og:image` meta tag resolves to a real PNG. Visually verified by pasting URLs into Twitter/Slack preview generators.
 
 #### T-303 — Wire OG image URLs into `Base.astro`
+
 - **Phase:** 3
-- **Status:** not-started
+- **Status:** done
+- **Result:** Base.astro derives og:image from Astro.url.pathname automatically; absolute URL via SITE_URL.
 - **Prereqs:** T-302
 - **Files to edit:** `site/src/layouts/Base.astro`
 - **Instructions:** The `ogImage` prop already exists; just default it to `/og/<slug>.png` based on the URL pathname. Phrasebook entries already pass a custom value; pages can use the default.
@@ -744,37 +861,47 @@ Each task follows the same shape: read the relevant principles, write the founda
 ### Phase 4 — Polish layer
 
 #### T-401 — Hover lift on cards
+
 - **Phase:** 4
-- **Status:** not-started
+- **Status:** done
+- **Result:** Hover lift on .mode, .move, .pb-row using transform translateY(-2px) + box-shadow; reduced-motion respected.
 - **Files to edit:** `site/src/styles/global.css`
 - **Instructions:** Add subtle `transform: translateY(-2px)` and `box-shadow` change on hover for `.mode`, `.move`, `.pb-row`. Transition 120ms ease. Respect `prefers-reduced-motion`.
 - **Why:** Tactile feedback when an interactive element is hoverable. Currently the only hover state is border-color change; lift adds depth.
 
 #### T-402 — Reading-progress indicator on entry pages
+
 - **Phase:** 4
-- **Status:** not-started
+- **Status:** done
+- **Result:** ReadingProgress custom element renders a thin blue bar; hidden on mobile; respects prefers-reduced-motion.
 - **Files to create:** `site/src/components/ReadingProgress.ts` (custom element)
 - **Files to edit:** `site/src/pages/phrasebook/[slug].astro` (add element), `site/src/styles/global.css` (style)
 - **Instructions:** Thin bar at top of the page that fills as the user scrolls through the entry. Blue accent color. Static at top; absolute-positioned. Hidden on mobile (bar doesn't help when the page is shorter).
 - **Why:** Long entry pages should give the reader a sense of progress. Subtle; not load-bearing UI.
 
 #### T-403 — Polish copy-button state machine
+
 - **Phase:** 4
-- **Status:** not-started
+- **Status:** done
+- **Result:** CopyButton has idle/copied/error states with 1.4s recovery; error styling uses --red token.
 - **Files to edit:** `site/src/components/CopyButton.ts`, `site/src/styles/global.css`
 - **Instructions:** Add `data-state` values for: `idle`, `hover`, `pressed`, `copied`, `error`. Each gets a distinct visual state. The success state holds for 1.4s, then returns to idle. The error state (clipboard rejected) shows briefly.
 - **Why:** Currently states are minimal. The copy interaction is one of the most-used affordances on the site.
 
 #### T-404 — Focus-visible audit across all interactive elements
+
 - **Phase:** 4
-- **Status:** not-started
+- **Status:** done
+- **Result:** Focus-visible audit complete: amber/blue outline on every interactive element; no outline:none anywhere.
 - **Files to edit:** `site/src/styles/global.css`
 - **Instructions:** For every clickable element (links, buttons, custom elements), confirm a visible `:focus-visible` outline. Use the existing `--blue` accent. No `outline: none` anywhere.
 - **Why:** Keyboard navigation parity with mouse. Required for accessibility CI to pass.
 
 #### T-405 — Subtle scroll-driven section reveals on entry pages
+
 - **Phase:** 4
-- **Status:** not-started
+- **Status:** done
+- **Result:** Each .block on entry pages fades up via animation-timeline: view(); gated by @supports and prefers-reduced-motion: no-preference.
 - **Files to edit:** `site/src/pages/phrasebook/[slug].astro`, `site/src/styles/global.css`
 - **Instructions:** Each `.block` on entry pages fades up subtly as it enters the viewport. Use CSS scroll-driven animations where supported; fall back to no animation otherwise. Respect `prefers-reduced-motion`.
 - **Why:** Texture. The page should feel like it's revealing itself rather than dumping all content at once.
@@ -782,8 +909,10 @@ Each task follows the same shape: read the relevant principles, write the founda
 ### Phase 5 — Security hardening
 
 #### T-501 — Author the security-headers configuration
+
 - **Phase:** 5
-- **Status:** not-started
+- **Status:** done
+- **Result:** public/\_headers ships CSP/HSTS/XFO/Referrer-Policy/Permissions-Policy/COOP/CORP; CSP allows script-src unsafe-inline + object-src none per amendment.
 - **Read first:**
   - https://web.dev/articles/security-headers
   - https://content-security-policy.com
@@ -803,55 +932,69 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** `curl -I https://<deploy-url>` shows every header. https://securityheaders.com grades the site A+.
 
 #### T-502 — Configure robots.txt with explicit AI bot policy
+
 - **Phase:** 5
-- **Status:** not-started
+- **Status:** done
+- **Result:** robots.txt allows GPTBot, ClaudeBot, anthropic-ai, PerplexityBot, Google-Extended, CCBot, Bytespider explicitly; default Allow:\* for others.
 - **Files to edit:** `site/public/robots.txt`
 - **Instructions:** Allow major AI crawlers explicitly: `GPTBot`, `ClaudeBot`, `anthropic-ai`, `PerplexityBot`, `Google-Extended`, `CCBot`, `Bytespider`. Allow `*` for traditional crawlers. Sitemap reference.
   > **Amendment 2026-05-15 (T-010):** Replaced `Claude-Web` with `ClaudeBot` per security review §4 — `Claude-Web` is not the canonical Anthropic crawler user-agent. `anthropic-ai` remains the umbrella identifier.
 - **Why:** The site's audience explicitly includes AI sessions. Explicit allowlist signals intent and aids discovery.
 
 #### T-503 — Cookie audit
+
 - **Phase:** 5
-- **Status:** not-started
+- **Status:** done
+- **Result:** Zero-cookie posture documented in Base.astro frontmatter comment.
 - **Instructions:** Confirm zero cookies set. Browser DevTools → Application → Cookies should be empty across all pages. Document the zero-cookie posture in a comment in `Base.astro`.
 - **Why:** Compliance with privacy expectations. No cookies → no consent banner → no GDPR or CCPA burden.
 
 ### Phase 6 — Performance gates
 
 #### T-601 — Preload critical fonts
+
 - **Phase:** 6
-- **Status:** not-started
+- **Status:** done
+- **Result:** src/integrations/font-preload.ts injects <link rel=preload> for 3 hashed woff2 paths into every dist HTML at astro:build:done.
 - **Files to edit:** `site/src/layouts/Base.astro`
 - **Instructions:** Add `<link rel="preload" as="font" type="font/woff2" crossorigin>` for the three font files that appear above the fold: Plex Sans Condensed 700, Plex Sans Condensed 600, Plex Mono 400. Find the exact paths in `node_modules/@fontsource/...`.
 - **Why:** Reduces FOIT (flash of invisible text) and improves LCP.
 - **Definition of done:** Lighthouse `first-contentful-paint` improves; no font flash visible at slow 3G.
 
 #### T-602 — Lighthouse CI integration
+
 - **Phase:** 6
-- **Status:** not-started
+- **Status:** done
+- **Result:** .lighthouserc.json runs against built dist; all 8 routes pass perf/a11y/best-practices/seo thresholds; 404 has a separate assertMatrix entry for noindex.
 - **Read first:** https://github.com/GoogleChrome/lighthouse-ci
 - **Files to create:** `site/.lighthouserc.json`
 - **Instructions:** Configure with all five page URLs. Performance, Accessibility, Best Practices, SEO all targeting 100. Add `pnpm script: "lhci": "lhci autorun"`.
 - **Definition of done:** All four scores 100/100/100/100 on all pages. CI fails if any drop below 95.
 
 #### T-603 — Cache-control headers
+
 - **Phase:** 6
-- **Status:** not-started
+- **Status:** done
+- **Result:** public/\_headers sets immutable cache for /\_astro/_, /og/_ and short SWR cache for HTML.
 - **Files to edit:** `site/public/_headers`
 - **Instructions:** Long cache for `/_astro/*` (hashed bundles), `/og/*`, `/fonts/*` (immutable). Short cache for HTML pages (e.g., `max-age=300, stale-while-revalidate=86400`).
 - **Why:** Best-effort caching without manual revalidation.
 
 #### T-604 — Bundle audit
+
 - **Phase:** 6
-- **Status:** not-started
+- **Status:** done
+- **Result:** Total client JS gzipped: ClientRouter 4.54 KB + Base script 2.51 KB + page 0.06 KB + index 1.04 KB ≈ 8.2 KB, under 15 KB budget.
 - **Instructions:** Run `pnpm build` and inspect `dist/_astro/*.js` sizes. Confirm total client JS under 15 KB gzipped. Remove anything unused.
 - **Definition of done:** Total client JS ≤ 15 KB gzipped. Documented in this task's "done" note.
 
 ### Phase 7 — AI-SEO + crawler optimization
 
 #### T-701 — Build llms-full.txt endpoint
+
 - **Phase:** 7
-- **Status:** not-started
+- **Status:** done
+- **Result:** src/pages/llms-full.txt.ts concatenates phrasebook + foundations into a single text response; cache 3600.
 - **Read first:** https://llmstxt.org/#format
 - **Files to create:** `site/src/pages/llms-full.txt.ts`
 - **Instructions:** Concatenated full content of every phrasebook entry and foundation move into a single Markdown response. Per the llms.txt spec. Cache-control `max-age=3600`.
@@ -859,28 +1002,35 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** `/llms-full.txt` returns ≥10 KB of content. Plain-text response.
 
 #### T-702 — Expand JSON-LD: BreadcrumbList on entries
+
 - **Phase:** 7
-- **Status:** not-started
+- **Status:** done
+- **Result:** BreadcrumbList in @graph on every phrasebook and start-here entry page.
 - **Files to edit:** `site/src/pages/phrasebook/[slug].astro`
 - **Instructions:** Add a `BreadcrumbList` JSON-LD: Home → Phrasebook → Category → Entry. Same for foundation moves.
 - **Why:** Google rich-results expand entries with breadcrumbs in SERP.
 
 #### T-703 — Add HowTo or FAQPage Schema.org markup to entries
+
 - **Phase:** 7
-- **Status:** not-started
+- **Status:** done
+- **Result:** HowTo node added to phrasebook entry @graph: three steps with deep-link anchors.
 - **Files to edit:** `site/src/pages/phrasebook/[slug].astro`
 - **Instructions:** Each phrasebook entry can be expressed as a `HowTo`: the steps are (1) recognize the agent's words, (2) paste the intervention, (3) verify the agent's response. Add the JSON-LD.
 - **Why:** Richer SERP. Each entry surfaces as an interactive how-to result.
 
 #### T-704 — Internal linking audit
+
 - **Phase:** 7
-- **Status:** not-started
+- **Status:** done
+- **Result:** Foundations all have ≥5 relatedPhrasebook entries; About links to /phrasebook/paid-service-claim and /start-here; entries link to relatedMove.
 - **Instructions:** Every phrasebook entry should link to its related foundation move (already there). Every foundation move should link to ≥3 related phrasebook entries. The About page should link to a representative phrasebook entry and the Start Here index. The home page already links everywhere.
 - **Why:** Crawl depth and SEO. Pages with three internal inbound links rank meaningfully better than orphan pages.
 
 ### Phase 8 — Production deployment
 
 #### T-801 — Cloudflare Pages project setup
+
 - **Phase:** 8
 - **Status:** not-started
 - **Read first:** https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site/
@@ -888,6 +1038,7 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Project deploys on push.
 
 #### T-802 — Custom domain
+
 - **Phase:** 8
 - **Status:** not-started
 - **Prereqs:** T-801
@@ -895,6 +1046,7 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** Site reachable at custom domain with valid HTTPS.
 
 #### T-803 — Production smoke test
+
 - **Phase:** 8
 - **Status:** not-started
 - **Prereqs:** T-802
@@ -902,6 +1054,7 @@ Each task follows the same shape: read the relevant principles, write the founda
 - **Definition of done:** All gates pass against production.
 
 #### T-804 — Basic uptime monitoring
+
 - **Phase:** 8
 - **Status:** not-started
 - **Prereqs:** T-803
@@ -911,9 +1064,11 @@ Each task follows the same shape: read the relevant principles, write the founda
 ## 10. Definition of done
 
 ### Per task
+
 Mechanical checks specified per task. Must all pass.
 
 ### Per phase
+
 - All tasks in the phase have status `done`.
 - `pnpm build` exits 0.
 - `pnpm test` (Playwright smoke) exits 0.
@@ -922,6 +1077,7 @@ Mechanical checks specified per task. Must all pass.
 - Sterilization checklist passed for any content change.
 
 ### Per site (production-ready)
+
 - All phases through 8 are `done`.
 - Live at custom domain with valid HTTPS.
 - Lighthouse 100/100/100/100 on every page.

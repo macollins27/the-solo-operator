@@ -4,26 +4,28 @@
 
 ## What this project is
 
-A static website published as **The Solo Operator's Manual**. A phrasebook for non-technical operators who build production software with AI agents. The audience is humans who don't write code AND future AI sessions that need to read the rules.
+A static website published as **How to Use Claude Code**. A user-friendly guide for non-technical operators mastering Claude Code through pattern recognition, response vocabulary, and system-building practice. The audience is humans who don't write code AND future AI sessions whose operators have pasted a link to the site (or to `/llms-full.txt`) into their context.
 
 Maxwell is the product owner. He is non-technical, operates entirely via Claude prompts, and never opens files himself. You are the engineer. Make every technical call. Refuse to route decisions back to him; present resolutions with your reasoning.
 
+This site replaces a prior artifact (the rejected "phrasebook + foundations" framing). The previous content and design are not reference material. The infrastructure is reusable; the content and design are not.
+
 ## Authority hierarchy (binding order)
 
-| Rank | Source                                                                 | Status                          |
-| ---- | ---------------------------------------------------------------------- | ------------------------------- |
-| 1    | `site/MASTER-PLAN.md`                                                  | Binding — the executable plan   |
-| 2    | This file (`site/CLAUDE.md`)                                           | Binding — agent rules           |
-| 3    | `~/.claude/CLAUDE.md` (Maxwell's universal rules)                      | Authority — applies everywhere  |
-| 4    | `/Users/maxwell/Developer/the-solo-operator/CLAUDE.md` (project root)  | Authority — course-context only |
-| 5    | `_internal/handoff/STACK.md`                                           | Tech-stack reference            |
-| 6    | `_internal/verified-principles.md`                                     | Content source                  |
-| 7    | `_internal/claude-insights-full/out/aggregate.json`                    | Corpus receipts source          |
-| 8    | `site/src/styles/global.css`                                           | Design tokens                   |
-| 9    | Astro 5 documentation (https://docs.astro.build)                       | Build mechanism                 |
-| 10   | Files an agent wrote earlier this session                              | Hint — re-verify                |
+| Rank | Source                                                                       | Status                          |
+| ---- | ---------------------------------------------------------------------------- | ------------------------------- |
+| 1    | `site/MASTER-PLAN.md`                                                        | Binding — the executable plan   |
+| 2    | This file (`site/CLAUDE.md`)                                                 | Binding — agent rules           |
+| 3    | `~/.claude/CLAUDE.md` (Maxwell's universal rules)                            | Authority — applies everywhere  |
+| 4    | `/Users/maxwell/Developer/the-solo-operator/CLAUDE.md` (project root)        | Authority — course-context only |
+| 5    | `/Users/maxwell/Downloads/handoff/source/manual.css` (reference visual bones) | Visual reference                |
+| 6    | `site/src/styles/global.css`                                                 | Design tokens (this repo)       |
+| 7    | Astro 5 documentation (https://docs.astro.build)                             | Build mechanism                 |
+| 8    | Files an agent wrote earlier this session                                    | Hint — re-verify                |
 
 When the docs and MASTER-PLAN.md conflict on a mechanism, the docs win on the mechanism but MASTER-PLAN.md wins on intent. When in doubt, ask Maxwell with a proposed resolution.
+
+The reference handoff at `/Users/maxwell/Downloads/handoff/source/` is for **visual bones only** — IBM Plex font system, GitHub-dark palette, blue + amber accent system, callout cards, pull quotes, zone headers, top sticky nav, code blocks, pagination. **The content in that directory is rejected — do not copy it.** The field-manual chrome ("CC-1073-A," "REV A," "SHEET X OF Y," "SEALED · OPERATOR-ONLY," part-number headers, revision blocks, "ENFORCED" receipt badges, sessions-logged stat strips) is also rejected. Drop all of it.
 
 ## How to start
 
@@ -40,32 +42,33 @@ When the docs and MASTER-PLAN.md conflict on a mechanism, the docs win on the me
 
 These cannot be relaxed without surfacing to Maxwell first.
 
-### Sterilization (cross-project rule)
+### Sterilization (binding, strengthened 2026-05-15)
 
-No client names, project names, company names, session IDs, work-substance descriptions, or financial details on any public page. Aggregate counts are fine (1,073 sessions, 46 projects). Per-project breakdowns are not. See `~/.claude/projects/-Users-maxwell-Developer-the-solo-operator/memory/feedback-sterilize-public-artifacts.md`.
+No client names, project names, company names, session IDs, work-substance descriptions, financial details, or personal cost-anchored incidents on any public page. This is stronger than the prior site's sterilization rule:
+
+- **No receipts.** No "I once paid $X for months." No "we lost 60 hours on Y." No commit counts, no destroyed-laptop counts, no specific dollar amounts ever — even anonymized.
+- **No aggregate-count proof either.** "1,073 sessions across 46 projects" is also receipt-shaped. The site teaches; it does not prove.
+- **No personal incidents framed as evidence.** The reader takes the lesson or doesn't. The author owes no proof.
+- **No first-person scar stories.** Voice the patterns directly, in third person ("the operator," "the AI"). Maxwell's private archive of incidents stays private.
+
+If you find yourself reaching for "this comes from N sessions" or "I once X-ed and paid $Y" — stop. Voice the pattern itself instead.
 
 ### Voice and content
 
-- No emojis anywhere: code, content, commits, OG images, comments.
+- No emojis anywhere: code, content, commits, OG images, comments, filenames.
 - No time estimates anywhere. No "30 minutes," "by end of day," "as a first pass," "happy to continue with X later." See `~/.claude/CLAUDE.md`.
 - No menus. Make the decision; present the result.
 - No filler. No "In this entry we will explore." No "First, let's understand." Get to the substance.
 - No jargon without inline definition the first time.
 - Plain English at the surface; the academic structure is the substrate.
 - **Contractions are register.** Maxwell's typed prose uses contractions throughout — "can't," "won't," "it's," "doesn't." Uncontracted English ("cannot," "will not") is Claude-default explainer voice. Pass through every body string and contract where natural.
-- **No "production software."** The phrase is marketing-vocab. Use "real software" wherever the concept appears (home kicker, llms.txt, meta descriptions).
-
-### Phrasebook story mode (added 2026-05-15 per audit)
-
-Every phrasebook entry's `whereThisCameFrom` section uses **first-person scar-tissue mode** — "I once X. Later Y. The lesson was Z." Three short paragraphs, terminal sentences, one concrete image per paragraph.
-
-**Constraint:** no two phrasebook entries share the same anchoring image. No two stories say "a service," "weeks later," "for months," "I paid for X," "I once X-ed for Y." Variance comes from substance, not structure. If a new entry's draft story uses an image already used in another entry, rewrite the new one with a different image — same lesson, different scar.
-
-The reason: twelve memoir-shaped stories in the same syntactic shape risks becoming a memoir. The shape is the manual; the images carry the load.
+- **No "production software."** The phrase is marketing-vocab. Use "real software" wherever the concept appears.
+- **Third-person operator-language.** "The operator," "the AI," "Claude," "the session." Not "I" or "you" in narrative prose. Imperative-mood ("do X," "demand Y") is fine for direct instruction.
 
 ### Stack
 
 - Astro 5 static output (`output: 'static'`, no SSR).
+- `@astrojs/mdx` v4 for chapters (each chapter is an MDX file authoring rich content with embedded components).
 - TypeScript strict.
 - pnpm for installs.
 - IBM Plex Mono + Plex Sans Condensed via `@fontsource` — self-hosted, no Google Fonts CDN.
@@ -75,7 +78,7 @@ The reason: twelve memoir-shaped stories in the same syntactic shape risks becom
 - No analytics, no cookies, no third-party scripts, no service workers.
 - No light mode. No theme toggle.
 - Mobile-first CSS: default styles target mobile; `min-width` queries enhance.
-- Total client JS budget: **under 15 KB gzipped.** (Revised upward from the handoff's 2 KB because the command palette is now part of the product.)
+- Total client JS budget: **under 15 KB gzipped.** (Revised upward from the handoff's 2 KB because the command palette is part of the product.)
 
 ### Browser validation (project-specific hard rule)
 
@@ -91,21 +94,22 @@ No exceptions. The build-passes check is the mechanical gate.
 
 ### Sticky effects and "little things"
 
-Subtle effects from prior iterations are load-bearing. Sticky sidebars (`position: sticky` on `.receipts` at ≥1024px), micro-animations, considered transitions, focus-visible polish — these are texture, not garnish. See `~/.claude/projects/-Users-maxwell-Developer-the-solo-operator/memory/feedback-carry-subtle-effects-through-iterations.md`.
+Subtle effects from prior iterations are load-bearing. Sticky top nav, micro-animations, considered transitions, focus-visible polish — these are texture, not garnish. See `~/.claude/projects/-Users-maxwell-Developer-the-solo-operator/memory/feedback-carry-subtle-effects-through-iterations.md`.
 
 ## Forbidden file paths and actions
 
 - Do not edit anything under `_internal/`. That is private working material; the site never publishes from there directly.
-- Do not edit anything under `parts/`. That is course content.
+- Do not edit anything under `parts/` (in the project-root). That is course content for a separate paid product.
 - Do not push to remote without explicit authorization.
 - Do not skip `pre-commit` hooks. If one fails, fix the underlying issue.
 - Do not commit `dist/` or `node_modules/`. They are gitignored; do not unignore.
+- Do not read `/Users/maxwell/Downloads/handoff/source/*.html` for content — only for visual reference (CSS, structural patterns, component shapes). The content there is rejected.
 
 ## Commit discipline
 
 - Stage by file name, never `git add .` or `git add -A`.
 - Never `--no-verify`.
-- Conventional Commits: `feat(scope): description`, `fix(scope): description`, `chore(scope): description`. Scope is the phase or task number when sensible (e.g., `feat(T-105): wire command palette to home CTA`).
+- Conventional Commits: `feat(scope): description`, `fix(scope): description`, `chore(scope): description`. Scope is the phase or task number when sensible (e.g., `feat(T-103): build CalloutCard component`).
 - Reference the active task in the commit body.
 
 ## Session-end behavior

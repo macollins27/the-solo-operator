@@ -1,0 +1,24 @@
+---
+type Tone = 'blue' | 'amber' | 'red';
+
+interface Props {
+  circ: string;
+  label: string;
+  title: string;
+  tone?: Tone;
+}
+
+const { circ, label, title, tone = 'blue' } = Astro.props;
+const toneClass = tone === 'blue' ? '' : tone;
+---
+
+<article class="detail">
+  <div class="callout">
+    <span class:list={['circ', toneClass]}>{circ}</span>
+    <span class:list={['lbl', toneClass]}>{label}</span>
+  </div>
+  <div class="body">
+    <div class="ttl">{title}</div>
+    <slot />
+  </div>
+</article>

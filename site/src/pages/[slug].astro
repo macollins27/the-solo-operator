@@ -1,0 +1,33 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { CHAPTERS_BY_N } from '../lib/chapters';
+
+export async function getStaticPaths() {
+  const chapters = await getCollection('chapters');
+  return chapters
+    .filter((entry: CollectionEntry<'chapters'>) => entry.data.n !== '00')
+    .map((entry: CollectionEntry<'chapters'>) => {
+      const meta = CHAPTERS_BY_N[entry.data.n];
+      if (!meta || !meta.slug) {
+        throw new Error(`No slug mapping for chapter n=${entry.data.n}`);
+      }
+      return { params: { slug: meta.slug }, props: { entry } };
+    });
+}
+
+interface Props {
+  entry: CollectionEntry<'chapters'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base title={entry.data.title} description={entry.data.description} pageType="article">
+  <div class="container">
+    <article class="chapter-body">
+      <Content />
+    </article>
+  </div>
+</Base>

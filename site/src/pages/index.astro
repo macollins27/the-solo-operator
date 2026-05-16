@@ -1,102 +1,113 @@
 ---
 import Base from '../layouts/Base.astro';
+import ZoneHeader from '../components/ZoneHeader.astro';
+import { CHAPTERS } from '../lib/chapters';
+
+const chapterRows = CHAPTERS.filter((c) => c.n !== '00');
+
+interface ChapterRow {
+  n: string;
+  slug: string;
+  label: string;
+  desc: string;
+  det: string;
+}
+
+// One-line descriptions and short categorical tags per chapter.
+// Authored alongside Chapter 00; sourced from MASTER-PLAN.md § 7.
+const CHAPTER_DESCRIPTIONS: Record<string, { desc: string; det: string }> = {
+  '01': {
+    desc: 'Four anchor rules. Role boundary, evidence hierarchy, two-option rule, skepticism default.',
+    det: 'Anchor rules',
+  },
+  '02': {
+    desc: 'Plugins, skills, hooks, MCP servers. The tools that turn Claude Code into a working harness.',
+    det: 'Tools',
+  },
+  '03': {
+    desc: "Twelve patterns the AI uses to escape work. Wind-down, deferral, \"I can't from CLI,\" the menu.",
+    det: 'Recognition',
+  },
+  '04': {
+    desc: 'Copy-pasteable counter-vocabulary. One response per escape pattern.',
+    det: 'Vocabulary',
+  },
+  '05': {
+    desc: 'Brainstorm, plan, build, review, persist. The session loop that holds.',
+    det: 'Workflow',
+  },
+  '06': {
+    desc: 'Memory, hooks, ast-grep rules. How the harness grows over time.',
+    det: 'Harness',
+  },
+  '07': {
+    desc: 'Subagent dispatch, parallel agents, retry caps. Throughput without chaos.',
+    det: 'Multi-agent',
+  },
+  '08': {
+    desc: 'Playwright MCP and the four required checks. The verification gate AI gaslights about.',
+    det: 'Verification',
+  },
+  '09': {
+    desc: 'One printable page. Forbidden phrases, session-open ritual, slash commands.',
+    det: 'Reference',
+  },
+};
+
+const rows: ChapterRow[] = chapterRows.map((c) => ({
+  n: c.n,
+  slug: c.slug,
+  label: c.label,
+  desc: CHAPTER_DESCRIPTIONS[c.n]?.desc ?? '',
+  det: CHAPTER_DESCRIPTIONS[c.n]?.det ?? '',
+}));
 ---
 
 <Base
-  title="When your agent misbehaves, say this."
-  description="A phrasebook for non-technical operators building real software with AI agents. Pick what your agent is doing, get the exact words to say back. Distilled from 1,073 working sessions."
+  title="How to Use Claude Code"
+  description="A user-friendly guide for non-technical operators mastering Claude Code through pattern recognition, response vocabulary, and system-building practice."
   pageType="home"
 >
-  <div class="container grid-bg">
-    <div class="titleblock">
-      <div class="cell">
-        <div class="kicker">Document</div>
-        <div class="val">The Solo Operator's Manual</div>
+  <div class="container">
+    <section class="hero">
+      <div class="pre">A guide for non-technical operators</div>
+      <h1>
+        How to Use<br />Claude Code<span class="em">.</span>
+      </h1>
+      <div class="deck">
+        Treat the AI as a worker who can do anything. Verify every claim. When a pattern fails, build the mechanical block that catches the class. The apparatus you end up with is the residue of paid attention to failures — and it gives the operator more leverage than a senior engineer working alone.
       </div>
-      <div class="cell">
-        <div class="kicker">For</div>
-        <div class="val">Non-technical operators</div>
-      </div>
-      <div class="cell">
-        <div class="kicker">Revision</div>
-        <div class="val">2026-05-15</div>
-      </div>
-      <div class="cell">
-        <div class="kicker">Refreshed</div>
-        <div class="val">Monthly</div>
-      </div>
-      <div class="cell">
-        <div class="kicker">Status</div>
-        <div class="val">Living</div>
-      </div>
-    </div>
-
-    <p class="kicker">How to talk to your AI agent when it gets stubborn</p>
-    <h1 class="h-display cover">When your agent<br />misbehaves, say this.</h1>
-    <p class="subtle">A phrasebook for operators who don't write code.</p>
-
-    <p class="thesis">
-      If you don't write code but you ship software with AI agents, the work eventually comes down
-      to this: knowing what to say back when the agent stalls, lies, hands the decision back to you,
-      or quietly makes something up. This is the phrasebook for those moments.
-    </p>
-
-    <button
-      type="button"
-      class="cmd-trigger"
-      onclick="document.dispatchEvent(new CustomEvent('cmd-palette-open'))"
-      aria-label="Open command palette"
-    >
-      <span class="cmd-trigger-leader">&gt;</span>
-      <span class="cmd-trigger-text">Search the manual</span>
-      <span class="cmd-trigger-kbd"><kbd>&#8984;</kbd><kbd>K</kbd></span>
-    </button>
-
-    <section class="modes" aria-labelledby="modes-heading">
-      <h2 id="modes-heading" class="sr-only">Three ways to read this manual</h2>
-      <a href="/phrasebook" class="mode primary">
-        <span class="badge">PRIMARY</span>
-        <h3>The Phrasebook</h3>
-        <p class="lead">
-          Pick the closest thing your agent is doing. Get the exact words to say back, a short
-          explanation of why those words work, and the story of where this pattern came from. This
-          is the part you'll use every day.
-        </p>
-        <span class="cta">Browse the phrasebook &rarr;</span>
-      </a>
-      <a href="/start-here" class="mode">
-        <span class="badge">IF YOU'RE NEW</span>
-        <h3>Start Here</h3>
-        <p class="lead">
-          Five foundational moves before you need the phrasebook. Read these once and the rest will
-          make sense.
-        </p>
-        <span class="cta">Read the basics &rarr;</span>
-      </a>
-      <a href="/about" class="mode">
-        <span class="badge">ABOUT</span>
-        <h3>Where this came from</h3>
-        <p class="lead">
-          A non-technical operator. Real software, shipped. The hard moves, written down.
-        </p>
-        <span class="cta">Read the story &rarr;</span>
-      </a>
     </section>
 
-    <section class="spec" aria-label="Corpus shape">
-      <div class="cell">
-        <div class="kicker">Sessions distilled</div><div class="val">1,073</div>
-      </div>
-      <div class="cell"><div class="kicker">Projects covered</div><div class="val">46</div></div>
-      <div class="cell">
-        <div class="kicker">Behaviors catalogued</div><div class="val">145</div>
-      </div>
-      <div class="cell"><div class="kicker">Principles named</div><div class="val">80</div></div>
-    </section>
+    <ZoneHeader num="§ 0.1" title="Contents" meta="9 chapters · read in order the first time" />
 
-    <div class="rev-strip">
-      <span>FRONTISPIECE</span>
-      <span>NEXT MONTHLY REFRESH: 2026-06-01</span>
+    <nav class="contents" aria-label="Chapters">
+      {
+        rows.map((c) => (
+          <a class="cnt-row" href={`/${c.slug}`}>
+            <span class="id">§ {c.n}</span>
+            <span class="ttl">
+              {c.label}
+              <span class="desc">{c.desc}</span>
+            </span>
+            <span class="det">{c.det}</span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <ZoneHeader num="§ 0.2" title="How to use this guide" />
+
+    <div class="chapter-body">
+      <p>
+        Read the chapters in order the first time. The mindset comes before the tools; the tools come before the patterns; the patterns come before the workflow. Each chapter assumes the prior ones have landed.
+      </p>
+      <p>
+        After the first read, treat the site as a reference. When the AI starts doing something familiar — the menu, the wind-down, the "I can't from CLI" — open Chapter 3 to recognize the pattern, then Chapter 4 for the words to say back.
+      </p>
+      <p>
+        If you want an AI session to internalize the whole guide in one shot, paste the URL <code>/llms-full.txt</code> into its context. Single fetch. The AI ingests the entire corpus and then can act on it for the rest of the session.
+      </p>
     </div>
   </div>
 </Base>

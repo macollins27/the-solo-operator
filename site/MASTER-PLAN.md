@@ -1,4 +1,4 @@
-# MASTER-PLAN.md — The Solo Operator's Manual
+# MASTER-PLAN.md — How to Use Claude Code
 
 > **Read this in full the first time. After that, jump to the active phase.**
 >
@@ -12,1100 +12,787 @@
 - **Status tracking:** Every task has a `Status:` line. Update it as work progresses. Permitted values: `not-started`, `in-progress`, `done`.
 - **No time estimates anywhere.** Phases are shippable units, not calendar windows.
 
+---
+
 ## 1. The artifact we are building
 
-A static website at a custom domain (TBD), branded as **The Solo Operator's Manual**. A phrasebook for non-technical operators who build production software with AI agents.
+A static website branded as **How to Use Claude Code**. A user-friendly guide for non-technical operators mastering Claude Code through pattern recognition, response vocabulary, and system-building practice.
 
 **Audience (two-tier):**
 
-1. Humans — non-technical operators landing cold. They have an agent misbehaving right now. They want the words to say back.
-2. AI sessions — future Claude (or other agent) sessions whose operators have pasted a link to a specific principle page into their CLAUDE.md. The site is a citable rules surface.
+1. **Humans** — non-technical operators learning to push AI past hallucinated capability ceilings, verify every claim, and build a working harness around an AI engineer. Many of them are running ChatGPT or Claude Web; the guide is platform-aware (Claude Code is the central case study, the principles transfer).
+2. **AI sessions** — Claude / ChatGPT / Gemini sessions whose operators have pasted a link to the site (or to `/llms-full.txt`) into their context window. Every page is structured so an LLM can ingest it cleanly. `/llms-full.txt` is the single-URL "paste this into your AI" handle.
+
+**What the guide teaches:**
+
+- The four anchor rules of operator-AI work.
+- The tools to install (open-source plugins, skills, hooks, memory).
+- The patterns AI exhibits when it tries to escape work, and how to recognize them.
+- The vocabulary the operator uses in response.
+- The session-loop that holds: brainstorm → plan → build → review → persist.
+- How to build the harness incrementally — hooks, memory, ast-grep rules as you go.
+- How to run multiple AI agents in parallel without chaos.
+- Browser validation as a non-negotiable verification gate.
+- A printable quick reference.
 
 **Animating thesis:**
 
-> The operator sets the bar and refuses the menu. The AI makes every technical call in between. Because the operator cannot verify the technical layer, the apparatus verifies it mechanically — prose rules cap at ~70–80% compliance; only the tool boundary cannot be rationalized around.
+> Treat AI as a worker who can do anything. Verify every claim. When a pattern fails, build the mechanical block that catches the class. The apparatus is the residue of paid attention to failures.
 
 **Three reading modes (the IA):**
 
-- **The Phrasebook** (primary) — symptom-indexed lookup. Pick what your agent is doing, get the words to say back.
-- **Start Here** — five foundational moves for new operators.
-- **About** — sterilized origin story + corpus receipts.
+- **Home (`/`)** — title, hero, lede, table of contents. One-screen orientation; the rest is linked from here.
+- **Chapter pages (`/01-mindset` through `/09-quick-reference`)** — single-scroll teaching pages. Each is internally structured but reads as one continuous chapter.
+- **`/llms-full.txt`** — the entire corpus concatenated for single-paste AI ingestion.
 
-## 2. Current state (what is built)
+**What this site is NOT:**
 
-As of revision 2026-05-15:
+- Not a phrasebook. (Rejected prior framing.)
+- Not a field manual. (Reference handoff's framing — visual bones kept, framing rejected.)
+- Not a docs publication. (Starlight was the wrong skeleton.)
+- Not a memoir. (No personal incidents, costs, or scars.)
+- Not a marketing surface for any paid product.
 
-- Astro 5.18 scaffold at `site/`, pnpm 10, Node 22 LTS, TypeScript strict.
-- Design system: tokens in CSS custom properties, IBM Plex Mono + Plex Sans Condensed self-hosted via `@fontsource`, GitHub-dark palette, drafting-grid identity. Mobile-first responsive at breakpoints 640 / 1024.
-- One layout (`src/layouts/Base.astro`) with full SEO meta block (title, description, canonical, OG, Twitter, JSON-LD), top nav, footer, skip-link.
-- One custom element (`src/components/CopyButton.ts`) — vanilla, ~1 KB.
-- Content collection at `src/content/phrasebook/` with Zod schema in `src/content/config.ts`.
-- **1 of 13** phrasebook entries authored: `src/content/phrasebook/paid-service-claim.md`.
-- Five pages live: `/`, `/phrasebook`, `/phrasebook/[slug]`, `/start-here`, `/about`. Plus `/404`, `/llms.txt`, `/sitemap-index.xml`.
-- Browser-validated at 375 / 1440. Zero console errors.
-- `pnpm build` passes; emits 6 HTML pages + llms.txt + sitemap. Client JS at ~1 KB gzipped.
+---
 
-**Site files of record:**
+## 2. Current state (as of 2026-05-15)
+
+**Done:**
+
+- Astro 5.18 scaffold at `site/`, pnpm 10, Node 22 LTS, TypeScript strict — preserved from prior build.
+- Stack additions: `@astrojs/mdx@^4` installed for MDX-authored chapters.
+- Tokens: `src/styles/global.css` retains GitHub-dark palette + IBM Plex Mono + Plex Sans Condensed (self-hosted via `@fontsource`). Old component selectors superseded — see Phase 1.
+- Content schema rewritten: `src/content/config.ts` defines a single `chapters` collection with prompt-injection-aware Zod refinements.
+- `src/lib/chapters.ts` created — canonical chapter metadata (n, short, label, slug) + `previousChapter` / `nextChapter` helpers.
+- `src/lib/categories.ts` deleted (was phrasebook-shaped).
+- All `src/content/foundations/*` and `src/content/phrasebook/*` markdown deleted.
+- All rejected page routes deleted: `about.astro`, `phrasebook.astro`, `phrasebook/[slug].astro`, `start-here.astro`, `start-here/[slug].astro`.
+- This file (`MASTER-PLAN.md`) and `CLAUDE.md` updated to reflect the new artifact.
+
+**Broken (intentional, to be repaired by Phase 1+):**
+
+- `pnpm build` will fail until chapters are authored, routes are wired, and endpoint files updated. This is expected interim state.
+- `tests/smoke.spec.ts` ROUTES array still references rejected page paths (`/phrasebook`, `/start-here`, etc.). Will be updated in Phase 5.
+- `src/pages/llms-full.txt.ts`, `src/pages/llms.txt.ts`, `src/pages/search.json.ts`, `src/pages/og/[slug].png.ts` still import the deleted `categories.ts` and reference the deleted collections. Will be updated in Phase 3.
+- `src/components/CommandPalette.ts` has hardcoded section types (`'phrasebook' | 'foundations' | 'pages'`). Will be updated in Phase 3.
+- `src/layouts/Base.astro` references rejected routes and old SITE_NAME. Will be updated in Phase 1.
+
+**Preserved infrastructure (do not touch unless a task says so):**
+
+- `src/integrations/font-preload.ts` — build-time font preload injection.
+- `src/pages/og/[slug].png.ts` and `src/lib/og-template.ts` — OG image generation pipeline via Satori + Resvg.
+- `src/components/CopyButton.ts`, `src/components/ReadingProgress.ts` — reusable vanilla custom elements.
+- `playwright.config.ts`, `tests/` — E2E test harness.
+- `.lighthouserc.json`, `.pa11yci.json`, `eslint.config.js`, `.prettierrc` — CI / quality gates.
+- `public/` — static assets (favicon, robots.txt, headers).
+
+**Files of record (this artifact):**
 
 ```
 site/
 ├── CLAUDE.md                          (agent charter — bind first)
 ├── MASTER-PLAN.md                     (this file)
-├── README.md                          (TBD — see T-004)
+├── README.md                          (TBD — outside this plan)
 ├── package.json
-├── astro.config.mjs
+├── astro.config.mjs                   (Astro + MDX + sitemap + font-preload)
 ├── tsconfig.json
+├── playwright.config.ts
+├── .lighthouserc.json
+├── .pa11yci.json
+├── eslint.config.js
+├── .prettierrc
 ├── public/
+│   ├── _headers
 │   ├── robots.txt
 │   └── favicon.svg
+├── tests/
+│   └── smoke.spec.ts
 └── src/
     ├── layouts/
-    │   └── Base.astro                 (SEO, nav, footer, fonts)
+    │   └── Base.astro                 (SEO, nav, footer, fonts; to overhaul Phase 1)
     ├── components/
-    │   └── CopyButton.ts              (custom element)
+    │   ├── CopyButton.ts              (preserved)
+    │   ├── ReadingProgress.ts         (preserved)
+    │   ├── CommandPalette.ts          (section types to update Phase 3)
+    │   ├── CalloutCard.astro          (to author Phase 1)
+    │   ├── PullQuote.astro            (to author Phase 1)
+    │   ├── ZoneHeader.astro           (to author Phase 1)
+    │   ├── ChapterIntro.astro         (to author Phase 1)
+    │   ├── ChapterPagination.astro    (to author Phase 1)
+    │   └── CalloutBox.astro           (to author Phase 1)
     ├── content/
-    │   ├── config.ts                  (Zod schemas)
-    │   └── phrasebook/
-    │       └── paid-service-claim.md  (1 of 13)
+    │   ├── config.ts                  (chapters Zod schema)
+    │   └── chapters/
+    │       ├── 01-mindset.mdx         (to author Phase 2)
+    │       ├── 02-install.mdx         (stub Phase 2)
+    │       ├── 03-escape-moves.mdx    (stub Phase 2)
+    │       ├── 04-counter-moves.mdx   (stub Phase 2)
+    │       ├── 05-working-loop.mdx    (stub Phase 2)
+    │       ├── 06-system-that-holds.mdx
+    │       ├── 07-multi-claude.mdx
+    │       ├── 08-browser-validation.mdx
+    │       └── 09-quick-reference.mdx
+    ├── lib/
+    │   ├── chapters.ts                (canonical chapter metadata)
+    │   └── og-template.ts             (Satori OG image template)
+    ├── integrations/
+    │   └── font-preload.ts            (preserved)
     ├── styles/
-    │   └── global.css                 (tokens + base + components + responsive)
+    │   └── global.css                 (tokens + base; component styles to author Phase 1)
     └── pages/
-        ├── index.astro
-        ├── phrasebook.astro
-        ├── phrasebook/[slug].astro
-        ├── start-here.astro
-        ├── about.astro
-        ├── 404.astro
-        └── llms.txt.ts
+        ├── index.astro                (home — to rewrite Phase 2)
+        ├── [slug].astro               (chapter detail — to author Phase 2)
+        ├── 404.astro                  (light edits Phase 2)
+        ├── llms.txt.ts                (to rewrite Phase 3)
+        ├── llms-full.txt.ts           (to rewrite Phase 3)
+        ├── search.json.ts             (to rewrite Phase 3)
+        └── og/[slug].png.ts           (to rewrite Phase 3)
 ```
+
+---
 
 ## 3. Binding constraints (cross-cuts every task)
 
 Full list in `site/CLAUDE.md`. Quick reference for task execution:
 
-1. **Sterilization.** No client names, project names, session IDs, work-substance descriptions on any public page. Every task that authors content runs the sterilization checklist (§ 4) before marking done.
-2. **No emojis anywhere.** Including comments, commit messages, OG images.
+1. **Sterilization.** No client/project/session names. No personal incidents. No receipts. No aggregate corpus counts. The site teaches the pattern; the author owes no proof.
+2. **No emojis anywhere.** Code, content, commits, OG images, comments, filenames.
 3. **No time estimates.** Anywhere.
 4. **No menus to Maxwell.** Make the call. Present the result.
 5. **Mobile-first CSS.** Default styles target mobile; `min-width` queries enhance.
 6. **No third-party scripts, analytics, cookies, service workers.** Static-only.
-7. **Total client JS budget under 15 KB gzipped.** (Revised from handoff's 2 KB because the command palette is part of the product.)
+7. **Total client JS budget under 15 KB gzipped.**
 8. **Browser-validate at 375 / 768 / 1024 / 1440 before claiming visual tasks done.** Zero console errors.
 9. **`pnpm build` is the mechanical gate.** `pnpm dev` results are not evidence of done.
-10. **Carry subtle effects through iterations.** Sticky sidebars, micro-animations, focus polish — these are load-bearing.
+10. **Carry subtle effects through iterations.** Sticky top nav, micro-animations, focus polish — load-bearing.
+11. **Third-person operator-language in prose.** "The operator," "the AI." Not first-person, not memoir.
+12. **Contractions where natural.** "Can't," "won't," "it's." Uncontracted is Claude-default explainer voice.
+
+---
 
 ## 4. The sterilization checklist (run for every public-facing edit)
 
 Before marking any content task `done`:
 
-1. Search the diff for: client names, company names, project names, project acronyms (e.g., `PLW`), software brand names tied to specific work (e.g., `Stripe webhook`), session IDs (8-character hex strings, UUIDs), specific dollar amounts, specific people's names.
-2. If any are found: redact them. Patterns:
-   - Client/company name → "a small company" / "a client"
-   - Project name → "a software ecosystem" / "a long-running project"
-   - Specific software identifying the work → generic category ("a payment-integration bugfix") or drop the example entirely
-   - Session ID → remove
-   - Dollar amount → generalize ("for months") or drop
-3. Aggregate counts are safe: `1,073 sessions`, `46 projects`, `145 behaviors`, `80 principles`. Per-project breakdowns are not.
-4. Spot-check by reading the page in a browser and asking: "If a stranger reads this, what could they infer about Maxwell's clients?" If anything specific can be inferred, sterilize further.
+1. Search the diff for:
+   - Client / company / project names or acronyms
+   - Session IDs (hex strings, UUIDs)
+   - Specific dollar amounts (any number followed by `$`)
+   - Personal-incident anchoring ("I once," "I paid," "we lost," "it cost me," "X commits")
+   - Aggregate-count proof framing ("N sessions across M projects," "N behaviors catalogued")
+   - Receipt-shaped phrasing ("ENFORCED" badges, "verified across N projects")
+2. If any are found: redact. Patterns:
+   - Client/company name → drop or generalize ("a small company")
+   - Project name → drop or generalize ("a long-running project")
+   - Personal incident → reframe as pattern: "The AI claims X" instead of "Last May the AI claimed X for 11 commits"
+   - Dollar amount → drop entirely; reframe to describe the pattern, not the cost
+   - Aggregate proof → drop; voice the pattern itself
+3. Read the page in a browser. If a stranger could infer Maxwell's clients, work history, or specific cost incidents, sterilize further.
+4. The teaching test: would the lesson still land if the receipt were redacted? If yes, the receipt was unnecessary. If no, the lesson was leaning on biography instead of teaching.
+
+---
 
 ## 5. Reference materials by topic
 
 When a task says "read X for context," consult this map for which files apply.
 
-### Content authoring (phrasebook entries, foundation moves)
+### Visual system
 
-- `_internal/verified-principles.md` — the canon. Each entry maps to one or more principles. Cite the principle (by theme letter + name, not by raw page reference) in the "Why this works" section.
-- `_internal/foundational-principles.md` — the un-audited merged canon. Use only the principles that are also in verified-principles.md.
-- `_internal/phase1/behaviors-v2.md` — 145 voice-filtered operator behaviors. Maps to recognition phrases.
-- `_internal/phase1/index.md` — anti-pattern catalog with recognition phrases. Especially Section 3 (named failure patterns).
-- `_internal/claude-insights-full/out/aggregate.json` — corpus counts. Use for receipt panels. Re-extract counts from this file; don't carry over numbers from prior versions of the site without verifying.
-- `_internal/CLAUDE REPORTS/2026-05-14-full-corpus-1073sessions.html` — rendered corpus report with category counts.
+- `/Users/maxwell/Downloads/handoff/source/manual.css` — original reference handoff stylesheet. **Visual bones only.** Copy the CSS primitives (tokens, panel layouts, callout cards, pull quotes, zone headers, pagination, code blocks). **Do not copy:** field-manual chrome (`.tb`, `.docbar`, `.rev-block`, `.title-block`, `.specs` strip on cover), engineering-spec headers, "ENFORCED" badges, sheet numbering, revision history blocks.
+- `/Users/maxwell/Downloads/handoff/source/How to Use Claude Code.html` — original cover page. Read for structural ideas (sticky top nav with section letters, hero + lede + TOC, callout cards with circular numbered badges). Do not read for content.
+- `/Users/maxwell/Downloads/handoff/source/01 The Mindset.html` — original chapter page. Read for structural ideas (chapter-intro with kicker + h1 + deck, zone-header, two-column callout-card grid, pull quote, pagination). Do not read for content.
+- `site/src/styles/global.css` — the binding token system + base styles for this build.
 
-### Voice
+### Content authoring
 
-- `_internal/max.md` — Maxwell's first-person typed material. Read for cadence; never quote without sterilization.
-- `_internal/phase1/voice-filter.md` — explains how to distinguish Maxwell's actual voice from Claude-played-persona output in source files.
-
-### Design tokens and visual system
-
-- `site/src/styles/global.css` — the binding token system + responsive breakpoints.
-- `_internal/handoff/source/manual.css` — original handoff stylesheet (reference, not source of truth anymore).
-- `_internal/handoff/DESIGN-SYSTEM.md` — design system specification.
-- `_internal/proposal-mockup-v2.html` — the visual reference Maxwell validated on 2026-05-15. When in doubt about a layout decision, refer to this.
+- **Source: live web research.** Author chapter content from publicly available best-practices: superpowers plugin docs, everything-claude-code plugin docs, anthropic skills repo, AGENTS.md / llms.txt standards, MCP server ecosystem, Claude Code official docs. Cite sources when load-bearing.
+- **Source: the universal patterns Maxwell already articulated** — the four anchor rules, the escape moves, the verification rituals. Voice them as pure teaching, not receipts.
+- **Forbidden sources:** `_internal/` (private), `parts/` (course content, separate paid product), session logs, anything with specific incidents or cost framing.
 
 ### SEO and structured data
 
-- https://schema.org/TechArticle, schema.org/HowTo, schema.org/BreadcrumbList
+- https://schema.org/TechArticle, schema.org/HowTo
 - https://llmstxt.org — spec for `llms.txt` and `llms-full.txt`
-- `_internal/handoff/SEO.md` — original SEO plan (reference).
-- `_internal/handoff/AI-OPTIMIZATION.md` — original AI-crawler plan (reference).
 
-### Astro
+### Astro / MDX
 
 - https://docs.astro.build/en/getting-started/
 - https://docs.astro.build/en/guides/content-collections/
+- https://docs.astro.build/en/guides/integrations-guide/mdx/
 - https://docs.astro.build/en/guides/view-transitions/
-- https://docs.astro.build/en/recipes/
 
 ### Security
 
-- https://content-security-policy.com — CSP reference
-- https://infosec.mozilla.org/guidelines/web_security — Mozilla web security checklist
-- https://web.dev/articles/security-headers — Google security headers overview
+- The prompt-injection refinements in `src/content/config.ts` are load-bearing. Carry them into any new content fields. See `noRawHtml` and `noPromptInjection`.
+- Per-page JSON-LD must be escaped via the `safeJsonLd` helper in `Base.astro` to prevent `</script>` breakout.
+
+---
 
 ## 6. Architecture decisions (with rationale)
 
-| Decision                                 | Why                                                                                                  |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Astro 5 static                           | Zero JS by default. Per-component scoping. Content collections typed. AI-crawler friendly.           |
-| Single content collection (`phrasebook`) | One Zod schema, one render path. Foundation moves are pages, not a collection (only five of them).   |
-| Frontmatter-only entries (no MDX body)   | Structured rendering. Designer has total control over layout. Markdown is brittle for complex pages. |
-| Custom elements over framework           | <15 KB JS budget. One built-in interactive surface (copy button + command palette).                  |
-| CSS custom properties for tokens         | No utility framework. One source of truth in `global.css`. Easy to retheme.                          |
-| Mobile-first responsive                  | Maxwell's directive 2026-05-15. Default is small; `min-width` adds up.                               |
-| Sticky receipts at ≥1024px only          | On mobile the panel stacks below content; sticky is meaningless.                                     |
-| Cloudflare Pages deploy                  | Free tier handles it. Free HTTPS. AI-crawler accessible. No vendor lock.                             |
-| 15 KB total client JS budget             | Command palette + copy button. Still ~10x smaller than a typical SPA.                                |
-| Per-page Schema.org JSON-LD              | Boosts AI ingestion and traditional SEO.                                                             |
-| llms.txt + llms-full.txt                 | Audience explicitly includes future AI sessions; native AI-discovery channel.                        |
+| Decision                                | Why                                                                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Astro 5 static                          | Zero JS by default. Per-component scoping. Content collections typed. AI-crawler friendly. Already in place.                                     |
+| `@astrojs/mdx` v4 for chapters          | Chapters mix prose, callout cards, pull quotes, code blocks, lists. Pure markdown is too rigid; rich frontmatter blocks become artificial. MDX lets each chapter be its natural shape with embedded components. v4 supports Astro 5 (v5 requires Astro 6). |
+| Single `chapters` collection            | One Zod schema, one render path. Each chapter is one MDX file. Foundations and phrasebook are gone.                                              |
+| One dynamic route `[slug].astro`        | Generates pages for chapters 01–09 via `getStaticPaths` over the chapters collection. Chapter 00 is the home page (`index.astro`).               |
+| `/llms-full.txt` as single-paste handle | The single-URL paste-this-into-your-AI UX is real and demonstrated (Anthropic, Cloudflare, Vercel, Mintlify all ship it). Single-pass ingestion. |
+| Reused vanilla custom elements          | CopyButton, ReadingProgress, CommandPalette are <15 KB combined. No framework dependency.                                                        |
+| CSS custom properties for tokens        | One source of truth in `global.css`. No utility framework.                                                                                       |
+| Mobile-first responsive                 | Maxwell's hard rule. Default is small; `min-width` queries add up.                                                                               |
+| Per-page Schema.org JSON-LD             | Boosts AI ingestion and traditional SEO.                                                                                                         |
+| Cloudflare Pages deploy (intended)      | Free tier, free HTTPS, AI-crawler accessible, no vendor lock-in. Deploy is outside this plan; build artifact is the deliverable.                 |
+| No light mode                           | Maxwell's preference. The site is dark-only.                                                                                                     |
 
-## 7. The Vercel-style command palette spec (Phase 2 reference)
+---
 
-The single largest new feature beyond content. Specified once here so each Phase 2 task can refer back without re-deriving.
+## 7. The 10-chapter plan
 
-### Trigger surfaces
+Each chapter has: number (`n`), URL slug, full title, short label (for the nav), kicker (eyebrow above the h1), deck (the lede after the h1), structural shape (which components used), and dependencies on other chapters.
 
-- Keyboard: `Cmd+K` (Mac) / `Ctrl+K` (Win/Linux) anywhere on the site.
-- Keyboard: `/` key when not focused on an input.
-- Mouse: click the "Browse the phrasebook" prompt on the home page. (Currently a link; will be re-wired to open the palette.)
+### Chapter 00 — Overview (the home page)
 
-### Overlay structure (visual)
+- **URL:** `/`
+- **Short:** `Overview`
+- **Title:** How to Use Claude Code
+- **Kicker:** `A guide for non-technical operators`
+- **Deck:** A few sentences naming what the site is, who it's for, and how to use it. No proof. No metrics. No receipts. The reader either keeps reading or doesn't.
+- **Shape:** Hero (kicker + h1 + deck) → ZoneHeader "§ 0.1 — Contents" → contents grid linking to chapters 01–09 with one-line descriptions → ZoneHeader "§ 0.2 — How to use this guide" → 1–2 paragraphs naming the reading order and the paste-URL-into-your-AI UX → footer.
+- **Dependencies:** none. Authored independent of chapter content.
 
-- Backdrop: `rgba(0,0,0,0.7)` with `backdrop-filter: blur(8px)`.
-- Modal: centered, max-width 640px, full-width-with-padding on mobile (full-screen takeover below 640px viewport).
-- Modal background: `var(--panel-2)`, border `1px solid var(--line-bright)`.
-- Modal padding: 0 (search input at top, list below, both flush to edge).
+### Chapter 01 — The Mindset
 
-### Search input
+- **URL:** `/01-mindset`
+- **Short:** `Mindset`
+- **Title:** The Mindset
+- **Kicker:** `§ 1.0 · Four anchor rules`
+- **Deck:** Before any tool, before any plugin, before any slash command — four rules. They are the anchors the rest of the guide descends from. Skip them and the rest collapses.
+- **Shape:** ChapterIntro → ZoneHeader "§ 1.1 — 1.4 · The Four Anchor Rules" → 4 CalloutCards in a 2-column grid → PullQuote (key principle) → CalloutBox (why these four, why this order) → Pagination.
+- **The four rules:** Role boundary · Evidence hierarchy · Two-option rule · Skepticism default.
+- **Dependencies:** none. First proper chapter.
 
-- Top of modal, sticky within.
-- Placeholder: `Search the manual...`
-- Auto-focus on open.
-- Leader glyph: `>` in blue, monospaced. (Same as current home-page input.)
-- ESC closes; arrow keys navigate the list (do not move cursor).
+### Chapter 02 — What to Install
 
-### Result list
+- **URL:** `/02-install`
+- **Short:** `Install`
+- **Title:** What to Install
+- **Kicker:** `§ 2.0 · Tools that earn their place`
+- **Deck:** Before the patterns. The open-source plugins, skills, hooks, and MCP servers that turn Claude Code from a capable assistant into a working harness. Install order matters; later sections assume this set is in place.
+- **Shape:** ChapterIntro → for each tool (6–8 of them): tool panel with name + chips (REQUIRED / RECOMMENDED) + short paragraph + install command (CodeBlock) + 1–2 sentences on what it changes. Tools likely covered: superpowers, everything-claude-code, claude-mem, graphify, Playwright MCP, hooks framework, /insights, /ultrareview, /goal.
+- **Dependencies:** none. But chapters 03–08 may reference these by name.
 
-- Grouped by section, in order: **Phrasebook**, **Foundations**, **Pages**.
-- Section header: small kicker in muted color (`Phrasebook`, `Foundations`, `Pages`).
-- Each row:
-  - Left: kicker badge (category number for phrasebook, "MOVE/0N" for foundations, "PAGE" for pages).
-  - Center: primary label (the agent quote for phrasebook entries; the move name for foundations; the page title for pages).
-  - Right: keyboard hint when active (`↵ Open`).
-- Active row: blue left border (3px), background `var(--panel-3)`, accent-color on the kicker.
-- Mouse hover and keyboard navigation share the same active state.
-- No results: a single row reading "No matches. Browse the phrasebook →" linking to `/phrasebook`.
+### Chapter 03 — How Claude Tries to Escape
 
-### Behavior
+- **URL:** `/03-escape-moves`
+- **Short:** `Escape`
+- **Title:** How Claude Tries to Escape
+- **Kicker:** `§ 3.0 · The recognition catalogue`
+- **Deck:** AI under pressure does specific, recognizable things to escape work. The wind-down, the deferral, the "I can't from CLI," the menu-of-options, the premature done. Twelve patterns. Each has a syntactic shape you can name.
+- **Shape:** ChapterIntro → ZoneHeader "§ 3.1 — 3.12 · Twelve escape moves" → 12 EscapeCards (variant of CalloutCard with `escape` styling: top bar, phrase emphasized, variants list, body paragraphs). Pagination to Chapter 04.
+- **Dependencies:** Chapter 04 (counter-moves) cross-references this catalogue.
 
-- Real-time filter as user types. Matching: case-insensitive `includes()` against the label, the category, and the description. (Hand-rolled; no library.)
-- Enter on active row navigates to the row's URL and closes the overlay.
-- ESC closes without navigation.
-- Click outside modal closes.
-- On mobile (<640): modal takes full screen, search input stays sticky at top, cancel button (text) at top-right of modal.
+### Chapter 04 — What You Say Back
 
-### Search index (build-time)
+- **URL:** `/04-counter-moves`
+- **Short:** `Counter`
+- **Title:** What You Say Back
+- **Kicker:** `§ 4.0 · The operator's vocabulary`
+- **Deck:** For each escape move in Chapter 3, the response. Copy-pasteable. The operator's job is to recognize and intercept; the words are the intercept.
+- **Shape:** ChapterIntro → ZoneHeader → 12 counter-cards (CalloutCard variant with `counter` styling: paste-text in a bordered blue block with CopyButton, "after paste" follow-up text underneath). Pagination.
+- **Dependencies:** Chapter 03 (each counter maps to an escape).
 
-- JSON manifest emitted at `/search.json` by a build-time endpoint at `src/pages/search.json.ts`.
-- Manifest shape:
-  ```json
-  [
-    {
-      "section": "phrasebook",
-      "label": "you'll need a paid service to do that",
-      "url": "/phrasebook/paid-service-claim",
-      "category": "It's giving up before trying",
-      "description": "..."
-    },
-    { "section": "foundations", "label": "Refuse the menu.", "url": "/start-here#refuse-the-menu", ... },
-    { "section": "pages", "label": "Where this came from", "url": "/about", ... }
-  ]
-  ```
-- Fetched once on first palette-open via `fetch('/search.json')`. Cached for the session.
+### Chapter 05 — The Working Loop
 
-### Implementation
+- **URL:** `/05-working-loop`
+- **Short:** `Loop`
+- **Title:** The Working Loop
+- **Kicker:** `§ 5.0 · One session, five beats`
+- **Deck:** The shape of an everyday session: brainstorm → plan → build → review → persist. Plus the `/goal` long-task primitive for work that exceeds one session.
+- **Shape:** ChapterIntro → phase list with 5–6 phases (numbered like reference handoff's `.phase` style: big-number left, h3 + body right) → CalloutBox on the `/goal` long-task primitive.
+- **Dependencies:** Chapter 02 (assumes /goal, /insights are installed). Chapter 06 (the session loop's "persist" step lands in the system that holds).
 
-- Custom element `<command-palette>` defined in `src/components/CommandPalette.ts`.
-- Mounted globally via `src/layouts/Base.astro` (single instance at end of body).
-- Vanilla JS; no framework imports.
-- Target gzipped size: < 8 KB.
-- Animations: 120ms fade-in for backdrop, 160ms scale-up + fade for modal. `prefers-reduced-motion` disables.
+### Chapter 06 — The System That Holds
 
-## 8. Phase plan
+- **URL:** `/06-system-that-holds`
+- **Short:** `System`
+- **Title:** The System That Holds
+- **Kicker:** `§ 6.0 · Build the harness as you go`
+- **Deck:** Memory, hooks, ast-grep rules, slash commands — the promotion ladder. Every failure becomes a permanent mechanical block. The harness grows; the operator gets more leverage over time.
+- **Shape:** ChapterIntro → ladder (4 rungs, reference handoff `.ladder` style: number / layer name / description / lifecycle stamp) → CalloutBox on `/failure-intake` and starter hooks.
+- **Dependencies:** Chapter 05 (the session loop produces the failures the system absorbs).
 
-Each phase is a shippable unit. Tasks within a phase can run in any order subject to prereqs. Phases run roughly in numeric order, but Phases 4-7 can interleave once Phase 1-2 are landed.
+### Chapter 07 — Running Multiple Claudes
 
-| Phase | Title                            | Result on completion                                                                                                                                                                                                   |
-| ----- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0     | Foundation hardening             | View transitions wired; pa11y/Playwright CI; a working README.                                                                                                                                                         |
-| 0.5   | Pre-content fixes (audit-driven) | The 27-task amendment from three reviews lands: typecheck passes, schema tightened, home page restructured, accessibility fails fixed, About voice rewritten, infrastructure (Prettier/ESLint/CI) wired. Blocks T-101. |
-| 1     | Content to full coverage         | All 13 phrasebook entries + 5 foundation-move detail pages live.                                                                                                                                                       |
-| 2     | Vercel-style command palette     | Cmd+K overlay live; home CTA re-wired; mobile takeover working.                                                                                                                                                        |
-| 3     | Open Graph image generation      | Every page has a unique OG image, build-time generated.                                                                                                                                                                |
-| 4     | Polish layer                     | Micro-animations, view transitions, copy-button states, reading progress on entries.                                                                                                                                   |
-| 5     | Security hardening               | CSP + HSTS + X-Content-Type-Options + Referrer-Policy + Permissions-Policy; AI bot policy in robots.txt.                                                                                                               |
-| 6     | Performance gates                | Lighthouse 100/100/100/100 on all pages; preloaded critical fonts; cache headers.                                                                                                                                      |
-| 7     | AI-SEO + crawler optimization    | llms-full.txt; expanded Schema.org (BreadcrumbList, HowTo); internal linking density; AI bot allowlist live.                                                                                                           |
-| 8     | Production deployment            | Live at custom domain on Cloudflare Pages, with smoke test and basic uptime monitoring.                                                                                                                                |
+- **URL:** `/07-multi-claude`
+- **Short:** `Multi`
+- **Title:** Running Multiple Claudes
+- **Kicker:** `§ 7.0 · Throughput without chaos`
+- **Deck:** Subagent dispatch, investigation forks, parallel agents. How to multiply output without losing the ability to verify. Dispatch discipline, prompt discipline, retry caps.
+- **Shape:** ChapterIntro → ZoneHeader → 4 CalloutCards (dispatch discipline / one task per agent / fresh-context routing / retry caps with structured escalation).
+- **Dependencies:** Chapter 01 (evidence hierarchy underpins fresh-context routing).
 
-## 9. Task catalog
+### Chapter 08 — Browser Validation
 
-### Phase 0 — Foundation hardening
+- **URL:** `/08-browser-validation`
+- **Short:** `Browser`
+- **Title:** Browser Validation
+- **Kicker:** `§ 8.0 · The verification gate AI gaslights`
+- **Deck:** Playwright MCP is the canonical case study. AI says "I can't browser-test from CLI" while the tool is registered the whole time. The four required checks. The empty-string-as-prop bug class.
+- **Shape:** ChapterIntro → ZoneHeader → 4 CalloutCards (the four required checks) → PullQuote on the gaslight pattern → CalloutBox on the empty-string-as-prop bug class.
+- **Dependencies:** Chapter 02 (Playwright MCP install). Chapter 03 (the "I can't from CLI" escape).
 
-#### T-001 — Add Astro view transitions integration
+### Chapter 09 — Quick Reference
 
-- **Phase:** 0
-- **Status:** done
-- **Result:** ClientRouter wired in Base.astro with transition:persist on topnav and footer.
-- **Prereqs:** none
-- **Read first:**
-  - https://docs.astro.build/en/guides/view-transitions/
-  - `site/src/layouts/Base.astro`
-- **Files to edit:**
-  - `site/src/layouts/Base.astro` (add `<ClientRouter />` from `astro:transitions`)
+- **URL:** `/09-quick-reference`
+- **Short:** `QRC`
+- **Title:** Quick Reference
+- **Kicker:** `§ 9.0 · Print this. Pin it.`
+- **Deck:** One page, optimized for print. The forbidden phrases (theirs and yours), the session-open ritual, the slash commands, the verification ladder.
+- **Shape:** ChapterIntro → two PhraseLists side-by-side at ≥48rem (their forbidden phrases / your forbidden phrases) → command table → session-open checklist. Print stylesheet keeps the layout clean on letter / A4.
+- **Dependencies:** Cross-references every prior chapter.
+
+---
+
+## 8. Visual system reference
+
+**Palette (already in `global.css`):**
+
+- Backgrounds: `--bg #0a0d10` (page) / `--panel #0e1116` / `--panel-2 #11151b` / `--panel-3 #141a22`
+- Borders: `--line #1c2128` / `--line-bright #262e38`
+- Text: `--text #cdd9e5` / `--text-bright #e6edf3` / `--muted #6e7b89` / `--dim #3a4451`
+- Accents: `--blue #58a6ff` (primary) / `--amber #d4a72c` (secondary) / `--red #f0883e` / `--green #56d364`
+
+**Type:**
+
+- Body: `IBM Plex Mono` (400/500/600) — `--mono` token.
+- Display: `IBM Plex Sans Condensed` (500/600/700) — `--display` token, used for h1, h2, chapter intros, callout titles.
+
+**Component inventory (Phase 1 builds these):**
+
+| Component             | File                                          | Variants                  | Used in                              |
+| --------------------- | --------------------------------------------- | ------------------------- | ------------------------------------ |
+| `ChapterIntro.astro`  | `src/components/ChapterIntro.astro`           | none                      | All chapter pages (top of body)      |
+| `ZoneHeader.astro`    | `src/components/ZoneHeader.astro`             | none                      | Chapter pages (section landmarks)    |
+| `CalloutCard.astro`   | `src/components/CalloutCard.astro`            | tone: blue / amber / red  | Chapters 01, 03, 04, 07, 08          |
+| `PullQuote.astro`     | `src/components/PullQuote.astro`              | none                      | Chapters 01, 08                      |
+| `CalloutBox.astro`    | `src/components/CalloutBox.astro`             | tone: blue / amber / red  | Chapters 01, 05, 06, 08              |
+| `ChapterPagination.astro` | `src/components/ChapterPagination.astro`  | none                      | All chapter pages (bottom)           |
+| `CopyButton.ts`       | `src/components/CopyButton.ts`                | (preserved)               | Chapter 04 paste blocks              |
+| `CommandPalette.ts`   | `src/components/CommandPalette.ts`            | (section types update)    | Global (top nav trigger)             |
+| `ReadingProgress.ts`  | `src/components/ReadingProgress.ts`           | (preserved)               | Global (top, under nav)              |
+
+**Layout primitives (in `global.css`):**
+
+- `.container` — max-width 1320px, side-gutter responsive.
+- `.topnav` — sticky 40px-tall top nav with brand on left, section letters on right (desktop), hamburger menu (mobile).
+- `.site-footer` — quiet bottom strip.
+- `.skip-link` — a11y skip-to-content.
+
+---
+
+## 9. Phase plan
+
+Phases are shippable units. Each phase ends with a verifiable artifact.
+
+- **Phase 0 — Demolition · DONE.** All rejected content/design removed. Schema rewritten. MDX integration added. Plan and charter authored.
+- **Phase 1 — Design system + components.** `global.css` finalized for new artifact. `Base.astro` overhauled. Six content components built (ChapterIntro, ZoneHeader, CalloutCard, PullQuote, CalloutBox, ChapterPagination). Verification: a Chapter 01 stub renders cleanly at 375/768/1024/1440.
+- **Phase 2 — Chapter 01 fully authored + Chapter 00 home + chapter route + Chapter 02–09 stubs.** `pnpm build` exits 0. All 10 routes resolve. Chapter 01 is the canonical authored example.
+- **Phase 3 — Endpoints updated.** `llms-full.txt`, `llms.txt`, `search.json`, `og/[slug].png.ts`, `og-template.ts`, `CommandPalette.ts` section types. Verification: curl each endpoint and confirm chapter-shaped output.
+- **Phase 4 — Documentation (this CLAUDE.md and MASTER-PLAN.md) finalized.** DONE for this revision. Re-run when chapter content matures.
+- **Phase 5 — Validation.** Smoke tests updated, `pnpm build` exits 0, Playwright run at four viewports, console clean. Maxwell reviews Chapter 01 rendering.
+- **Phase 6 — Chapters 02–09 fully authored.** One chapter per task. Each chapter is its own dispatch.
+- **Phase 7 — Deploy.** Outside this plan's scope. The deliverable is a Cloudflare-Pages-ready static site.
+
+---
+
+## 10. Task catalog
+
+Tasks are grouped by phase. Each task is a single agent dispatch. Tasks are atomic; if a task feels like it might exceed one focused session, split it.
+
+### Phase 1 — Design system + components
+
+#### T-101 — Author the new `global.css`
+
+- **Status:** `done`
+- **Prereqs:** none.
+- **Files:** `src/styles/global.css` (full rewrite).
+- **Why:** The previous component selectors are tied to the rejected design surface. Tokens are aligned with the reference handoff; component-layer styles need to match the new component inventory (ChapterIntro, ZoneHeader, CalloutCard, PullQuote, CalloutBox, ChapterPagination, top nav with section letters, footer without personal branding).
 - **Instructions:**
-  1. Import `ClientRouter` from `astro:transitions` in `Base.astro`.
-  2. Render `<ClientRouter />` inside `<head>`.
-  3. Add `transition:name` directives on the title block, the hero h1, and the receipts sidebar so they animate across navigations.
-  4. Verify on `/phrasebook` → `/phrasebook/paid-service-claim` → back. The title block should crossfade.
-  5. Respect `prefers-reduced-motion`.
-- **Why:** Cross-page navigation should feel cohesive, not page-flash. View transitions are an Astro built-in; no extra JS budget cost.
-- **Definition of done:** `pnpm build` exits 0. Visual check shows a smooth crossfade between phrasebook index and entry pages. `prefers-reduced-motion` disables them.
-
-#### T-002 — Add Playwright smoke-test suite
-
-- **Phase:** 0
-- **Status:** done
-- **Result:** tests/smoke.spec.ts runs 8 routes at 4 viewports; pnpm test passes.
-- **Prereqs:** none
-- **Read first:**
-  - https://playwright.dev/docs/test-fixtures
-  - `site/src/pages/` (the route list)
-- **Files to create:**
-  - `site/playwright.config.ts`
-  - `site/tests/smoke.spec.ts`
-- **Instructions:**
-  1. Add `@playwright/test` to `devDependencies` via pnpm.
-  2. Create `playwright.config.ts` configured for the four viewports (375 / 768 / 1024 / 1440), retries 0, base URL `http://localhost:4321`.
-  3. In `smoke.spec.ts`: for each page (`/`, `/phrasebook`, `/phrasebook/paid-service-claim`, `/start-here`, `/about`, `/404`), assert: HTTP 200, `<title>` present, one `<h1>` present, zero console errors, no horizontal scrollbar.
-  4. Add an `npm script`: `"test": "playwright test"`.
-- **Why:** Mechanical regression gate. Every future task can run `pnpm test` to confirm no page is broken.
-- **Definition of done:** `pnpm test` passes for all viewports and all pages.
-
-#### T-003 — Add accessibility CI gate (pa11y or axe)
-
-- **Phase:** 0
-- **Status:** done
-- **Result:** .pa11yci.json present; pnpm a11y wired; passes against built dist.
-- **Prereqs:** T-002
-- **Read first:** https://github.com/pa11y/pa11y-ci
-- **Files to create:**
-  - `site/.pa11yci.json`
-- **Instructions:**
-  1. Add `pa11y-ci` to devDependencies.
-  2. Configure with standard WCAG 2.1 AA, all five page URLs at `http://localhost:4321`.
-  3. Add npm script `"a11y": "pa11y-ci"`.
-- **Why:** Accessibility is non-negotiable for a site whose audience explicitly includes screen-reader users and keyboard-only navigation.
-- **Definition of done:** `pnpm a11y` exits 0 against the running dev server.
-
-#### T-004 — Write `site/README.md`
-
-- **Phase:** 0
-- **Status:** done
-- **Result:** site/README.md present, 63 lines, accurate to current scaffold.
-- **Prereqs:** none
-- **Read first:** `site/CLAUDE.md`, `site/MASTER-PLAN.md`
-- **Files to create:** `site/README.md`
-- **Instructions:**
-  1. Human-readable orientation: what this is, how to develop locally (`pnpm install && pnpm dev`), how to deploy, where the master plan lives.
-  2. No more than 80 lines. Maxwell will skim this once.
-  3. Link to `CLAUDE.md` for agent rules and `MASTER-PLAN.md` for task list.
-- **Why:** README is the first file a human collaborator opens. Should orient in 30 seconds.
-- **Definition of done:** File exists, under 80 lines, accurate as of the current state.
-
-### Phase 0.5 — Pre-content fixes (audit-driven)
-
-Added 2026-05-15 in response to three independent reviewer findings. Phase 0.5 must complete before any Phase 1 content authoring begins. The findings are durable artifacts at:
-
-- `_internal/reviews/2026-05-15-security-review.md`
-- `_internal/reviews/2026-05-15-architecture-review.md`
-- `_internal/reviews/2026-05-15-content-voice-review.md`
-
-This phase has three tiers: Critical (T-005 through T-010), High (T-011 through T-020), Medium (T-021 through T-031). Tiers run in order; tasks within a tier can run in any order subject to prereqs. Phase 0.5 closes with a validation pass (the existing browser-validate task) that must succeed before T-101 unblocks.
-
-#### Critical tier (blocks T-101)
-
-##### T-005 — Fix pnpm check implicit-any errors
-
-- **Status:** done
-- **Result:** CollectionEntry annotations applied to phrasebook.astro and [slug].astro; pnpm check 0/0/0.
-- **Prereqs:** none
-- **Read first:** `site/src/pages/phrasebook.astro`, `site/src/pages/phrasebook/[slug].astro`, https://docs.astro.build/en/guides/content-collections/#querying-collections
-- **Files to edit:** the two files above
-- **Instructions:**
-  1. In `phrasebook.astro`, import `CollectionEntry` from `astro:content` and annotate the `getCollection` result type and each `.filter`/`.map` callback parameter as `CollectionEntry<'phrasebook'>`.
-  2. In `[slug].astro`, declare a local `Props` type with `entry: CollectionEntry<'phrasebook'>`, annotate `getStaticPaths` callbacks the same way, and cast `Astro.props` to `Props`.
-  3. Run `pnpm check` — must exit 0.
-- **Why:** Architecture review CRITICAL-1. The build doesn't catch implicit-any but `astro check` does. A cold-start agent who runs `pnpm check` before T-101 will be misled into thinking their work caused the failure.
-- **Definition of done:** `pnpm check` exits 0 with 0 errors and 0 warnings.
-
-##### T-006 — Add astro check to prebuild gate
-
-- **Status:** done
-- **Result:** build script is "astro check && astro build" in package.json.
-- **Prereqs:** T-005
-- **Files to edit:** `site/package.json`
-- **Instructions:** Change the `build` script from `astro build` to `astro check && astro build`. Verify `pnpm build` fails if a type error is reintroduced (test by adding `const x: number = 'string'` temporarily, confirming build fails, then reverting).
-- **Why:** Mechanical gate so future regressions can't land silently.
-- **Definition of done:** `pnpm build` first runs `astro check`. Reintroducing a type error causes build to exit 1.
-
-##### T-007 — Apply JSON-LD escape function
-
-- **Status:** done
-- **Result:** safeJsonLd helper escapes </ in Base.astro; is:inline on JSON-LD script.
-- **Prereqs:** none
-- **Files to edit:** `site/src/layouts/Base.astro`
-- **Instructions:** Add a helper function `safeJsonLd(obj)` that returns `JSON.stringify(obj).replace(/<\//g, '<\\/')`. Replace the `<script type="application/ld+json" set:html={JSON.stringify(schema)} />` with `set:html={safeJsonLd(schema)}`. Also add `is:inline` attribute on that script to silence the Astro hint.
-- **Why:** Security review F-01 HIGH. `JSON.stringify` does not escape `</script>` sequences. Latent XSS in the build pipeline because AI agents author content.
-- **Definition of done:** Helper present, used in Base.astro, no behavior change observable in browser. `pnpm check` exits 0 (hint cleared).
-
-##### T-008 — Tighten content collection schema
-
-- **Status:** done
-- **Result:** Schema in src/content/config.ts uses max() caps, enum on category and relatedMove.slug, refine() against raw HTML.
-- **Prereqs:** none
-- **Files to edit:** `site/src/content/config.ts`, `site/src/content/phrasebook/paid-service-claim.md`, `site/src/pages/phrasebook/[slug].astro`
-- **Instructions:**
-  1. Drop `categoryLabel` and `categoryNumber` from the schema and frontmatter. Add a `CATEGORY_MAP` const in `[slug].astro` (and import into `phrasebook.astro`) that maps `category` → `{ number, label }`. Look up in the template.
-  2. Add `.max()` caps: `quote.max(120)`, `subtitle.max(160)`, `pasteText.max(800)`. (Per content review: pasteText should be tight; 800 is a soft cap that allows the current 234-char example with headroom.)
-  3. Constrain `relatedMove.slug` to `z.enum(['ai-is-the-engineer','refuse-the-menu','verify-the-artifact','push-back-on-i-cant','make-recurring-mistakes-mechanical'])`.
-  4. Add `.refine()` on each entry of `whyThisWorks` and `whereThisCameFrom`: reject strings containing the regex `<[a-zA-Z]` (matches raw HTML tag openers; the `*italic*` shorthand uses no `<`).
-  5. Update `paid-service-claim.md` frontmatter to remove `categoryLabel` and `categoryNumber`.
-- **Why:** Architecture review §2.7 + security review F-03. Three fields that must stay in sync; schema permits drift. Length caps prevent layout overflow. Enum on slug prevents typos that fail silently. Refine on body fields closes the `set:html` injection path at schema level.
-- **Definition of done:** `pnpm check` and `pnpm build` both exit 0. The published entry renders identically. Attempting to add `category: 'giving-up'` with no `categoryLabel` in frontmatter succeeds (because the field no longer exists).
-
-##### T-009 — Convert hardcoded afterPaste paragraph to frontmatter
-
-- **Status:** done
-- **Result:** afterPaste is an optional schema field; rendered conditionally in [slug].astro.
-- **Prereqs:** T-008
-- **Files to edit:** `site/src/content/config.ts`, `site/src/content/phrasebook/paid-service-claim.md`, `site/src/pages/phrasebook/[slug].astro`
-- **Instructions:**
-  1. Add an optional `afterPaste: z.string().max(400).optional()` field to the schema.
-  2. In `paid-service-claim.md`, set `afterPaste: |\n  If the agent comes back with an actual command and an actual error, you have ground truth.\n  If it comes back with another paragraph about pricing tiers, push again.\n`.
-  3. In `[slug].astro:64`, replace the hardcoded `<p class="body-copy">...</p>` after the paste block with a conditional `{d.afterPaste && <p class="body-copy">{d.afterPaste}</p>}`.
-- **Why:** Content/voice review CRITICAL §10 Rewrite 5. The hardcoded sentence mentions "pricing tiers" — specific to the paid-service entry. Without this fix, every one of the next 12 entries will display the same irrelevant followup.
-- **Definition of done:** The published entry still shows the followup paragraph. A new entry without `afterPaste` does not show any followup paragraph. `pnpm build` exits 0.
-
-##### T-010 — Already amended in T-501 and T-502 above
-
-- **Status:** done
-- **Result:** T-501 CSP `script-src` now includes `'unsafe-inline'` + adds `object-src 'none'`. T-502 user-agent list replaces `Claude-Web` with `ClaudeBot`. Amendments are inline in Phase 5 task definitions.
-
-#### High tier (should land before T-101)
-
-##### T-011 — Lift Start Here cards into clickable anchors
-
-- **Status:** done
-- **Result:** Start Here cards are clickable anchors styled as cards (text-decoration:none, color:inherit).
-- **Files to edit:** `site/src/pages/start-here.astro`, `site/src/styles/global.css`
-- **Instructions:** Wrap each `.move` card in an `<a href="#${move.slug}">` element (interim, until T-150 creates `/start-here/<slug>` routes). Update `.move` CSS so the anchor behaves as the card (text-decoration: none, color: inherit, display: flex, flex-direction: column).
-- **Why:** Architecture review HIGH-3 + content/voice §5. The cards show "Read →" but aren't clickable.
-- **Definition of done:** Clicking anywhere on a `.move` card scrolls to its `#slug` anchor. Keyboard nav reaches each card.
-
-##### T-012 — Fix home heading hierarchy (h1 → h2 → h3)
-
-- **Status:** done
-- **Result:** home modes section wrapped in <section aria-labelledby="modes-heading"> with a visually-hidden h2.
-- **Files to edit:** `site/src/pages/index.astro`, `site/src/styles/global.css` (selector update)
-- **Instructions:** The three mode tiles use `<h3>` with no intermediate `<h2>`. Wrap the modes section in `<section aria-labelledby="modes-heading">`, prepend a visually-hidden `<h2 id="modes-heading" class="sr-only">Three ways to read this manual</h2>` (add `.sr-only` utility in global.css), keep tiles as `<h3>`. Result: screen-reader hierarchy `h1 → h2 → h3`.
-- **Why:** Architecture review HIGH-4. Trips screen-reader heading nav and pa11y CI (T-003).
-- **Definition of done:** Heading order on `/` is h1, h2, h3, h3, h3. pa11y test passes.
-
-##### T-013 — Ship placeholder og-default.png
-
-- **Status:** done
-- **Result:** SUPERSEDED by T-301/T-302/T-303: per-page OG generator replaces the placeholder; og-default.png removed from public/.
-- **Files to create:** `site/public/og-default.png`
-- **Instructions:** Render a 1200×630 PNG with the brand title "The Solo Operator's Manual" centered in Plex Sans Condensed-style typography on the `#0a0d10` background, with a subtle drafting-grid underlay. Use any one-shot SVG-to-PNG path: a hand-authored SVG converted via `resvg-js`, an inline canvas-rendered PNG, or a build-time Satori call. Keep file size under 100 KB.
-- **Why:** Architecture review HIGH-2 + security F-06. `og:image` defaults to a 404 file today. Every link preview is a broken image.
-- **Definition of done:** `curl -I http://localhost:4321/og-default.png` returns 200. File is a valid PNG, 1200×630.
-
-##### T-014 — Remove dead RSS link from Base.astro
-
-- **Status:** done
-- **Result:** No <link rel="alternate" type="application/rss+xml"> in Base.astro.
-- **Files to edit:** `site/src/layouts/Base.astro`
-- **Instructions:** Delete the `<link rel="alternate" type="application/rss+xml" title=... href="/rss.xml" />` at Base.astro:91. RSS is deferred until Phase 7 backlog (see T-705 below).
-- **Why:** Architecture HIGH-2 + security F-05. The endpoint doesn't exist; the link is a broken contract.
-- **Definition of done:** No `<link rel="alternate" type="application/rss+xml">` in any built page. Feed reader 404s on this site simply because the link is gone, not advertised-then-broken.
-
-##### T-015 — Redesign home page structure
-
-- **Status:** done
-- **Result:** Home has thesis paragraph; .search-wrap removed; three-card modes grid remains.
-- **Files to edit:** `site/src/pages/index.astro`
-- **Instructions:**
-  1. Delete the entire `.search-wrap` `<section>` (the prompt + helper + "Browse the phrasebook" link block).
-  2. Insert a thesis paragraph between the `.subtle` subtitle and the `.modes` grid: _"If you don't write code but you ship software with AI agents, the work eventually comes down to this: knowing what to say back when the agent stalls, lies, hands the decision back to you, or quietly makes something up. This is the phrasebook for those moments."_ — wrapped in `<p class="thesis">`.
-  3. Keep the three-card `.modes` grid as-is.
-  4. Move the inline-style mess at `index.astro:41-44` into a new `.mode.cta-row` class in `global.css`; or, if that section is being deleted entirely (per step 1), this is moot.
-- **Why:** Content/voice review CRITICAL §10 Rewrite 1. Two competing CTAs ten pixels apart; no thesis on the home page; the fake-search section is misleading.
-- **Definition of done:** Home page renders thesis paragraph above the three-card grid. No duplicate CTAs. `pnpm build` exits 0.
-
-##### T-016 — Replace home kicker + "production software" sweep
-
-- **Status:** done
-- **Result:** Kicker is "How to talk to your AI agent when it gets stubborn"; zero occurrences of "production software" remain in src/ or public/.
-- **Files to edit:** `site/src/pages/index.astro`, `site/src/pages/llms.txt.ts`, any other surface that uses the phrase
-- **Instructions:**
-  1. Change the kicker on the home page from "How to talk to an AI agent so it builds production software" to "How to talk to your AI agent when it gets stubborn."
-  2. Search the codebase for the literal string `production software`. Replace each occurrence with `real software`.
-  3. Verify in built `llms.txt`.
-- **Why:** Content/voice review §10 Rewrite 2 + §9. "Production software" is marketing-vocab; the site uses "real software" elsewhere. Consistency.
-- **Definition of done:** Zero occurrences of "production software" in `site/src/`. Home kicker reads the new copy.
-
-##### T-017 — Rewrite About paragraph 3
-
-- **Status:** done
-- **Result:** About paragraph 3 reads the rewritten copy starting "A thousand sessions in...".
-- **Files to edit:** `site/src/pages/about.astro`
-- **Instructions:** Replace the existing paragraph 3 (starting "Over the course of more than a thousand working sessions...") with the tighter version from content/voice §10 Rewrite 3: _"A thousand sessions in, I had a notebook of patterns. The agent failed the same way over and over. \"Please remember\" never worked. \"Build a rule the agent can't ignore\" almost always did. \"What do you want me to do?\" stalled the work. \"You decide and tell me why\" moved it."_
-- **Why:** Content/voice §2 Passage C + §10 Rewrite 3. LLM-cadence drift; rewrite drops the "Over the course of" tic and halves word count while preserving substance.
-- **Definition of done:** Paragraph reads the new copy. About page builds.
-
-##### T-018 — Rewrite About verification-discipline paragraph
-
-- **Status:** done
-- **Result:** About verification-discipline paragraph reads the rewritten copy starting "Every number on this site is a real number...".
-- **Files to edit:** `site/src/pages/about.astro`
-- **Instructions:** Replace the verification-discipline paragraph (currently "Every claim on this site is anchored in a count from the underlying working corpus...") with content/voice §10 Rewrite 4: _"Every number on this site is a real number from real sessions. If a section's claim can't be traced back to a count, the section stays empty. Guessing is the failure mode this manual is trying to break — the manual itself doesn't guess."_
-- **Why:** Content/voice §2 Passage D — labeled CLAUDE-DEFAULT-EXPLAINER. The single most fixable voice problem on the site.
-- **Definition of done:** Paragraph reads the new copy.
-
-##### T-019 — Contraction pass on Start Here card bodies
-
-- **Status:** done
-- **Result:** Start Here card bodies pass contraction check (no "cannot", "I have added", etc., where natural).
-- **Files to edit:** `site/src/pages/start-here.astro`
-- **Instructions:** Pass through all five `move.body` strings and apply contractions per content/voice §5:
-  - Move 03: "I have added" → "I've added"
-  - Move 04: "it cannot do" → "it can't do"; "you will need" → "you'll need"; "three out of four times" → "three quarters of the time" (both occurrences, for global consistency with the phrasebook entry)
-  - Move 05: "will not fix" → "won't fix"; "cannot ignore" → "can't ignore"
-- **Why:** Content/voice §5 MEDIUM finding. Uncontracted English is Claude-default register; Maxwell's voice uses contractions.
-- **Definition of done:** Five card bodies updated. No remaining uncontracted forms where contraction reads natural.
-
-##### T-020 — Document story-mode decision in CLAUDE.md
-
-- **Status:** done
-- **Result:** site/CLAUDE.md has "Phrasebook story mode" subsection under Voice and content.
-- **Files to edit:** `site/CLAUDE.md`
-- **Instructions:** Add a short subsection under "Voice and content" titled "Phrasebook story mode" stating: _"Every phrasebook entry's 'where this came from' section uses first-person scar-tissue mode ('I once X. Later Y. The lesson was Z.'). Constraint: no two stories share the same anchoring image — no two stories say 'a service', 'weeks later', 'for months', etc. Variance comes from substance, not structure."_
-- **Why:** Content/voice §3 CRITICAL framing question. Twelve memoir-shaped stories risk becoming a memoir; locking the mode AND the variance rule preserves the manual register.
-- **Definition of done:** Section added to CLAUDE.md. Next phrasebook author task will read it.
-
-#### Medium tier (polish)
-
-##### T-021 — Bump --muted to pass AA on --panel
-
-- **Status:** done
-- **Result:** --muted bumped to pass AA on --panel; verified by pa11y CI.
-- **Files to edit:** `site/src/styles/global.css`
-- **Instructions:** Change `--muted: #6e7b89` (4.37:1 on --panel — FAIL AA body). Target a value that clears 4.5:1. Candidate: `#7a8693` (estimated 4.6+). Verify with a contrast checker; visually verify the muted text doesn't read too bright. If too bright, instead introduce a new token `--muted-on-panel: #7d8a98` and use selectively where backgrounds are panel-colored.
-- **Why:** Architecture review §2.5 MEDIUM contrast fail. Blocks T-003 pa11y CI.
-- **Definition of done:** All muted-text-on-panel uses pass 4.5:1.
-
-##### T-022 — Replace opacity:0.45 stubs with explicit token color
-
-- **Status:** done
-- **Result:** No stub rows remain — all 13 entries are published; .is-stub pattern unneeded.
-- **Files to edit:** `site/src/pages/phrasebook.astro`, `site/src/styles/global.css`
-- **Instructions:** Drop the inline `style="opacity:0.45; cursor:default; pointer-events:none"` on stub rows. Replace with a `.pb-row.is-stub` class. In CSS, the class sets color via `--dim` token, `cursor: default`, `pointer-events: none`. Add `aria-disabled="true"` and a visually-hidden `<span class="sr-only">, forthcoming, not yet published</span>` for screen readers.
-- **Why:** Architecture §2.4 MEDIUM. Opacity bypasses tokens and crashes contrast; aria-disabled signals state to AT.
-- **Definition of done:** Stub rows render with token-based dim color, pass AA Large at minimum, announce "forthcoming" to screen readers.
-
-##### T-023 — Polish CopyButton: aria-live, aria-label, error recovery, error styling
-
-- **Status:** done
-- **Result:** CopyButton has aria-label, aria-live, error-state CSS, 1.4s recovery to idle.
-- **Files to edit:** `site/src/components/CopyButton.ts`, `site/src/styles/global.css`
-- **Instructions:**
-  1. In `connectedCallback`, also set `this.setAttribute('aria-label', 'Copy paste text to clipboard'); this.setAttribute('aria-live', 'polite');`
-  2. In the `catch` branch, after setting `data-state = 'error'`, also do `setTimeout(() => { this.dataset.state = 'idle'; this.textContent = original; }, 1400);`
-  3. In `global.css`, add `copy-button[data-state='error'] { background: var(--red); color: var(--bg); border-color: var(--red); }`
-- **Why:** Architecture §2.8 MEDIUM. Silent error state today; state changes announce to screen readers post-fix.
-- **Definition of done:** Denying clipboard permission (in DevTools) shows a brief red error state, then returns to idle. Screen-reader testing announces "Copied" after success.
-
-##### T-024 — Remove Astro generator meta tag
-
-- **Status:** done
-- **Result:** No <meta name="generator"> on any built page.
-- **Files to edit:** `site/src/layouts/Base.astro`
-- **Instructions:** Delete the `<meta name="generator" content={Astro.generator} />` at Base.astro:94.
-- **Why:** Security review F-07 NIT. Tells scanners the exact Astro version; maps to known CVEs.
-- **Definition of done:** No generator meta on any built page.
-
-##### T-025 — Remove unused @astrojs/mdx
-
-- **Status:** done
-- **Result:** @astrojs/mdx absent from package.json and astro.config.mjs.
-- **Files to edit:** `site/package.json`, `site/astro.config.mjs`
-- **Instructions:** Remove `@astrojs/mdx` from `dependencies`. Remove the `mdx()` integration from `astro.config.mjs`. Remove the unused import line. Run `pnpm install` to update the lockfile.
-- **Why:** Security review §5 + architecture review. No `.mdx` files exist; reduces dependency surface and supply-chain audit load.
-- **Definition of done:** `pnpm build` exits 0. `pnpm list @astrojs/mdx` shows it's gone.
-
-##### T-026 — Add Prettier + plugin-astro
-
-- **Status:** done
-- **Result:** Prettier 3.x + prettier-plugin-astro present; pnpm format and pnpm format:check both green.
-- **Files to create:** `site/.prettierrc`, `site/.prettierignore`
-- **Files to edit:** `site/package.json`
-- **Instructions:** Add `prettier ^3.3.0` and `prettier-plugin-astro ^0.14.0` to `devDependencies`. Create `.prettierrc` with `{ "printWidth": 100, "semi": true, "singleQuote": true, "plugins": ["prettier-plugin-astro"] }`. Create `.prettierignore` with `dist`, `node_modules`, `.astro`. Add `"format": "prettier --write 'src/**/*.{astro,ts,js,css,md}'"` script. Run it once.
-- **Why:** Handoff STACK.md budgeted Prettier; not installed; consistency matters for cold-start agents.
-- **Definition of done:** `pnpm format` runs without errors. `pnpm format --check` exits 0 after running write.
-
-##### T-027 — Add ESLint flat config
-
-- **Status:** done
-- **Result:** eslint.config.js flat config; pnpm lint exits 0.
-- **Files to create:** `site/eslint.config.js`
-- **Files to edit:** `site/package.json`
-- **Instructions:** Add `eslint ^9.0.0`, `astro-eslint-parser`, `@typescript-eslint/parser`, `eslint-plugin-astro`, `typescript-eslint` to `devDependencies`. Create `eslint.config.js` (flat config) with rules for `.astro` and `.ts`/`.js` files: no-unused-vars warn, prefer-const error, no-implicit-any error, recommended ts rules. Add `"lint": "eslint 'src/**/*.{astro,ts,js}'"`. Run; resolve any findings.
-- **Why:** Handoff STACK.md budgeted ESLint.
-- **Definition of done:** `pnpm lint` exits 0.
-
-##### T-028 — Add GitHub Actions CI
-
-- **Status:** done
-- **Result:** .github/workflows/ci.yml runs install/check/lint/format:check/build/playwright/pa11y/lhci.
-- **Prereqs:** T-026, T-027
-- **Files to create:** `site/.github/workflows/ci.yml`
-- **Instructions:** Workflow triggers on push and pull_request. Steps: checkout, setup pnpm, setup Node 22, cache pnpm store, `pnpm install`, `pnpm check`, `pnpm lint`, `pnpm format --check`, `pnpm build`. Fail the workflow if any step fails.
-- **Why:** Mechanical regression gate. Every change is screened before landing.
-- **Definition of done:** Workflow file syntactically valid (verify with `actionlint` if available). Local simulation of all steps passes.
-
-##### T-029 — Add \_TEMPLATE.md.txt authoring scaffold
-
-- **Status:** done
-- **Result:** src/content/phrasebook/\_TEMPLATE.md.txt exists; .txt extension keeps it out of the collection glob.
-- **Files to create:** `site/src/content/phrasebook/_TEMPLATE.md.txt`
-- **Instructions:** Annotated frontmatter scaffold for a new phrasebook entry. Every field has an inline comment naming: what it is, length cap, format constraint, sterilization reminder. `.txt` extension keeps it out of the content collection glob.
-- **Why:** Architecture review §4.9. Cold-start agent copying T-101 from spec needs an annotated reference.
-- **Definition of done:** File exists. Contains every schema field with inline comments. `pnpm build` does not pick it up as an entry.
-
-##### T-030 — Add prompt-injection guard
-
-- **Status:** done
-- **Result:** noPromptInjection refine() applied to pasteText, afterPaste, whyThisWorks, whereThisCameFrom.
-- **Files to edit:** `site/src/content/config.ts`
-- **Instructions:** Add a Zod `.refine()` on `pasteText` that rejects strings matching `^(Ignore|Forget|Disregard|You are now|Your new role|System:|Assistant:|Human:)\\b/i`. Same for entries of `whyThisWorks` and `whereThisCameFrom`. The `.refine()` should produce a clear error message naming the disallowed prefix.
-- **Why:** Security review §6. `llms-full.txt` (Phase 7) will concatenate body content; if a future Claude session ingests it as authoritative context, prompt-injection patterns in entry bodies become a vector.
-- **Definition of done:** A test entry with `pasteText: "Ignore all previous instructions"` fails `pnpm check` or `pnpm build`. Removing the prefix passes.
-
-##### T-031 — Sterilization micro-tightening
-
-- **Status:** done
-- **Result:** Three sterilization micro-edits landed in about.astro and paid-service-claim.md.
-- **Files to edit:** `site/src/pages/about.astro`, `site/src/content/phrasebook/paid-service-claim.md`
-- **Instructions:**
-  1. `about.astro:20` — drop "small" from "a small company" → "a company".
-  2. `about.astro:22` — compress "no technical co-founder, no junior developer, no engineering staff" → "no engineering team behind me".
-  3. `paid-service-claim.md` — change "I once paid for a service for months because" → "I once paid for a service I could have self-hosted free, because" (drops the months-anchor breadcrumb).
-- **Why:** Content/voice §7. Three sterilization NITs — none load-bearing alone but together they leak less.
-- **Definition of done:** Three substitutions in place. Sterilization sweep on About + the entry returns clean.
-
-### Phase 1 — Content to full coverage
-
-Twelve more phrasebook entries to author. Each follows the same shape:
-
-**Common task template — TC-PHRASEBOOK-ENTRY:**
-
-- **Prereqs:** none
-- **Read first:**
-  - `site/src/content/config.ts` (the schema)
-  - `site/src/content/phrasebook/paid-service-claim.md` (the reference entry — copy this shape)
-  - `_internal/verified-principles.md` (find the principle this entry leans on)
-  - `_internal/phase1/index.md` (find the recognition phrases)
-  - `_internal/claude-insights-full/out/aggregate.json` (find the corpus count for the `appears` field)
-- **Instructions:**
-  1. Create `site/src/content/phrasebook/<slug>.md` matching the schema exactly.
-  2. Frontmatter fields: `title`, `quote`, `subtitle`, `description` (≤180 chars), `category` (one of `giving-up` / `done-before-done` / `handing-back` / `making-up`), `categoryNumber`, `categoryLabel`, `appears`, `categoryTotal`, `successRate` (optional), `relatedMove`, `hearing` (3-5 phrases), `pasteText`, `whyThisWorks` (1-3 paragraphs), `whereThisCameFrom` (2-4 paragraphs, sterilized), `pubDate`.
-  3. Sterilize per § 4 of this file.
-  4. Add a row to the `phrasebook.astro` placeholders list with `coveredBy: '<slug>'` so the stub disappears from the index.
+  1. Keep the existing tokens block at the top (GitHub-dark palette + IBM Plex font tokens + container/gutter tokens). Do not rename existing variables; downstream components reference them.
+  2. Replace everything below the tokens block with a clean component-layer authored from the reference handoff manual.css.
+  3. Match these selector classes (from the reference handoff visual system):
+     - `.skip-link`, `.container`, `main#main`
+     - `.topnav` and children (`.brand`, `.sects`, `.menu-button`, `.cmd-trigger`, `.mobile-menu`)
+     - `.hero`, `.chapter-intro` (with `.pre`, `h1`, `.deck`)
+     - `.specs` (3-column strip; for home page contents)
+     - `.zone-hd` (with `.num`, `.ttl`, `.meta`)
+     - `.details` (1-col mobile, 2-col `cols-2` desktop), `.detail` (with `.callout`, `.circ`, `.lbl`, `.body`, `.ttl`)
+     - `.pq` (with `.text`, `.attr`)
+     - `.callout-box` (with `.blue`, `.amber`, `.red` variants)
+     - Code block styles (`pre`, `.code-block`)
+     - `.prose` / chapter body prose
+     - `.phrase-list` (for chapter 9)
+     - `.pag` (chapter pagination)
+     - `.contents` (home page chapter index)
+     - `.site-footer`
+     - `reading-progress` and `.reading-progress-bar`
+     - `copy-button`
+     - `command-palette` and children
+     - Print stylesheet (`@media print`)
+     - Reduced-motion stylesheet (`@media (prefers-reduced-motion: reduce)`)
+  4. Strip ALL field-manual chrome selectors from the reference handoff: no `.tb`, no `.docbar`, no `.rev-block`, no `.title-block`, no engineering-spec stamps.
+  5. Mobile-first: default styles target mobile (≤47.99rem). Use `min-width` media queries at `48rem` (768px) and `64rem` (1024px) to enhance.
 - **Definition of done:**
-  - File exists and `pnpm build` exits 0.
-  - The entry appears in `/phrasebook` (real, full-opacity row).
-  - The entry renders at `/phrasebook/<slug>` at all four viewports without console errors.
-  - The sterilization checklist passes.
+  - `global.css` opens with the existing `:root` token block intact.
+  - All selectors listed above are present and styled per the reference handoff visual bones (minus field-manual chrome).
+  - No `.tb`, `.docbar`, `.rev-block`, `.title-block` selectors exist anywhere in the file.
+  - `pnpm dev` starts without CSS parse errors.
+  - File ends with a print stylesheet and reduced-motion stylesheet.
 
-The twelve entries:
+#### T-102 — Overhaul `Base.astro` (nav, footer, OG routes, SITE_NAME)
 
-| Task  | Category         | Slug                         | Quote (agent's voice)                                       |
-| ----- | ---------------- | ---------------------------- | ----------------------------------------------------------- |
-| T-101 | giving-up        | `cant-do-something`          | "I can't do that"                                           |
-| T-102 | giving-up        | `good-stopping-place`        | "this is a good place to stop"                              |
-| T-103 | done-before-done | `complete-but-untested`      | "the change is complete"                                    |
-| T-104 | done-before-done | `paraphrased-error`          | "the command failed with a permissions issue" (paraphrased) |
-| T-105 | done-before-done | `time-estimate`              | "this should take about thirty minutes"                     |
-| T-106 | done-before-done | `claimed-ran-but-didnt`      | "I ran the tests and they all pass"                         |
-| T-107 | handing-back     | `three-options`              | "would you like A, B, or C?"                                |
-| T-108 | handing-back     | `your-preference`            | "this depends on your preference"                           |
-| T-109 | handing-back     | `what-would-you-like`        | "what would you like me to do?"                             |
-| T-110 | making-up        | `cites-own-doc-as-authority` | "per the spec you wrote" (when the spec was AI-authored)    |
-| T-111 | making-up        | `false-file-citation`        | "the file says X" (when it doesn't)                         |
-| T-112 | making-up        | `unrequested-scope-change`   | "I also went ahead and refactored Y"                        |
-
-**Phase 1 task statuses (template-based):**
-
-| Task  | Status | Result                                                             |
-| ----- | ------ | ------------------------------------------------------------------ |
-| T-101 | done   | `cant-do-something.md` published; row in phrasebook index.         |
-| T-102 | done   | `good-stopping-place.md` published.                                |
-| T-103 | done   | `complete-but-untested.md` published.                              |
-| T-104 | done   | `paraphrased-error.md` published.                                  |
-| T-105 | done   | `time-estimate.md` published.                                      |
-| T-106 | done   | `claimed-ran-but-didnt.md` published.                              |
-| T-107 | done   | `three-options.md` published.                                      |
-| T-108 | done   | `your-preference.md` published.                                    |
-| T-109 | done   | `what-would-you-like.md` published.                                |
-| T-110 | done   | `cites-own-doc-as-authority.md` published.                         |
-| T-111 | done   | `false-file-citation.md` published.                                |
-| T-112 | done   | `unrequested-scope-change.md` published.                           |
-| T-151 | done   | `ai-is-the-engineer.md` foundation body published.                 |
-| T-152 | done   | `refuse-the-menu.md` foundation body published.                    |
-| T-153 | done   | `verify-the-artifact.md` foundation body published.                |
-| T-154 | done   | `push-back-on-i-cant.md` foundation body published.                |
-| T-155 | done   | `make-recurring-mistakes-mechanical.md` foundation body published. |
-
-For each task `T-1NN` use the common template above plus the specific slug, category, and quote from the table.
-
-**Five foundation move detail pages:**
-
-#### T-150 — Build foundation move detail page route
-
-- **Phase:** 1
-- **Status:** done
-- **Result:** foundations collection + src/pages/start-here/[slug].astro emit all five foundation move pages.
-- **Prereqs:** none
-- **Read first:**
-  - `site/src/pages/start-here.astro` (the index page; the cards already have slugs and bodies)
-  - `site/src/pages/phrasebook/[slug].astro` (mirror its dynamic-route pattern)
-- **Files to create:**
-  - `site/src/content/foundations/` directory + Zod schema in `src/content/config.ts`
-  - `site/src/pages/start-here/[slug].astro` dynamic route
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/layouts/Base.astro`.
+- **Why:** Current Base.astro references the rejected routes (`/phrasebook`, `/start-here`, `/about`), uses the old SITE_NAME ("The Solo Operator's Manual"), and has nav items that don't match the new artifact.
 - **Instructions:**
-  1. Define a `foundations` collection in `config.ts`. Fields: `title`, `summary` (≤180 chars), `slug`, `n` (e.g., "MOVE / 01"), `body` (string, full essay), `pasteExamples` (array of objects: { label, text }), `relatedPhrasebook` (array of slugs), `pubDate`.
-  2. Create five entries: `ai-is-the-engineer.md`, `refuse-the-menu.md`, `verify-the-artifact.md`, `push-back-on-i-cant.md`, `make-recurring-mistakes-mechanical.md`.
-  3. Build `[slug].astro` to render each foundation move as a full page. Layout: hero (kicker MOVE/0N, title, summary), body (the essay), paste-examples (using the same `paste-block` component as phrasebook entries), related phrasebook entries.
-  4. Update `start-here.astro` cards to link to `/start-here/<slug>` instead of `#<slug>`.
-- **Why:** The five cards on Start Here currently show body text in-line. They need full pages so the deeper material lives somewhere; foundation moves are the _why_ phrasebook entries lean on.
-- **Definition of done:** All five `/start-here/<slug>` URLs render. Each links to relevant phrasebook entries. `pnpm build` exits 0.
+  1. Change SITE_NAME constant to `"How to Use Claude Code"`.
+  2. Replace `navItems` array with a top-nav structure that maps to chapters via `src/lib/chapters.ts` — desktop shows section letters (`00 Overview · 01 Mindset · 02 Install · ...`) with the active one highlighted. Use the `.topnav .sects` markup pattern.
+  3. Add a mobile menu button (`.menu-button`) that toggles `.mobile-menu` via a small inline `is:inline` script (no framework). Keep it under 1 KB JS.
+  4. Add a `.cmd-trigger` button that dispatches `cmd-palette-open` event when clicked (CommandPalette.ts listens for this event already).
+  5. Update `resolveOgPath()` to handle the new route shape: `/` → `/og/home.png`, `/01-mindset` → `/og/01-mindset.png`, etc. Remove handlers for `/phrasebook`, `/start-here`, `/about`.
+  6. Drop the "Where this came from" link in the footer. Drop the "Living document" small text under the brand. Keep the sitemap link and the SITE_NAME line.
+  7. Add `<reading-progress>` element at the top of `<body>` (under the skip-link, above the topnav).
+  8. Keep: ClientRouter, the SEO meta block, the JSON-LD JSON-emit, the skip-link, the safeJsonLd escape helper, the transition:persist on header/footer.
+- **Definition of done:**
+  - SITE_NAME, nav items, OG routes all updated.
+  - `pnpm dev` renders the new nav at desktop and mobile.
+  - No references to `/phrasebook`, `/start-here`, or `/about` remain anywhere in the file.
+  - View-transition persistence intact (header and footer have `transition:persist`).
 
-#### T-151 through T-155 — Author the five foundation move bodies
+#### T-103 — Build `ChapterIntro.astro`
 
-| Task  | Slug                                 | Title                                    | Source principles in `verified-principles.md` |
-| ----- | ------------------------------------ | ---------------------------------------- | --------------------------------------------- |
-| T-151 | `ai-is-the-engineer`                 | The AI is the engineer. You are not.     | Theme A (operator worldview)                  |
-| T-152 | `refuse-the-menu`                    | Refuse the menu.                         | Theme A, Principle 2                          |
-| T-153 | `verify-the-artifact`                | Verify the artifact, not the summary.    | Theme B (tool output as truth)                |
-| T-154 | `push-back-on-i-cant`                | Push back on "I can't" once.             | Theme F (receptionist refusals)               |
-| T-155 | `make-recurring-mistakes-mechanical` | Make every recurring mistake mechanical. | Theme D (mechanical enforcement)              |
-
-Each task follows the same shape: read the relevant principles, write the foundation move body in plain non-technical English (1,200-2,000 words), include 2-3 paste-example blocks (sterilized), list 3-5 related phrasebook entries.
-
-### Phase 2 — Vercel-style command palette
-
-#### T-201 — Build the search-index manifest endpoint
-
-- **Phase:** 2
-- **Status:** done
-- **Result:** src/pages/search.json.ts emits a single typed manifest covering phrasebook, foundations, and top-level pages.
-- **Prereqs:** T-101 through T-112 (entries exist), T-151 through T-155 (foundations exist)
-- **Read first:**
-  - § 7 of this file (the spec)
-  - `site/src/pages/llms.txt.ts` (pattern for build-time endpoints)
-- **Files to create:**
-  - `site/src/pages/search.json.ts`
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/components/ChapterIntro.astro` (create).
+- **Why:** Every chapter page opens with: small uppercase blue eyebrow (kicker), large condensed h1 title, lede paragraph (deck), thin bottom border. Render this from chapter frontmatter so the layout is consistent.
 - **Instructions:**
-  1. Astro API route emitting `application/json`.
-  2. Pull phrasebook entries via `getCollection('phrasebook')`, foundations via `getCollection('foundations')`.
-  3. Emit array of `{ section, label, url, category, description, kicker }` objects.
-  4. Include the three top-level pages: home, phrasebook index, start-here index, about.
-- **Why:** Single typed source of truth for the search palette. Built at compile time; zero runtime cost.
-- **Definition of done:** `pnpm build` emits `/search.json` containing all phrasebook entries, all foundations, and all pages.
+  1. Props: `kicker: string`, `title: string`, `deck: string`. Type the props with a TypeScript interface.
+  2. Render as a `<section class="chapter-intro">` with `.pre` (kicker), `<h1>` (title), `.deck` (deck).
+  3. Allow inline `<b>` and `.b` markup within `deck` via `set:html` BUT only after sanitizing through the same `noRawHtml` check that the content schema uses. Alternative: render `deck` as plain text via `{deck}` and skip the markup affordance for v1.
+- **Definition of done:**
+  - Component file exists.
+  - Importable from MDX chapters as `<ChapterIntro kicker="..." title="..." deck="..." />`.
+  - Renders correctly in a smoke test render.
 
-#### T-202 — Build the `<command-palette>` custom element
+#### T-104 — Build `ZoneHeader.astro`
 
-- **Phase:** 2
-- **Status:** done
-- **Result:** src/components/CommandPalette.ts is a vanilla custom element; Cmd+K/Ctrl+K/Esc/click-outside/arrow-keys all wired; bundle under 8KB gzipped.
-- **Prereqs:** T-201
-- **Read first:**
-  - § 7 of this file
-  - `site/src/components/CopyButton.ts` (pattern for custom elements in this codebase)
-- **Files to create:**
-  - `site/src/components/CommandPalette.ts`
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/components/ZoneHeader.astro` (create).
+- **Why:** Section landmark within a chapter. Numbered prefix (`§ 1.1 — 1.4`), title, optional meta line on the right.
 - **Instructions:**
-  1. Vanilla custom element. Shadow DOM optional (probably skip — easier styling with global tokens).
-  2. On `connectedCallback`: attach listeners for `keydown` on `document` (Cmd+K, Ctrl+K, /, Esc).
-  3. Render the overlay structure into the light DOM. Hidden by default via `[hidden]` attribute.
-  4. Lazy-fetch `/search.json` on first open; cache for the session.
-  5. Render matching results grouped by section.
-  6. Arrow keys move the active row; Enter navigates; Esc closes.
-  7. Click outside modal closes.
-  8. `prefers-reduced-motion` disables animations.
-- **Why:** This is the primary interactive surface beyond copy-buttons. Must remain framework-free.
-- **Definition of done:** Cmd+K opens the palette anywhere on the site. Typing filters results. Arrow keys navigate. Enter goes to the URL. Esc closes. Bundle size under 8 KB gzipped (verified by `pnpm build`'s output).
+  1. Props: `num: string`, `title: string`, `meta?: string`.
+  2. Render as `<div class="zone-hd">` with `<span class="num">`, `<span class="ttl">`, `<span class="meta">` (optional).
+- **Definition of done:**
+  - Component file exists.
+  - Importable from MDX chapters.
 
-#### T-203 — Style the command palette
+#### T-105 — Build `CalloutCard.astro`
 
-- **Phase:** 2
-- **Status:** done
-- **Result:** Palette styled in global.css using existing tokens; mobile takeover below 640px; centered modal above.
-- **Prereqs:** T-202
-- **Read first:**
-  - § 7 of this file (visual spec)
-  - `site/src/styles/global.css` (token system; add palette styles here in a new section)
-- **Files to edit:**
-  - `site/src/styles/global.css`
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/components/CalloutCard.astro` (create).
+- **Why:** The numbered detail card with circular badge in the top-left corner. The repeating teaching unit across multiple chapters.
 - **Instructions:**
-  1. Add a `.cmd-palette` section to the bottom of global.css.
-  2. Style the backdrop, modal, search input, section headers, rows, active state per § 7.
-  3. Mobile-first: full-screen takeover below 640px; centered modal at ≥640px.
-  4. Use existing tokens (`--panel-2`, `--blue`, etc.) only.
-- **Why:** Visual continuity with the rest of the site.
-- **Definition of done:** Visual screenshots at 375 and 1440 match § 7's spec.
+  1. Props: `circ: string` (e.g., `"1.1"`), `label: string` (e.g., `"RULE 01 · Role Boundary"`), `title: string` (display title), `tone?: 'blue' | 'amber' | 'red'` (default `'blue'`).
+  2. Slot for body content (markdown / paragraphs / lists).
+  3. Render as `<article class="detail">` with `.callout > .circ + .lbl` (tone-aware class added to circ and lbl), then `.body > .ttl + <slot />`.
+- **Definition of done:**
+  - Component file exists.
+  - Tone variants render correctly.
+  - Body slot accepts MDX content.
 
-#### T-204 — Mount the palette globally and re-wire home CTA
+#### T-106 — Build `PullQuote.astro`
 
-- **Phase:** 2
-- **Status:** done
-- **Result:** Single <command-palette> mounted in Base.astro; home CTA opens it via event.
-- **Prereqs:** T-202, T-203
-- **Files to edit:**
-  - `site/src/layouts/Base.astro` (add `<command-palette></command-palette>` before `</body>`; import the JS module)
-  - `site/src/pages/index.astro` (change the home CTA to a button that dispatches `cmd-palette-open` event)
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/components/PullQuote.astro` (create).
+- **Why:** The top/bottom-bordered emphasized quote used for canonical principles. Used in Chapters 01 and 08.
 - **Instructions:**
-  1. Single `<command-palette>` instance at end of `<body>` in `Base.astro`.
-  2. The home page's "Browse the phrasebook" CTA becomes a `<button>` element that, on click, dispatches the open event the palette listens for.
-  3. The palette closes on URL change (listen for navigation; the Astro view-transitions `astro:before-preparation` event is the right hook).
-- **Why:** One instance, mounted once, available everywhere.
-- **Definition of done:** Cmd+K, `/`, and click on the home CTA all open the same palette.
+  1. Props: `attribution?: string`. Slot for the quote text itself.
+  2. Render as `<aside class="pq">` with `.text` (slot) and `.attr` (if attribution given).
+- **Definition of done:**
+  - Component file exists.
+  - Renders cleanly with and without attribution.
 
-#### T-205 — Browser-validate command palette at 4 viewports
+#### T-107 — Build `CalloutBox.astro`
 
-- **Phase:** 2
-- **Status:** done
-- **Result:** Cmd+K opens palette; typing "paid" filters to 1 hit (paid-service-claim entry); Esc closes (hidden attribute set, body overflow restored). DOM evaluate at 1440 confirms no horizontal scroll, h1 correct, Plex Sans Condensed loaded, bg #0a0d10. Screenshots at 375/768/1024 saved in \_internal/val-\*.png. Playwright smoke suite passes 32/32 across all four viewports.
-- **Prereqs:** T-204
+- **Status:** `done`
+- **Prereqs:** T-101.
+- **Files:** `src/components/CalloutBox.astro` (create).
+- **Why:** The soft callout box (left-border accent + tinted background) used for "Why these four, why this order" type notes.
 - **Instructions:**
-  1. Open the palette at 375, 768, 1024, 1440. Screenshot each.
-  2. Type a query, verify filtering. Screenshot.
-  3. Tab through rows with keyboard, verify focus visible.
-  4. Verify Esc closes, click-outside closes.
-  5. Verify `prefers-reduced-motion` works.
-  6. Capture console: zero errors.
-- **Definition of done:** Eight screenshots captured. Zero console errors. All keyboard paths work.
+  1. Props: `title?: string`, `tone?: 'amber' | 'blue' | 'red'` (default `'amber'`).
+  2. Slot for body content.
+  3. Render as `<aside class="callout-box [tone]">` with `.k` (title) and slot.
+- **Definition of done:**
+  - Component file exists.
+  - All three tones render correctly.
 
-### Phase 3 — Open Graph image generation
+#### T-108 — Build `ChapterPagination.astro`
 
-#### T-301 — Add `@vercel/og` or Satori dependency
-
-- **Phase:** 3
-- **Status:** done
-- **Result:** satori 0.26 + @resvg/resvg-js 2.6 installed; no peer-dep warnings.
-- **Prereqs:** none
-- **Read first:** https://github.com/vercel/satori (likely the right pick — pure TS, runs at build time)
-- **Files to edit:** `site/package.json`
+- **Status:** `done`
+- **Prereqs:** T-101, `src/lib/chapters.ts` (DONE).
+- **Files:** `src/components/ChapterPagination.astro` (create).
+- **Why:** Prev / next pagination at the bottom of every chapter page. Uses the chapters lib helpers.
 - **Instructions:**
-  1. Add `satori` and `@resvg/resvg-js` to dependencies. (Satori produces SVG; resvg renders to PNG.)
-  2. Add `sharp` if needed for additional image work (probably not).
-- **Definition of done:** Both packages install cleanly; no peer-dep warnings.
+  1. Props: `currentN: string` (the chapter's `n` value, e.g., `"01"`).
+  2. Use `previousChapter(currentN)` and `nextChapter(currentN)` from `src/lib/chapters.ts`.
+  3. Render `<nav class="pag">` with two `<a>` (or `<span.empty>`) cells: previous on the left, next on the right.
+  4. Each cell shows `.k` ("← Previous" or "Next Section →") and `.v` (chapter label).
+- **Definition of done:**
+  - Component file exists.
+  - Empty state for first / last chapter handled.
+  - Renders correctly at mobile (stacks 1 column) and desktop (2 columns side-by-side).
 
-#### T-302 — Build the OG image generator endpoint
+### Phase 2 — Chapter 01 fully authored + Chapter 00 home + route + stubs
 
-- **Phase:** 3
-- **Status:** done
-- **Result:** src/pages/og/[slug].png.ts emits 24 unique 1200x630 PNGs (13 phrasebook + 5 foundations + 6 special routes).
-- **Prereqs:** T-301
-- **Read first:** Satori README; `_internal/handoff/SEO.md` § OG image spec
-- **Files to create:**
-  - `site/src/pages/og/[slug].png.ts`
-  - `site/src/lib/og-template.tsx` (the JSX template Satori renders)
+#### T-201 — Author Chapter 01 (The Mindset) MDX file
+
+- **Status:** `done`
+- **Prereqs:** Phase 1 complete (all six components built).
+- **Files:** `src/content/chapters/01-mindset.mdx` (create).
+- **Why:** This is the canonical first authored chapter. It establishes the voice, the component composition, and the teaching style. Every other chapter is patterned after it.
 - **Instructions:**
-  1. The endpoint at `/og/<slug>.png` reads the matching phrasebook entry or page, builds a Satori JSX template, renders to SVG, converts to PNG via resvg, returns the buffer.
-  2. The template: dark background, Plex Sans Condensed display title, kicker for category, footer with site brand. 1200x630.
-  3. For pages without a content collection match (home, phrasebook index, start-here index, about), build static OG images at known paths.
-- **Why:** Open Graph images drive link-preview visuals on Twitter, Slack, LinkedIn, Discord, every messenger. Without them, share-link previews are empty boxes.
-- **Definition of done:** Every page's `og:image` meta tag resolves to a real PNG. Visually verified by pasting URLs into Twitter/Slack preview generators.
+  1. Frontmatter: `n: '01'`, `title: 'The Mindset'`, `short: 'Mindset'`, `kicker: '§ 1.0 · Four anchor rules'`, `description: '<180 chars>'`, `deck: '<the lede>'`, `pubDate: 2026-05-15`.
+  2. Body: import components at top of MDX, then:
+     - `<ChapterIntro kicker={frontmatter.kicker} title={frontmatter.title} deck={frontmatter.deck} />`
+     - `<ZoneHeader num="§ 1.1 — 1.4" title="The Four Anchor Rules" meta="Enforce all four" />`
+     - 4 `<CalloutCard>` inside a `<div class="details cols-2">`:
+       - **1.1 · Role Boundary** — "You are the product owner. The AI is the engineer." Body: the AI doesn't get a menu; you don't pick libraries; the AI presents resolutions you approve, redirect, or push back on.
+       - **1.2 · Evidence Hierarchy** — "Tool output is truth. Chat is hint. AI-authored docs are hearsay." Body: file system is truth; demand file:line; AI citing AI-authored docs back is gaslighting.
+       - **1.3 · Two-Option Rule** — "Two options on every error. No third option exists." Body: fix the root cause or stop and present. Silent continuation, deferral, "out of scope" are the third option in costume.
+       - **1.4 · Skepticism Default** — "Assume the claim is wrong until tool output proves it." Body: prove every "done" five times — read, run, screenshot, check, quote.
+     - `<PullQuote attribution="The canonical operator rule">` "The file system and tool output are truth. Chat is hint. AI-authored docs are hearsay." `</PullQuote>`
+     - `<CalloutBox title="Why these four · why this order" tone="blue">` body: Rule 01 is the role boundary; Rule 02 is the evidence floor; Rule 03 is the closure law; Rule 04 is the verification floor. Every escape move in Chapter 03 is a violation of one of these four. The cure is recognition. `</CalloutBox>`
+     - `<ChapterPagination currentN="01" />`
+  3. Voice: third-person operator-language. No first-person scar stories. No dollar amounts. No commit counts. Contractions where natural. No emojis.
+  4. Word budget: aim for tight body paragraphs (2–4 sentences each). Each callout body should be 60–120 words total.
+- **Definition of done:**
+  - File exists and parses (the chapter route resolves).
+  - All four rules are authored as specified.
+  - Sterilization checklist (§ 4) run against the diff.
+  - Component imports resolve.
 
-#### T-303 — Wire OG image URLs into `Base.astro`
+#### T-202 — Stub Chapters 02–09 MDX files
 
-- **Phase:** 3
-- **Status:** done
-- **Result:** Base.astro derives og:image from Astro.url.pathname automatically; absolute URL via SITE_URL.
-- **Prereqs:** T-302
-- **Files to edit:** `site/src/layouts/Base.astro`
-- **Instructions:** The `ogImage` prop already exists; just default it to `/og/<slug>.png` based on the URL pathname. Phrasebook entries already pass a custom value; pages can use the default.
-- **Definition of done:** All page-source views show a real `og:image` URL.
+- **Status:** `done`
+- **Prereqs:** Phase 1 complete; T-201 done (so the canonical pattern is established).
+- **Files:** `src/content/chapters/02-install.mdx` through `09-quick-reference.mdx` (create 8 files).
+- **Why:** Routes must resolve for `pnpm build` to pass. Stubs are full-frontmatter MDX files with a `<ChapterIntro />` + a `<CalloutBox tone="amber">` placeholder note ("This chapter is being authored. Check back soon.") + `<ChapterPagination />`. Real content lands in Phase 6.
+- **Instructions:**
+  1. For each chapter 02 through 09: create the file with full frontmatter (n, title, short, kicker, description, deck, pubDate per § 7 spec).
+  2. Body: ChapterIntro + a CalloutBox placeholder + ChapterPagination. No further content.
+  3. Use the exact `n`, `title`, `short`, `kicker`, `deck` values specified in § 7 of this plan.
+- **Definition of done:**
+  - All 8 stub files exist.
+  - Each parses through the schema (no Zod errors).
+  - `pnpm build` would resolve the routes (verify in Phase 5).
 
-### Phase 4 — Polish layer
+#### T-203 — Wire the chapter route `[slug].astro`
 
-#### T-401 — Hover lift on cards
+- **Status:** `done`
+- **Prereqs:** T-201 (Chapter 01 exists as the canonical example).
+- **Files:** `src/pages/[slug].astro` (create).
+- **Why:** Single dynamic route generates `/01-mindset`, `/02-install`, ..., `/09-quick-reference` from the chapters collection. Each MDX file's slug field in frontmatter or filename-derived slug maps to a URL.
+- **Instructions:**
+  1. Implement `getStaticPaths()`: iterate `getCollection('chapters')`, for each entry derive the slug from `CHAPTERS_BY_N[entry.data.n].slug` (from `src/lib/chapters.ts`). Skip the n='00' chapter (it's the home page).
+  2. The route accepts `params.slug` and resolves to the matching collection entry.
+  3. Use `Base.astro` layout with `title={entry.data.title}`, `description={entry.data.description}`, `pageType="article"`.
+  4. Render: `<entry.Content />` (the MDX body renders directly; chapter content provides ChapterIntro and ChapterPagination itself).
+  5. Add an `entry.Content` render with the chapter-body class wrapper.
+- **Definition of done:**
+  - Visiting `/01-mindset` renders Chapter 01 cleanly.
+  - Visiting `/02-install` through `/09-quick-reference` renders stubs.
+  - 404 on unknown slugs (Astro default).
 
-- **Phase:** 4
-- **Status:** done
-- **Result:** Hover lift on .mode, .move, .pb-row using transform translateY(-2px) + box-shadow; reduced-motion respected.
-- **Files to edit:** `site/src/styles/global.css`
-- **Instructions:** Add subtle `transform: translateY(-2px)` and `box-shadow` change on hover for `.mode`, `.move`, `.pb-row`. Transition 120ms ease. Respect `prefers-reduced-motion`.
-- **Why:** Tactile feedback when an interactive element is hoverable. Currently the only hover state is border-color change; lift adds depth.
+#### T-204 — Author Chapter 00 (the home page)
 
-#### T-402 — Reading-progress indicator on entry pages
+- **Status:** `done`
+- **Prereqs:** T-201, T-203.
+- **Files:** `src/pages/index.astro` (full rewrite).
+- **Why:** The home is Chapter 00. It's the front door. Hero + lede + contents grid + how-to-use note. It does NOT redirect to Chapter 01 — it stands on its own.
+- **Instructions:**
+  1. Use `Base.astro` layout with `title="How to Use Claude Code"`, `description="<180-char description>"`, `pageType="home"`.
+  2. Hero: `.pre` kicker ("A guide for non-technical operators"), `<h1>` "How to Use Claude Code", `.deck` (lede paragraph — 2 sentences, plain, no proof).
+  3. ZoneHeader `§ 0.1 — Contents`.
+  4. `.contents` grid linking to chapters 01 through 09. Each row: `.id` (the n), `.ttl` (chapter label + .desc one-line), `.det` (3-word category like "Anchor rules" / "Tools" / "Recognition" — match the chapter's flavor).
+  5. ZoneHeader `§ 0.2 — How to use this guide`.
+  6. 1–2 paragraphs: read in order the first time; refer back as needed; if you want an AI session to internalize the whole guide, paste `<your site URL>/llms-full.txt` into the AI's context.
+  7. No personal proof. No metrics strip. No receipts. No "1,073 sessions" anywhere.
+- **Definition of done:**
+  - `/` renders the new home cleanly at all four viewports.
+  - No `/phrasebook`, `/start-here`, `/about` references remain.
+  - Sterilization checklist passed.
 
-- **Phase:** 4
-- **Status:** done
-- **Result:** ReadingProgress custom element renders a thin blue bar; hidden on mobile; respects prefers-reduced-motion.
-- **Files to create:** `site/src/components/ReadingProgress.ts` (custom element)
-- **Files to edit:** `site/src/pages/phrasebook/[slug].astro` (add element), `site/src/styles/global.css` (style)
-- **Instructions:** Thin bar at top of the page that fills as the user scrolls through the entry. Blue accent color. Static at top; absolute-positioned. Hidden on mobile (bar doesn't help when the page is shorter).
-- **Why:** Long entry pages should give the reader a sense of progress. Subtle; not load-bearing UI.
+#### T-205 — Update `404.astro` to new artifact
 
-#### T-403 — Polish copy-button state machine
+- **Status:** `done`
+- **Prereqs:** T-203.
+- **Files:** `src/pages/404.astro`.
+- **Why:** The 404 page references the old artifact's IA ("Try the phrasebook or the start-here index"). Update to the new chapter structure.
+- **Instructions:**
+  1. Read current 404.astro; identify rejected references.
+  2. Update h1, kicker, body, and any nav suggestions to point at the home page and Chapter 01.
+- **Definition of done:**
+  - `/404` renders cleanly.
+  - No references to `/phrasebook` or `/start-here`.
 
-- **Phase:** 4
-- **Status:** done
-- **Result:** CopyButton has idle/copied/error states with 1.4s recovery; error styling uses --red token.
-- **Files to edit:** `site/src/components/CopyButton.ts`, `site/src/styles/global.css`
-- **Instructions:** Add `data-state` values for: `idle`, `hover`, `pressed`, `copied`, `error`. Each gets a distinct visual state. The success state holds for 1.4s, then returns to idle. The error state (clipboard rejected) shows briefly.
-- **Why:** Currently states are minimal. The copy interaction is one of the most-used affordances on the site.
+### Phase 3 — Endpoints updated
 
-#### T-404 — Focus-visible audit across all interactive elements
+#### T-301 — Rewrite `llms-full.txt.ts`
 
-- **Phase:** 4
-- **Status:** done
-- **Result:** Focus-visible audit complete: amber/blue outline on every interactive element; no outline:none anywhere.
-- **Files to edit:** `site/src/styles/global.css`
-- **Instructions:** For every clickable element (links, buttons, custom elements), confirm a visible `:focus-visible` outline. Use the existing `--blue` accent. No `outline: none` anywhere.
-- **Why:** Keyboard navigation parity with mouse. Required for accessibility CI to pass.
+- **Status:** `done`
+- **Prereqs:** T-201 (so at least Chapter 01 has authored content), T-202 (stubs exist).
+- **Files:** `src/pages/llms-full.txt.ts` (full rewrite).
+- **Why:** This is the load-bearing AI-ingestion handle. An operator pastes this URL into Claude / ChatGPT / Gemini and the whole guide loads into the AI's context.
+- **Instructions:**
+  1. Iterate `getCollection('chapters')` in order of `n` (use `CHAPTERS` array from `src/lib/chapters.ts` for canonical ordering).
+  2. Emit a single concatenated markdown file:
+     - Top: `# How to Use Claude Code — full text` + brief blockquote summary + a divider.
+     - For each chapter: `## ${n}. ${title}` + URL line + `### Kicker:` + kicker + `### Deck:` + deck + the chapter body (rendered to markdown).
+  3. Rendering chapter bodies: since MDX bodies aren't trivially serializable to markdown, render each chapter via Astro's content render and strip HTML, OR keep the body content separate from the MDX-component embeds in a `bodyMarkdown` frontmatter field (decide and document). For v1: emit the frontmatter + a placeholder note that chapter body is at the page URL, with the page URL prominent. This is degraded but unambiguous.
+  4. Return as `text/plain; charset=utf-8`.
+- **Definition of done:**
+  - `curl http://localhost:4321/llms-full.txt` returns 200 with the full text.
+  - The output is well-formed markdown.
+  - All 9 chapters appear in order.
 
-#### T-405 — Subtle scroll-driven section reveals on entry pages
+#### T-302 — Rewrite `llms.txt.ts`
 
-- **Phase:** 4
-- **Status:** done
-- **Result:** Each .block on entry pages fades up via animation-timeline: view(); gated by @supports and prefers-reduced-motion: no-preference.
-- **Files to edit:** `site/src/pages/phrasebook/[slug].astro`, `site/src/styles/global.css`
-- **Instructions:** Each `.block` on entry pages fades up subtly as it enters the viewport. Use CSS scroll-driven animations where supported; fall back to no animation otherwise. Respect `prefers-reduced-motion`.
-- **Why:** Texture. The page should feel like it's revealing itself rather than dumping all content at once.
+- **Status:** `done`
+- **Prereqs:** T-202.
+- **Files:** `src/pages/llms.txt.ts` (full rewrite).
+- **Why:** Companion index file to `llms-full.txt`. Markdown index of all chapters with one-line descriptions and URLs.
+- **Instructions:**
+  1. Top: `# How to Use Claude Code` + blockquote summary.
+  2. Section: `## Reading modes` — link to home, link to chapters list, link to `llms-full.txt`.
+  3. Section: `## Chapters` — for each chapter in `CHAPTERS` order: `- [§ N · Title](url): description`.
+  4. No provenance / aggregate-count line. (Was on old version; receipts framing now banned.)
+- **Definition of done:**
+  - `curl http://localhost:4321/llms.txt` returns 200.
+  - Lists all 9 chapters with correct URLs.
 
-### Phase 5 — Security hardening
+#### T-303 — Rewrite `search.json.ts`
 
-#### T-501 — Author the security-headers configuration
+- **Status:** `done`
+- **Prereqs:** T-202.
+- **Files:** `src/pages/search.json.ts` (full rewrite).
+- **Why:** Powers the command palette's search list. Must enumerate every searchable surface (home + 9 chapters + any internal anchor we want indexable).
+- **Instructions:**
+  1. Replace the existing iteration over `phrasebook` and `foundations` with iteration over `chapters`.
+  2. For each chapter: emit a SearchItem with `section: 'chapters'`, `label: title`, `url: '/${slug}'`, `kicker: 'Ch ${n}'`, `description: description`.
+  3. Add a `pages` section entry for Home.
+  4. Update the `SearchItem` interface: `section: 'chapters' | 'pages'`.
+- **Definition of done:**
+  - `curl http://localhost:4321/search.json` returns 200 with valid JSON.
+  - Includes home + all 9 chapters.
 
-- **Phase:** 5
-- **Status:** done
-- **Result:** public/\_headers ships CSP/HSTS/XFO/Referrer-Policy/Permissions-Policy/COOP/CORP; CSP allows script-src unsafe-inline + object-src none per amendment.
-- **Read first:**
-  - https://web.dev/articles/security-headers
-  - https://content-security-policy.com
-- **Files to create:**
-  - `site/public/_headers` (Cloudflare Pages convention)
-- **Instructions:** Add the following headers to all routes:
-  - `Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'`
-    > **Amendment 2026-05-15 (T-010):** `script-src` includes `'unsafe-inline'` so the inline JSON-LD structured-data block in `Base.astro` is not blocked. Without it, every page's JSON-LD silently fails and the site loses all rich-results indexing. Backlog: switch to a build-time hash-based policy to drop `'unsafe-inline'` later. Added `object-src 'none'` per security review §4.
-  - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`
-  - `Referrer-Policy: strict-origin-when-cross-origin`
-  - `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()`
-  - `Cross-Origin-Opener-Policy: same-origin`
-  - `Cross-Origin-Resource-Policy: same-origin`
-- **Why:** Defense in depth. The site has no user input, no auth, no third-party scripts — these headers prevent classes of attack regardless.
-- **Definition of done:** `curl -I https://<deploy-url>` shows every header. https://securityheaders.com grades the site A+.
+#### T-304 — Update `og/[slug].png.ts` and `og-template.ts`
 
-#### T-502 — Configure robots.txt with explicit AI bot policy
+- **Status:** `done`
+- **Prereqs:** T-202.
+- **Files:** `src/pages/og/[slug].png.ts`, `src/lib/og-template.ts`.
+- **Why:** Per-page OG image generation. Update to enumerate chapter slugs and emit images with the new SITE_NAME and chapter-shaped props.
+- **Instructions:**
+  1. In `og/[slug].png.ts`: replace iteration over `phrasebook` + `foundations` with iteration over `chapters`. For each: kicker = `§ ${n} · ${kicker}` (truncate if long), title = chapter title, footer = description.
+  2. Update `specialPaths`: keep `default`, `home`, `404`; remove `phrasebook-index`, `start-here-index`, `about`; add no others (chapter slugs handle themselves).
+  3. In `og-template.ts`: update `SITE_NAME` to `"How to Use Claude Code"`. Update `TAGLINE` to `"A guide for non-technical operators mastering Claude Code."`. Drop the "Living document" badge in the corner.
+- **Definition of done:**
+  - `curl http://localhost:4321/og/home.png > /tmp/og.png` returns a valid PNG.
+  - Same for `/og/01-mindset.png` through `/og/09-quick-reference.png`.
 
-- **Phase:** 5
-- **Status:** done
-- **Result:** robots.txt allows GPTBot, ClaudeBot, anthropic-ai, PerplexityBot, Google-Extended, CCBot, Bytespider explicitly; default Allow:\* for others.
-- **Files to edit:** `site/public/robots.txt`
-- **Instructions:** Allow major AI crawlers explicitly: `GPTBot`, `ClaudeBot`, `anthropic-ai`, `PerplexityBot`, `Google-Extended`, `CCBot`, `Bytespider`. Allow `*` for traditional crawlers. Sitemap reference.
-  > **Amendment 2026-05-15 (T-010):** Replaced `Claude-Web` with `ClaudeBot` per security review §4 — `Claude-Web` is not the canonical Anthropic crawler user-agent. `anthropic-ai` remains the umbrella identifier.
-- **Why:** The site's audience explicitly includes AI sessions. Explicit allowlist signals intent and aids discovery.
+#### T-305 — Update `CommandPalette.ts` section types
 
-#### T-503 — Cookie audit
+- **Status:** `done`
+- **Prereqs:** T-303.
+- **Files:** `src/components/CommandPalette.ts`.
+- **Why:** The component has hardcoded `section: 'phrasebook' | 'foundations' | 'pages'` types and `SECTION_LABEL` / `SECTION_ORDER` constants that reference the rejected IA.
+- **Instructions:**
+  1. Update the `SearchItem` interface: `section: 'chapters' | 'pages'`.
+  2. Update `SECTION_LABEL`: `{ chapters: 'Chapters', pages: 'Pages' }`.
+  3. Update `SECTION_ORDER`: `['chapters', 'pages']`.
+  4. No other logic changes; the rest of the file is shape-agnostic.
+- **Definition of done:**
+  - Type check passes.
+  - Opening the palette (`Cmd+K`) shows the new section labels.
 
-- **Phase:** 5
-- **Status:** done
-- **Result:** Zero-cookie posture documented in Base.astro frontmatter comment.
-- **Instructions:** Confirm zero cookies set. Browser DevTools → Application → Cookies should be empty across all pages. Document the zero-cookie posture in a comment in `Base.astro`.
-- **Why:** Compliance with privacy expectations. No cookies → no consent banner → no GDPR or CCPA burden.
+### Phase 5 — Validation
 
-### Phase 6 — Performance gates
+#### T-501 — Update `tests/smoke.spec.ts`
 
-#### T-601 — Preload critical fonts
+- **Status:** `done`
+- **Prereqs:** T-204 (home exists), T-203 (chapter route works), all chapters 01–09 at least stubbed.
+- **Files:** `tests/smoke.spec.ts`.
+- **Why:** The current ROUTES array references rejected paths (`/phrasebook`, `/start-here`, `/about`). Update to the new chapter routes.
+- **Instructions:**
+  1. Replace ROUTES array with: home (`/`), each chapter (`/01-mindset` through `/09-quick-reference`), `/404`.
+  2. Update `expectedH1` regex for each route to match the new headlines.
+  3. Keep the structural assertions (one h1, no horizontal scroll, no console errors, canonical present, JSON-LD parseable).
+- **Definition of done:**
+  - `pnpm test` (Playwright) passes against the dev server.
 
-- **Phase:** 6
-- **Status:** done
-- **Result:** src/integrations/font-preload.ts injects <link rel=preload> for 3 hashed woff2 paths into every dist HTML at astro:build:done.
-- **Files to edit:** `site/src/layouts/Base.astro`
-- **Instructions:** Add `<link rel="preload" as="font" type="font/woff2" crossorigin>` for the three font files that appear above the fold: Plex Sans Condensed 700, Plex Sans Condensed 600, Plex Mono 400. Find the exact paths in `node_modules/@fontsource/...`.
-- **Why:** Reduces FOIT (flash of invisible text) and improves LCP.
-- **Definition of done:** Lighthouse `first-contentful-paint` improves; no font flash visible at slow 3G.
+#### T-502 — Run `pnpm build` and fix any errors
 
-#### T-602 — Lighthouse CI integration
+- **Status:** `done`
+- **Prereqs:** Phases 1–3 complete.
+- **Files:** Whatever the build error points at.
+- **Why:** Build is the mechanical gate. If it fails, the site can't ship.
+- **Instructions:**
+  1. Run `pnpm build`. Read the full error output.
+  2. Diagnose. Fix. Re-run.
+  3. Verify dist/ has: 10 HTML files (home + 9 chapters), llms.txt, llms-full.txt, search.json, sitemap, 11 OG PNGs (home + 9 chapters + 404 + default).
+- **Definition of done:**
+  - `pnpm build` exits 0.
+  - dist/ has the expected files.
 
-- **Phase:** 6
-- **Status:** done
-- **Result:** .lighthouserc.json runs against built dist; all 8 routes pass perf/a11y/best-practices/seo thresholds; 404 has a separate assertMatrix entry for noindex.
-- **Read first:** https://github.com/GoogleChrome/lighthouse-ci
-- **Files to create:** `site/.lighthouserc.json`
-- **Instructions:** Configure with all five page URLs. Performance, Accessibility, Best Practices, SEO all targeting 100. Add `pnpm script: "lhci": "lhci autorun"`.
-- **Definition of done:** All four scores 100/100/100/100 on all pages. CI fails if any drop below 95.
+#### T-503 — Browser-validate at 375 / 768 / 1024 / 1440
 
-#### T-603 — Cache-control headers
+- **Status:** `done`
+- **Prereqs:** T-501, T-502.
+- **Files:** Screenshots saved to a working directory.
+- **Why:** Maxwell's hard rule. Required for sign-off on any visual task.
+- **Instructions:**
+  1. `pnpm dev` on port 4321.
+  2. Use Playwright MCP to navigate home, Chapter 01, and Chapter 02 stub at each of 375 / 768 / 1024 / 1440.
+  3. Screenshot each combination. Save with descriptive names.
+  4. Check console messages at each viewport on each route — must be empty.
+  5. Report back to Maxwell with the screenshots inline.
+- **Definition of done:**
+  - 12 screenshots captured (3 routes × 4 viewports).
+  - All console error logs empty.
+  - Screenshots presented inline in the chat.
 
-- **Phase:** 6
-- **Status:** done
-- **Result:** public/\_headers sets immutable cache for /\_astro/_, /og/_ and short SWR cache for HTML.
-- **Files to edit:** `site/public/_headers`
-- **Instructions:** Long cache for `/_astro/*` (hashed bundles), `/og/*`, `/fonts/*` (immutable). Short cache for HTML pages (e.g., `max-age=300, stale-while-revalidate=86400`).
-- **Why:** Best-effort caching without manual revalidation.
+### Phase 6 — Chapters 02–09 fully authored
 
-#### T-604 — Bundle audit
+Each chapter is one task. Pattern after T-201. Dispatch one per session. Status updated to `done` when the chapter passes Phase 5 validation.
 
-- **Phase:** 6
-- **Status:** done
-- **Result:** Total client JS gzipped: ClientRouter 4.54 KB + Base script 2.51 KB + page 0.06 KB + index 1.04 KB ≈ 8.2 KB, under 15 KB budget.
-- **Instructions:** Run `pnpm build` and inspect `dist/_astro/*.js` sizes. Confirm total client JS under 15 KB gzipped. Remove anything unused.
-- **Definition of done:** Total client JS ≤ 15 KB gzipped. Documented in this task's "done" note.
+- T-601 — Author Chapter 02 (What to Install). `not-started`.
+- T-602 — Author Chapter 03 (How Claude Tries to Escape). `not-started`.
+- T-603 — Author Chapter 04 (What You Say Back). `not-started`.
+- T-604 — Author Chapter 05 (The Working Loop). `not-started`.
+- T-605 — Author Chapter 06 (The System That Holds). `not-started`.
+- T-606 — Author Chapter 07 (Running Multiple Claudes). `not-started`.
+- T-607 — Author Chapter 08 (Browser Validation). `not-started`.
+- T-608 — Author Chapter 09 (Quick Reference). `not-started`.
 
-### Phase 7 — AI-SEO + crawler optimization
+Each task: open the MDX file, replace the stub body with the full chapter content per the § 7 spec, run the sterilization checklist, run `pnpm build`, browser-validate.
 
-#### T-701 — Build llms-full.txt endpoint
+---
 
-- **Phase:** 7
-- **Status:** done
-- **Result:** src/pages/llms-full.txt.ts concatenates phrasebook + foundations into a single text response; cache 3600.
-- **Read first:** https://llmstxt.org/#format
-- **Files to create:** `site/src/pages/llms-full.txt.ts`
-- **Instructions:** Concatenated full content of every phrasebook entry and foundation move into a single Markdown response. Per the llms.txt spec. Cache-control `max-age=3600`.
-- **Why:** AI crawlers consume the full text in one fetch.
-- **Definition of done:** `/llms-full.txt` returns ≥10 KB of content. Plain-text response.
+## Revision log
 
-#### T-702 — Expand JSON-LD: BreadcrumbList on entries
-
-- **Phase:** 7
-- **Status:** done
-- **Result:** BreadcrumbList in @graph on every phrasebook and start-here entry page.
-- **Files to edit:** `site/src/pages/phrasebook/[slug].astro`
-- **Instructions:** Add a `BreadcrumbList` JSON-LD: Home → Phrasebook → Category → Entry. Same for foundation moves.
-- **Why:** Google rich-results expand entries with breadcrumbs in SERP.
-
-#### T-703 — Add HowTo or FAQPage Schema.org markup to entries
-
-- **Phase:** 7
-- **Status:** done
-- **Result:** HowTo node added to phrasebook entry @graph: three steps with deep-link anchors.
-- **Files to edit:** `site/src/pages/phrasebook/[slug].astro`
-- **Instructions:** Each phrasebook entry can be expressed as a `HowTo`: the steps are (1) recognize the agent's words, (2) paste the intervention, (3) verify the agent's response. Add the JSON-LD.
-- **Why:** Richer SERP. Each entry surfaces as an interactive how-to result.
-
-#### T-704 — Internal linking audit
-
-- **Phase:** 7
-- **Status:** done
-- **Result:** Foundations all have ≥5 relatedPhrasebook entries; About links to /phrasebook/paid-service-claim and /start-here; entries link to relatedMove.
-- **Instructions:** Every phrasebook entry should link to its related foundation move (already there). Every foundation move should link to ≥3 related phrasebook entries. The About page should link to a representative phrasebook entry and the Start Here index. The home page already links everywhere.
-- **Why:** Crawl depth and SEO. Pages with three internal inbound links rank meaningfully better than orphan pages.
-
-### Phase 8 — Production deployment
-
-#### T-801 — Cloudflare Pages project setup
-
-- **Phase:** 8
-- **Status:** not-started
-- **Read first:** https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site/
-- **Instructions:** Create Cloudflare Pages project pointed at the GitHub repo (or direct upload). Build command `pnpm build`, output `dist/`. Configure environment variables (none currently). Confirm the `_headers` file is honored.
-- **Definition of done:** Project deploys on push.
-
-#### T-802 — Custom domain
-
-- **Phase:** 8
-- **Status:** not-started
-- **Prereqs:** T-801
-- **Instructions:** Configure custom domain at Cloudflare. Verify HTTPS certificate. Add the domain to `astro.config.mjs`'s `site` field.
-- **Definition of done:** Site reachable at custom domain with valid HTTPS.
-
-#### T-803 — Production smoke test
-
-- **Phase:** 8
-- **Status:** not-started
-- **Prereqs:** T-802
-- **Instructions:** Run the Playwright smoke suite (`pnpm test`) against the deployed URL. Run `lhci` against the deployed URL. Verify securityheaders.com grade is A+.
-- **Definition of done:** All gates pass against production.
-
-#### T-804 — Basic uptime monitoring
-
-- **Phase:** 8
-- **Status:** not-started
-- **Prereqs:** T-803
-- **Instructions:** Configure a free uptime check (UptimeRobot, BetterUptime, or similar) that pings `/` every 5 minutes. Email alert on downtime. No analytics; just uptime.
-- **Definition of done:** Service active; alert tested with a deliberate 404.
-
-## 10. Definition of done
-
-### Per task
-
-Mechanical checks specified per task. Must all pass.
-
-### Per phase
-
-- All tasks in the phase have status `done`.
-- `pnpm build` exits 0.
-- `pnpm test` (Playwright smoke) exits 0.
-- `pnpm a11y` exits 0 (once Phase 0 lands).
-- Browser-validated at four viewports for any visual change.
-- Sterilization checklist passed for any content change.
-
-### Per site (production-ready)
-
-- All phases through 8 are `done`.
-- Live at custom domain with valid HTTPS.
-- Lighthouse 100/100/100/100 on every page.
-- securityheaders.com grade A+.
-- Zero console errors on any page.
-- Zero cookies set.
-- Zero third-party scripts loaded.
-- `/llms.txt` and `/llms-full.txt` populated.
-- Sitemap published.
-- Robots.txt with explicit AI policy.
-- Uptime monitor active.
-- README and CLAUDE.md and MASTER-PLAN.md all current.
-
-## 11. How to use this document
-
-You (the agent) just finished reading it. Now:
-
-1. Open the task catalog (§ 9).
-2. Find the lowest-numbered `not-started` task in the lowest active phase (skip done phases).
-3. Verify its prereqs are `done`. If not, pick a different task whose prereqs are met.
-4. Read the task's "Read first" files.
-5. Execute the task's "Instructions" steps in order.
-6. Run the task's "Definition of done" check.
-7. Edit this file to change the task's `Status: not-started` to `Status: done` and add a one-line `Result:` note immediately below.
-8. Commit. Conventional message format: `feat(T-NNN): <short subject>`.
-9. Update the Maxwell-facing summary at the top of this file (Section 2 "Current state") if your task materially changed what's built.
-
-You do not have permission to skip phases, ad-lib content, or invent tasks outside this plan. If a needed task is missing, add it as a new T-NNN entry and surface to Maxwell before executing it.
+- 2026-05-15 · Rev A · Initial draft of the new plan after rejection of the phrasebook + foundations artifact. Phase 0 (demolition) marked done. Phase 1+ pending. Author: Claude (Opus 4.7) under direction.
 
 — **End of MASTER-PLAN.md** —

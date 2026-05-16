@@ -1,5 +1,5 @@
 interface SearchItem {
-  section: 'phrasebook' | 'foundations' | 'pages';
+  section: 'chapters' | 'pages';
   label: string;
   url: string;
   kicker: string;
@@ -7,11 +7,10 @@ interface SearchItem {
 }
 
 const SECTION_LABEL: Record<SearchItem['section'], string> = {
-  phrasebook: 'Phrasebook',
-  foundations: 'Foundations',
+  chapters: 'Chapters',
   pages: 'Pages',
 };
-const SECTION_ORDER: SearchItem['section'][] = ['phrasebook', 'foundations', 'pages'];
+const SECTION_ORDER: SearchItem['section'][] = ['chapters', 'pages'];
 
 class CommandPalette extends HTMLElement {
   private items: SearchItem[] = [];
@@ -118,8 +117,7 @@ class CommandPalette extends HTMLElement {
       return;
     }
     const grouped: Record<SearchItem['section'], SearchItem[]> = {
-      phrasebook: [],
-      foundations: [],
+      chapters: [],
       pages: [],
     };
     for (const it of this.filtered) grouped[it.section].push(it);

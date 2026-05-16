@@ -1,11 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 const ROUTES = [
-  { path: '/', expectedH1: /When your agent/ },
-  { path: '/phrasebook', expectedH1: /What is your agent doing/ },
-  { path: '/phrasebook/paid-service-claim', expectedH1: /Your agent says/ },
-  { path: '/start-here', expectedH1: /Five moves before anything else/ },
-  { path: '/about', expectedH1: /Where this came from/ },
+  { path: '/', expectedH1: /How to Use/ },
+  { path: '/01-mindset', expectedH1: /The Mindset/ },
+  { path: '/02-install', expectedH1: /What to Install/ },
+  { path: '/03-escape-moves', expectedH1: /How Claude Tries to Escape/ },
+  { path: '/04-counter-moves', expectedH1: /What You Say Back/ },
+  { path: '/05-working-loop', expectedH1: /The Working Loop/ },
+  { path: '/06-system-that-holds', expectedH1: /The System That Holds/ },
+  { path: '/07-multi-claude', expectedH1: /Running Multiple Claudes/ },
+  { path: '/08-browser-validation', expectedH1: /Browser Validation/ },
+  { path: '/09-quick-reference', expectedH1: /Quick Reference/ },
   { path: '/404', expectedH1: /That page isn't here/ },
 ];
 
@@ -19,8 +24,6 @@ for (const route of ROUTES) {
       page.on('pageerror', (err) => errors.push(err.message));
       page.on('console', (msg) => {
         if (msg.type() !== 'error') return;
-        // /404 itself returns HTTP 404, which Chromium logs as a console error.
-        // Skip the self-404 noise on that route only.
         if (isPath404 && /Failed to load resource.*404/i.test(msg.text())) return;
         errors.push(msg.text());
       });
@@ -31,15 +34,12 @@ for (const route of ROUTES) {
       });
 
       const response = await page.goto(route.path, { waitUntil: 'networkidle' });
-      // 404 page is rendered statically and returns 404 by Astro convention; accept both.
       const status = response?.status() ?? 0;
       expect(status === 200 || status === 404).toBeTruthy();
 
       const title = await page.title();
       expect(title.length).toBeGreaterThan(0);
 
-      // Scope h1 lookup to <main> so view-transition snapshot pseudo-elements
-      // and prefetched-document fragments don't inflate the count.
       const h1s = await page.locator('main h1').all();
       expect(h1s).toHaveLength(1);
       const h1Text = (await h1s[0].textContent()) ?? '';

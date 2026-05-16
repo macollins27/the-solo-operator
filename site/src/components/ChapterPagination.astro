@@ -1,0 +1,47 @@
+---
+import { previousChapter, nextChapter } from '../lib/chapters';
+
+interface Props {
+  currentN: string;
+}
+
+const { currentN } = Astro.props;
+const prev = previousChapter(currentN);
+const next = nextChapter(currentN);
+
+function hrefFor(slug: string): string {
+  return slug === '' ? '/' : `/${slug}`;
+}
+---
+
+<nav class="pag" aria-label="Chapter">
+  {
+    prev ? (
+      <a class="prev" href={hrefFor(prev.slug)}>
+        <div class="k">← Previous</div>
+        <div class="v">
+          <span class="ar">§ {prev.n}</span>
+          {prev.label}
+        </div>
+      </a>
+    ) : (
+      <span class="prev empty">
+        <div class="k">Start of guide</div>
+      </span>
+    )
+  }
+  {
+    next ? (
+      <a class="next" href={hrefFor(next.slug)}>
+        <div class="k">Next Section →</div>
+        <div class="v">
+          § {next.n} {next.label} <span class="ar">→</span>
+        </div>
+      </a>
+    ) : (
+      <span class="next empty">
+        <div class="k">End of guide</div>
+      </span>
+    )
+  }
+</nav>

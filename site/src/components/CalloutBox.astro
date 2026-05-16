@@ -1,0 +1,16 @@
+---
+type Tone = 'amber' | 'blue' | 'red';
+
+interface Props {
+  title?: string;
+  tone?: Tone;
+}
+
+const { title, tone = 'amber' } = Astro.props;
+const toneClass = tone === 'amber' ? '' : tone;
+---
+
+<aside class:list={['callout-box', toneClass]}>
+  {title && <div class="k">{title}</div>}
+  <slot />
+</aside>

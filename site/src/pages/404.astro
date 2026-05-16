@@ -4,18 +4,26 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Page not found"
-  description="The page you were looking for is not part of this manual. Use the navigation to find what you need."
+  description="The page you were looking for isn't part of this guide. Try the home page or Chapter 01."
   noIndex={true}
 >
   <div class="container">
-    <p class="kicker">404 &middot; Page not found</p>
-    <h1 class="h-display chapter">That page isn't here.</h1>
-    <p class="body-copy">
-      Either the page never existed, or it has been retired. Try the navigation above &mdash; the
-      phrasebook, the start-here path, or the about page.
-    </p>
-    <p class="body-copy">
-      <a href="/">&larr; Back to the front</a>
-    </p>
+    <section class="chapter-intro">
+      <div class="pre">404 · Page not found</div>
+      <h1>That page isn't here.</h1>
+      <div class="deck">
+        Either the page never existed, or it's been retired. Try the home page or jump straight into Chapter 01 below.
+      </div>
+    </section>
+    <nav class="pag" aria-label="Recovery">
+      <a class="prev" href="/">
+        <div class="k">← Home</div>
+        <div class="v"><span class="ar">§ 00</span>Overview</div>
+      </a>
+      <a class="next" href="/01-mindset">
+        <div class="k">Start reading →</div>
+        <div class="v">§ 01 The Mindset <span class="ar">→</span></div>
+      </a>
+    </nav>
   </div>
 </Base>

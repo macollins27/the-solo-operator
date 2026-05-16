@@ -1,40 +1,34 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { CHAPTERS } from '../lib/chapters';
 
 export const GET: APIRoute = async ({ site }) => {
   const base = site?.toString().replace(/\/$/, '') ?? '';
-  const entries = await getCollection('phrasebook');
+  const chapters: CollectionEntry<'chapters'>[] = await getCollection('chapters');
+  const byN: Record<string, CollectionEntry<'chapters'>> = Object.fromEntries(
+    chapters.map((c) => [c.data.n, c]),
+  );
 
   const lines: string[] = [];
-  lines.push("# The Solo Operator's Manual");
+  lines.push('# How to Use Claude Code');
   lines.push('');
   lines.push(
-    '> A phrasebook for non-technical operators who build real software with AI agents. ' +
-      'Pick what your agent is doing wrong, get the words to say back.',
+    '> A user-friendly guide for non-technical operators mastering Claude Code through pattern recognition, response vocabulary, and system-building practice.',
   );
   lines.push('');
   lines.push('## Reading modes');
   lines.push('');
-  lines.push(`- [The Phrasebook](${base}/phrasebook): symptom-indexed lookup`);
-  lines.push(`- [Start Here](${base}/start-here): five foundational moves for new operators`);
-  lines.push(`- [Where this came from](${base}/about): origin story and verification discipline`);
+  lines.push(`- [Home](${base}/): table of contents and how to use the guide`);
+  lines.push(`- Full concatenated text for AI ingestion: ${base}/llms-full.txt`);
   lines.push('');
-  lines.push(`Full concatenated body: ${base}/llms-full.txt`);
+  lines.push('## Chapters');
   lines.push('');
-  lines.push('## Phrasebook entries');
-  lines.push('');
-  for (const entry of entries) {
-    lines.push(
-      `- [${entry.data.title}](${base}/phrasebook/${entry.id}): ${entry.data.description}`,
-    );
+  for (const meta of CHAPTERS) {
+    if (meta.n === '00') continue;
+    const entry = byN[meta.n];
+    if (!entry) continue;
+    lines.push(`- [§ ${meta.n} · ${entry.data.title}](${base}/${meta.slug}): ${entry.data.description}`);
   }
-  lines.push('');
-  lines.push('## Provenance');
-  lines.push('');
-  lines.push(
-    'Distilled from 1,073 working sessions across 46 projects. Aggregate counts only — ' +
-      'no client, project, or session identifiers are retained. Refreshed monthly.',
-  );
 
   return new Response(lines.join('\n'), {
     status: 200,

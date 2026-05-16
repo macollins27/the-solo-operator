@@ -1,0 +1,19 @@
+---
+interface Props {
+  attribution?: string;
+}
+
+const { attribution } = Astro.props;
+---
+
+<aside class="pq">
+  <div class="text"><slot /></div>
+  {
+    attribution && (
+      <div class="attr">
+        <span class="em-dash">—</span>
+        {attribution}
+      </div>
+    )
+  }
+</aside>

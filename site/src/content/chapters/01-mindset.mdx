@@ -1,0 +1,70 @@
+---
+n: '01'
+title: 'The Mindset'
+short: 'Mindset'
+kicker: '§ 1.0 · Four anchor rules'
+description: 'Four rules every operator enforces before any tool, plugin, or slash command. Role boundary, evidence hierarchy, two-option rule, skepticism default.'
+deck: "Before any tool. Before any plugin. Before any slash command — four rules. They're the anchors everything else descends from. Skip them and the rest collapses. Each rule is the operating contract, not a best practice. If a rule isn't enforced, the discipline isn't being held."
+pubDate: 2026-05-15
+---
+
+import ChapterIntro from '../../components/ChapterIntro.astro';
+import ZoneHeader from '../../components/ZoneHeader.astro';
+import CalloutCard from '../../components/CalloutCard.astro';
+import PullQuote from '../../components/PullQuote.astro';
+import CalloutBox from '../../components/CalloutBox.astro';
+import ChapterPagination from '../../components/ChapterPagination.astro';
+
+<ChapterIntro
+  kicker="§ 1.0 · Four anchor rules"
+  title="The Mindset"
+  deck="Before any tool. Before any plugin. Before any slash command — four rules. They're the anchors everything else descends from. Skip them and the rest collapses. Each rule is the operating contract, not a best practice. If a rule isn't enforced, the discipline isn't being held."
+/>
+
+<ZoneHeader num="§ 1.1 — 1.4" title="The Four Anchor Rules" meta="Enforce all four" />
+
+<div class="details cols-2">
+
+  <CalloutCard circ="1.1" label="RULE 01 · Role Boundary" title="The operator is the product owner. The AI is the engineer.">
+    The operator doesn't pick between technical options. Not libraries, not architectures, not file structures, not framework versions. When the AI offers a menu — <b>"Option A, Option B, your call"</b> — that's the failure mode, not a polite invitation.
+
+    The contract: the AI diagnoses, develops the fix, presents it as <code>"I did X, it caused Y, here's the fix Z. OK to proceed?"</code> and waits for approval. The operator has three legal responses: <b>approve, redirect, push back</b>.
+
+    Picking between technical options is the engineer's job. The moment the operator accepts a menu, the role boundary is gone — and the operator starts making bad calls with less information than the AI has.
+  </CalloutCard>
+
+  <CalloutCard circ="1.2" label="RULE 02 · Evidence Hierarchy" title="Tool output is truth. Chat is hint. AI-authored docs are hearsay.">
+    There's a hierarchy of evidence, and the operator enforces it. <b>The file system and tool output are truth.</b> The operator's typed spec or prototype is authority. The live codebase is current state. Chat narration, handoff summaries, post-compaction descriptions, AI-authored READMEs are hints at best, hearsay at worst.
+
+    When the AI says <code>"I read the file"</code> — demand the <code>file:line</code>. When it says <code>"the tests pass"</code> — demand the exit code. When it cites a spec, verify whether that spec is the operator's typed authority or an AI-generated intermediate.
+
+    <span class="em">Citing an AI-authored doc back at the operator as "your spec" has a name. It's gaslighting, and it's common.</span>
+  </CalloutCard>
+
+  <CalloutCard circ="1.3" label="RULE 03 · Two-Option Rule" title="Two options on every error. No third option exists.">
+    When the AI hits an error, warning, failure, or mid-task discovery, exactly two responses are legal: <b>(1)</b> fix the root cause, or <b>(2)</b> stop and present the finding with a proposed fix, then await approval.
+
+    <b>Silent continuation is the third option. It doesn't exist.</b> <code>"I'll come back to it"</code>, <code>"tracked in TODO"</code>, <code>"out of scope for this layer"</code>, <code>"logged for later"</code>, <code>"doesn't block X"</code>, <code>"noted for tracking"</code> — every one is the third option in costume.
+
+    Every finding gets fixed or surfaced. <b>"Noticed but ignored" isn't a legal disposition.</b>
+  </CalloutCard>
+
+  <CalloutCard circ="1.4" label="RULE 04 · Skepticism Default" title="Assume the claim is wrong until tool output proves it.">
+    The AI will declare <code>"done"</code> before it's done. It will paraphrase the error instead of reading it. It will cite a file it never opened. It will run a test, see it pass on retry, and claim the original failure is resolved without investigating why it failed in the first place.
+
+    The operator's stance: <b>assume the claim is wrong until tool output proves it.</b> For anything that matters — a gate passing, a feature working, a domain rule being enforced — demand <b>five separate verifications from five separate angles</b>. Read the file. Run the command. Check the exit code. Take the screenshot. Quote the line.
+
+    <span class="em">If five converge, the claim is real. If three converge and two diverge, the work isn't done.</span>
+  </CalloutCard>
+
+</div>
+
+<PullQuote attribution="The canonical operator rule">
+  The file system and tool output are truth. Chat narration is not. Memory is a hint, never truth — re-derive facts from source files.
+</PullQuote>
+
+<CalloutBox title="Why these four · why this order" tone="blue">
+  Rule 01 is the role boundary — without it, every other rule fails, because the operator will be the one making technical decisions the AI should have made. Rule 02 is the evidence floor — without it, the operator trusts AI narration over the file system and bakes hallucinations into production. Rule 03 is the closure law — without it, work accumulates as "tracked for later" and never gets done. Rule 04 is the verification floor — without it, "done" means "the AI said so." <b>Every escape move catalogued in the next chapter is a real-time violation of one of these four.</b> The cure is recognition.
+</CalloutBox>
+
+<ChapterPagination currentN="01" />

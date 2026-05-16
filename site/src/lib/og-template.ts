@@ -49,11 +49,10 @@ export interface OgOptions {
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-const SITE_NAME = "The Solo Operator's Manual";
-const TAGLINE = 'A phrasebook for non-technical operators who ship real software with AI agents.';
+const SITE_NAME = 'How to Use Claude Code';
+const TAGLINE = 'A guide for non-technical operators mastering Claude Code.';
 
 const COLOR_BG = '#0a0d10';
-const COLOR_PANEL = '#0e1216';
 const COLOR_LINE = '#1b2027';
 const COLOR_BLUE = '#4a8ce8';
 const COLOR_FG = '#e7eef6';
@@ -196,20 +195,6 @@ export async function renderOg(opts: OgOptions): Promise<Uint8Array> {
                       },
                     },
                   ],
-                },
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    fontSize: 16,
-                    color: COLOR_MUTED,
-                    display: 'flex',
-                    backgroundColor: COLOR_PANEL,
-                    border: `1px solid ${COLOR_LINE}`,
-                    padding: '10px 16px',
-                  },
-                  children: 'Living document',
                 },
               },
             ],

@@ -1,0 +1,15 @@
+---
+interface Props {
+  num: string;
+  title: string;
+  meta?: string;
+}
+
+const { num, title, meta } = Astro.props;
+---
+
+<div class="zone-hd">
+  <span class="num">{num}</span>
+  <span class="ttl">{title}</span>
+  {meta && <span class="meta">{meta}</span>}
+</div>

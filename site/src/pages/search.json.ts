@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { CATEGORIES, type CategoryKey } from '../lib/categories';
+import { CHAPTERS } from '../lib/chapters';
 
 interface SearchItem {
-  section: 'phrasebook' | 'foundations' | 'pages';
+  section: 'chapters' | 'pages';
   label: string;
   url: string;
   kicker: string;
@@ -11,29 +11,23 @@ interface SearchItem {
 }
 
 export const GET: APIRoute = async () => {
-  const phrasebook: CollectionEntry<'phrasebook'>[] = await getCollection('phrasebook');
-  const foundations: CollectionEntry<'foundations'>[] = await getCollection('foundations');
+  const chapters: CollectionEntry<'chapters'>[] = await getCollection('chapters');
+  const byN: Record<string, CollectionEntry<'chapters'>> = Object.fromEntries(
+    chapters.map((c) => [c.data.n, c]),
+  );
 
   const items: SearchItem[] = [];
 
-  for (const entry of phrasebook) {
-    const cat = CATEGORIES[entry.data.category as CategoryKey];
+  for (const meta of CHAPTERS) {
+    if (meta.n === '00') continue;
+    const entry = byN[meta.n];
+    if (!entry) continue;
     items.push({
-      section: 'phrasebook',
-      label: entry.data.quote,
-      url: `/phrasebook/${entry.id}`,
-      kicker: cat.number,
-      description: cat.label,
-    });
-  }
-
-  for (const move of foundations.sort((a, b) => a.data.n.localeCompare(b.data.n))) {
-    items.push({
-      section: 'foundations',
-      label: move.data.title,
-      url: `/start-here/${move.id}`,
-      kicker: move.data.n.replace('MOVE / ', ''),
-      description: move.data.summary,
+      section: 'chapters',
+      label: entry.data.title,
+      url: `/${meta.slug}`,
+      kicker: `Ch ${meta.n}`,
+      description: entry.data.description,
     });
   }
 
@@ -43,28 +37,14 @@ export const GET: APIRoute = async () => {
       label: 'Home',
       url: '/',
       kicker: 'PAGE',
-      description: 'When your agent misbehaves, say this.',
+      description: 'Overview, contents, how to use the guide.',
     },
     {
       section: 'pages',
-      label: 'The Phrasebook',
-      url: '/phrasebook',
+      label: 'llms-full.txt',
+      url: '/llms-full.txt',
       kicker: 'PAGE',
-      description: 'What is your agent doing right now?',
-    },
-    {
-      section: 'pages',
-      label: 'Start Here',
-      url: '/start-here',
-      kicker: 'PAGE',
-      description: 'Five foundational moves before you need the phrasebook.',
-    },
-    {
-      section: 'pages',
-      label: 'About',
-      url: '/about',
-      kicker: 'PAGE',
-      description: 'Where this came from.',
+      description: 'Single-paste ingestion of the entire guide for AI sessions.',
     },
   ];
 
